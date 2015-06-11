@@ -33,4 +33,5 @@ dependencies {
         transitive = true
     }
     compile 'com.google.maps.android:android-maps-utils:0.3+'
+    compile 'com.appyvet:materialrangebar:1.0'
 }
