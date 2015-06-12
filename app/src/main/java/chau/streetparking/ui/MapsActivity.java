@@ -1,14 +1,16 @@
 package chau.streetparking.ui;
 
-import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.SeekBar;
 
 import com.appyvet.rangebar.RangeBar;
 import com.google.android.gms.common.ConnectionResult;
@@ -22,7 +24,6 @@ import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterManager;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
@@ -43,9 +44,13 @@ public class MapsActivity extends AppCompatActivity {
     private static final String TAG = "MapsActivity";
 
     private GoogleApiClient mGoogleApiClient;
-    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    private GoogleMap googleMap; // Might be null if Google Play services APK is not available.
     private Drawer drawer;
     private MapLayout mapLayout;
+
+    private Circle circle;  // Radius circle for parking
+    private Geocoder geocoder;
+    private TaskGetAddress taskGetAddress;
 
     // For testing purpose
     private List<SpotMarker> testList = new ArrayList<>();
@@ -55,6 +60,7 @@ public class MapsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         mapLayout = (MapLayout) findViewById(R.id.map_layout);
+        geocoder = new Geocoder(this);
 
         setupTestList();
         setUpMapIfNeeded();
@@ -73,8 +79,17 @@ public class MapsActivity extends AppCompatActivity {
         setUpMapIfNeeded();
     }
 
+    /** Called when "REQUEST" button is clicked */
     public void onRequestClicked(View v) {
+        if (googleMap != null) {
+            googleMap.setPadding(0, dpToPx(48), 0, 0);
+
+            LatLng latLng = googleMap.getCameraPosition().target;
+            new TaskGetAddress().execute(latLng);
+        }
+
         mapLayout.showNext();
+        enableCircle();
     }
 
     public void onAddClicked(View v) {
@@ -84,13 +99,16 @@ public class MapsActivity extends AppCompatActivity {
     }
 
     public void onCancelClicked(View v) {
+        if (googleMap != null)
+            googleMap.setPadding(0, 0, 0, 0);
         mapLayout.cancel();
+        disableCircle();
     }
 
     /**
      * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
      * installed) and the map has not already been instantiated.. This will ensure that we only ever
-     * call {@link #setUpMap()} once when {@link #mMap} is not null.
+     * call {@link #setUpMap()} once when {@link #googleMap} is not null.
      * <p/>
      * If it isn't installed {@link SupportMapFragment} (and
      * {@link com.google.android.gms.maps.MapView MapView}) will show a prompt for the user to
@@ -104,12 +122,12 @@ public class MapsActivity extends AppCompatActivity {
      */
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
-        if (mMap == null) {
+        if (googleMap == null) {
             // Try to obtain the map from the SupportMapFragment.
-            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
+            googleMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
                     .getMap();
             // Check if we were successful in obtaining the map.
-            if (mMap != null) {
+            if (googleMap != null) {
                 setUpMap();
             }
         }
@@ -119,16 +137,47 @@ public class MapsActivity extends AppCompatActivity {
      * This is where we can add markers or lines, add listeners or move the camera. In this case, we
      * just add a marker near Africa.
      * <p/>
-     * This should only be called once and when we are sure that {@link #mMap} is not null.
+     * This should only be called once and when we are sure that {@link #googleMap} is not null.
      */
     private void setUpMap() {
         // Build the client to show current location
         buildGoogleApiClient();
-        mMap.setMyLocationEnabled(true);
+        googleMap.setMyLocationEnabled(true);
 
-        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+        mapLayout.setSeekBarListener(new RangeBar.OnRangeBarChangeListener() {
             @Override
-            public void onMapClick(LatLng latLng) {
+            public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex, int rightPinIndex,
+                                              String leftPinValue, String rightPinValue) {
+                if (circle != null) {
+                    circle.setRadius(Double.parseDouble(rightPinValue) * 0.3048); // ft to meter
+                }
+            }
+        });
+
+        googleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+            @Override
+            public void onCameraChange(CameraPosition cameraPosition) {
+                LatLng latLng = cameraPosition.target;
+
+                if (circle != null) {
+                    circle.setCenter(latLng);
+                }
+
+                mapLayout.closeCurtain();
+
+                if (mapLayout.getCurrentLayout() == MapLayout.LAYOUT_SEND_CANCEL) {
+                    try {
+                        if (taskGetAddress != null && taskGetAddress.isLoading) {
+                            taskGetAddress.cancel(true);
+                        }
+
+                        taskGetAddress = new TaskGetAddress();
+                        taskGetAddress.execute(latLng);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         });
 
@@ -212,41 +261,35 @@ public class MapsActivity extends AppCompatActivity {
     }
 
     private void showMyLocation(LatLng latLng) {
-        if (latLng != null && mMap != null) {
+        if (latLng != null && googleMap != null) {
 
             CameraPosition cameraPosition = new CameraPosition.Builder()
                     .target(latLng)             // Sets the center of the map to location user
-                    .zoom(17)                   // Sets the zoom
+                    .zoom(16)                   // Sets the zoom
                     .bearing(0)                 // Sets the orientation of the camera to north
                     .build();                   // Creates a CameraPosition from the builder
 
-            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        }
+    }
 
-            final Circle circle = mMap.addCircle(new CircleOptions()
-                    .center(latLng)
-                    .radius(100)
-                    .strokeColor(0xffff0000)
-                    .fillColor(0x44ff0000));
+    private void enableCircle() {
+        if (googleMap != null) {
+            LatLng currentCamPosition = googleMap.getCameraPosition().target;
+                circle = googleMap.addCircle(new CircleOptions()
+                        .center(currentCamPosition)
+                        .radius(100)
+                        .strokeColor(0xffff0000)
+                        .fillColor(0x44ff0000));
 
-            circle.setStrokeWidth(3.0f);
+                circle.setStrokeWidth(3.0f);
+        }
+    }
 
-            mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
-                @Override
-                public void onCameraChange(CameraPosition cameraPosition) {
-                    circle.setCenter(cameraPosition.target);
-                    if (mapLayout.isCurtainOpen()) {
-                        mapLayout.hideCurtainView();
-                    }
-                }
-            });
-
-            mapLayout.setSeekBarListener(new RangeBar.OnRangeBarChangeListener() {
-                @Override
-                public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex, int rightPinIndex,
-                                                  String leftPinValue, String rightPinValue) {
-                    circle.setRadius(Double.parseDouble(rightPinValue));
-                }
-            });
+    private void disableCircle() {
+        if (googleMap != null && circle != null) {
+            circle.remove();
+            circle = null;
         }
     }
 
@@ -256,12 +299,12 @@ public class MapsActivity extends AppCompatActivity {
 
         // Initialize the manager with the context and the map.
         // (Activity extends context, so we can pass 'this' in the constructor.)
-        mClusterManager = new ClusterManager<>(this, mMap);
+        mClusterManager = new ClusterManager<>(this, googleMap);
 
         // Point the map's listeners at the listeners implemented by the cluster
         // manager.
-        mMap.setOnCameraChangeListener(mClusterManager);
-        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+//        googleMap.setOnCameraChangeListener(mClusterManager);
+        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
                 marker.setTitle("15 mins ago");
@@ -286,5 +329,49 @@ public class MapsActivity extends AppCompatActivity {
         testList.add(new SpotMarker(38.96109242408757, -77.0695873349905));
         testList.add(new SpotMarker(38.96222516395402, -77.07205329090357));
         testList.add(new SpotMarker(38.96110180934844, -77.0732294395566));
+    }
+
+    private int dpToPx(int dp) {
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        return (int)((dp * displayMetrics.density) + 0.5);
+    }
+
+    private class TaskGetAddress extends AsyncTask<LatLng, Void, String> {
+        private boolean isLoading = false;
+
+        @Override
+        protected void onPreExecute() {
+            isLoading = true;
+        }
+
+        @Override
+        protected String doInBackground(LatLng... params) {
+            try {
+                List<Address> matches = geocoder.getFromLocation(params[0].latitude, params[0].longitude, 1);
+                Address bestMatch = (matches.isEmpty() ? null : matches.get(0));
+
+                if (bestMatch != null) {
+                    return bestMatch.getAddressLine(0);
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            try {
+                isLoading = false;
+
+                if (!isCancelled() && s != null && !s.isEmpty()) {
+                    mapLayout.setLocationText(s);
+                }
+            } catch (Exception e) {}
+            finally {
+            }
+        }
     }
 }

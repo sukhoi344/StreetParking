@@ -11,6 +11,53 @@
         android:layout_height="match_parent"
         tools:context=".MapsActivity" />
 
+    <!-- Location layout  -->
+    <RelativeLayout
+        android:id="@+id/location_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="@drawable/parking_location_selector"
+        android:clickable="true"
+        android:visibility="invisible">
+
+    <ImageView
+        android:id="@+id/search_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:src="@drawable/ic_action_search"/>
+
+        <TextView
+            android:id="@+id/title1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentTop="true"
+            android:text="PARKING LOCATION"
+            android:textStyle="bold"
+            android:textColor="@color/primary"
+            android:textSize="12sp"/>
+
+        <TextView
+            android:id="@+id/tv_location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="40dp"
+            android:layout_marginBottom="5dp"
+            android:gravity="center"
+            android:layout_below="@id/title1"
+            android:layout_toRightOf="@id/search_icon"
+            android:singleLine="true"
+            android:textColor="@android:color/black"
+            android:text="4849 Connecticut ave NW"/>
+
+
+    </RelativeLayout>
+
     <!--  REQUEST and ADD buttons layout -->
     <LinearLayout
         android:id="@+id/request_add_layout"
@@ -43,8 +90,7 @@
             android:text="Add" />
     </LinearLayout>
 
-    <chau.streetparking.ui.curtain.CurtainView
-        xmlns:curtainView="http://schemas.android.com/apk/res-auto"
+    <chau.streetparking.ui.curtain.CurtainView xmlns:curtainView="http://schemas.android.com/apk/res-auto"
         android:id="@+id/curtain_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -77,9 +123,9 @@
                     android:layout_marginRight="2dp"
                     android:layout_marginTop="4dp"
                     android:layout_weight="1"
+                    android:enabled="false"
                     android:onClick="onSendRequestClicked"
-                    android:text="SEND REQUEST"
-                    android:enabled="false"/>
+                    android:text="SEND REQUEST" />
 
                 <Button
                     android:layout_width="0dp"
@@ -96,27 +142,26 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:layout_marginLeft="4dp"
-                android:layout_marginRight="4dp">
+                android:layout_marginRight="4dp"
+                android:orientation="horizontal">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="33dp"
-                    android:text="Radius:"
-                    android:textColor="@android:color/black"/>
+                    android:text="Radius (ft):"
+                    android:textColor="@android:color/black" />
 
-                <com.appyvet.rangebar.RangeBar
-                    xmlns:custom="http://schemas.android.com/apk/res-auto"
+                <com.appyvet.rangebar.RangeBar xmlns:custom="http://schemas.android.com/apk/res-auto"
                     android:id="@+id/seek_bar"
                     android:layout_width="match_parent"
                     android:layout_height="72dp"
-                    custom:tickStart="0"
-                    custom:tickInterval="10"
-                    custom:tickEnd="1000"
+                    android:layout_marginLeft="4dp"
                     custom:rangeBar="false"
-                    android:layout_marginLeft="4dp"/>
+                    custom:tickEnd="3000"
+                    custom:tickInterval="30"
+                    custom:tickStart="150" />
             </LinearLayout>
 
             <!-- Select date and time layout -->
@@ -126,36 +171,57 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="4dp"
                 android:layout_marginRight="4dp"
-                android:orientation="vertical">
+                android:orientation="horizontal">
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="From:"
-                    android:clickable="true" />
+                    android:layout_weight="1"
+                    android:layout_marginRight="2dp"
+                    android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/from"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="10dp"
-                    android:textColor="#44000000"
-                    style="@android:style/Widget.Holo.Light.Spinner" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:text="From:"
+                        android:textColor="@android:color/black"/>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="15dp"
-                    android:text="To:"
-                    android:clickable="true" />
+                    <TextView
+                        android:id="@+id/from"
+                        style="@android:style/Widget.Holo.Light.Spinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="10dp"
+                        android:textColor="#44000000"
+                        android:text="Tap to select"/>
+                </LinearLayout>
 
-                <TextView
-                    android:id="@+id/to"
-                    android:layout_width="match_parent"
+                <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:paddingLeft="10dp"
-                    android:textColor="#44000000"
-                    style="@android:style/Widget.Holo.Light.Spinner" />
+                    android:layout_weight="1"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginBottom="5dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:text="To:"
+                        android:textColor="@android:color/black"/>
+
+                    <TextView
+                        android:id="@+id/to"
+                        style="@android:style/Widget.Holo.Light.Spinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="10dp"
+                        android:textColor="#44000000"
+                        android:text="Tap to select"/>
+
+                </LinearLayout>
             </LinearLayout>
 
         </LinearLayout>
