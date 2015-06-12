@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.SeekBar;
 
+import com.appyvet.rangebar.RangeBar;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -79,7 +80,7 @@ public class MapsActivity extends AppCompatActivity {
     public void onAddClicked(View v) {
     }
 
-    public void onScheduleClicked(View v) {
+    public void onSendRequestClicked(View v) {
 
     }
 
@@ -228,6 +229,8 @@ public class MapsActivity extends AppCompatActivity {
                     .strokeColor(0xffff0000)
                     .fillColor(0x44ff0000));
 
+            circle.setStrokeWidth(3.0f);
+
             mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
                 @Override
                 public void onCameraChange(CameraPosition cameraPosition) {
@@ -235,18 +238,11 @@ public class MapsActivity extends AppCompatActivity {
                 }
             });
 
-            mapLayout.setSeekBarListener(new SeekBar.OnSeekBarChangeListener() {
+            mapLayout.setSeekBarListener(new RangeBar.OnRangeBarChangeListener() {
                 @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    circle.setRadius(progress);
-                }
-
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
-                }
-
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
+                public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex, int rightPinIndex,
+                                                  String leftPinValue, String rightPinValue) {
+                    circle.setRadius(Double.parseDouble(rightPinValue));
                 }
             });
         }

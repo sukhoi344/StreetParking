@@ -16,87 +16,169 @@
         android:id="@+id/request_add_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_gravity="bottom"
-        android:background="#ffffff">
-
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginLeft="4dp"
-            android:layout_marginBottom="4dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginRight="2dp"
-            android:text="Request"
-            android:onClick="onRequestClicked"/>
-
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginLeft="2dp"
-            android:layout_marginBottom="4dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginRight="4dp"
-            android:text="Add"
-            android:onClick="onAddClicked"/>
-    </LinearLayout>
-
-    <!--  SCHEDULE and CANCEL buttons layout -->
-    <LinearLayout
-        android:id="@+id/schedule_cancel_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_gravity="bottom"
         android:background="#ffffff"
-        android:visibility="gone">
+        android:orientation="horizontal">
 
         <Button
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_marginBottom="4dp"
             android:layout_marginLeft="4dp"
-            android:layout_marginBottom="4dp"
-            android:layout_marginTop="4dp"
             android:layout_marginRight="2dp"
-            android:text="SCHEDULE"
-            android:onClick="onScheduleClicked"/>
+            android:layout_marginTop="4dp"
+            android:layout_weight="1"
+            android:onClick="onRequestClicked"
+            android:text="Request" />
 
         <Button
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginLeft="2dp"
             android:layout_marginBottom="4dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginLeft="2dp"
             android:layout_marginRight="4dp"
-            android:text="CANCEL"
-            android:onClick="onCancelClicked"/>
+            android:layout_marginTop="4dp"
+            android:layout_weight="1"
+            android:onClick="onAddClicked"
+            android:text="Add" />
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/seek_bar_layout"
-        android:layout_width="30dp"
+    <chau.streetparking.ui.curtain.CurtainView
+        xmlns:curtainView="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/curtain_view"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_gravity="center_vertical|right"
-        android:visibility="gone">
+        android:layout_gravity="bottom"
+        android:visibility="gone"
+        curtainView:curtainGravity="bottom"
+        curtainView:curtainStatus="closed"
+        curtainView:fixedValue="56dp"
+        curtainView:reboundMode="half"
+        curtainView:scrollDuration="1300">
 
-        <chau.streetparking.ui.VerticalSeekBar
-            android:id="@+id/seek_bar"
-            android:layout_width="wrap_content"
-            android:layout_height="300dp"
-            android:max="1000"
-            android:progress="100"/>
 
-        <TextView
-            android:id="@+id/range_indicator"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="10 ft"/>
-    </LinearLayout>
+            android:background="#ffffff"
+            android:orientation="vertical">
+
+            <!-- Sent Request & Cancel Layout-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#ffffff"
+                android:orientation="horizontal">
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginRight="2dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_weight="1"
+                    android:onClick="onSendRequestClicked"
+                    android:text="SEND REQUSET" />
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginRight="4dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_weight="1"
+                    android:onClick="onCancelClicked"
+                    android:text="CANCEL" />
+            </LinearLayout>
+
+            <!--  SeekBar layout -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_margin="4dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="-10dp"
+                    android:text="Radius:"
+                    android:textColor="@android:color/black"/>
+
+                <com.appyvet.rangebar.RangeBar
+                    xmlns:custom="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/seek_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="72dp"
+                    custom:tickStart="0"
+                    custom:tickInterval="100"
+                    custom:tickEnd="1000"
+                    custom:rangeBar="false"
+                    android:layout_marginLeft="4dp"/>
+
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+    </chau.streetparking.ui.curtain.CurtainView>
+
+    <!--<LinearLayout-->
+    <!--android:id="@+id/schedule_cancel_layout"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="100dp"-->
+    <!--android:orientation="horizontal"-->
+    <!--android:layout_gravity="bottom"-->
+    <!--android:background="#ffffff"-->
+    <!--android:visibility="gone">-->
+
+    <!--<Button-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_weight="1"-->
+    <!--android:layout_marginLeft="4dp"-->
+    <!--android:layout_marginBottom="4dp"-->
+    <!--android:layout_marginTop="4dp"-->
+    <!--android:layout_marginRight="2dp"-->
+    <!--android:text="SCHEDULE"-->
+    <!--android:onClick="onScheduleClicked"/>-->
+
+    <!--<Button-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_weight="1"-->
+    <!--android:layout_marginLeft="2dp"-->
+    <!--android:layout_marginBottom="4dp"-->
+    <!--android:layout_marginTop="4dp"-->
+    <!--android:layout_marginRight="4dp"-->
+    <!--android:text="CANCEL"-->
+    <!--android:onClick="onCancelClicked"/>-->
+    <!--</LinearLayout>-->
+
+    <!--<LinearLayout-->
+        <!--android:id="@+id/seek_bar_layout"-->
+        <!--android:layout_width="30dp"-->
+        <!--android:layout_height="wrap_crtical"-->
+        <!--android:layout_gravity="centeration="veontent"-->
+        <!--android:orient_vertical|right"-->
+        <!--android:visibility="gone">-->
+
+        <!--<chau.streetparking.ui.VerticalSeekBar-->
+            <!--android:id="@+id/seek_bar"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="300dp"-->
+            <!--android:max="1000"-->
+            <!--android:progress="100" />-->
+
+        <!--<TextView-->
+            <!--android:id="@+id/range_indicator"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="10 ft" />-->
+    <!--</LinearLayout>-->
 
 
 </FrameLayout>
