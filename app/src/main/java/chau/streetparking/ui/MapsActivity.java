@@ -81,7 +81,6 @@ public class MapsActivity extends AppCompatActivity {
     }
 
     public void onSendRequestClicked(View v) {
-
     }
 
     public void onCancelClicked(View v) {
@@ -235,6 +234,9 @@ public class MapsActivity extends AppCompatActivity {
                 @Override
                 public void onCameraChange(CameraPosition cameraPosition) {
                     circle.setCenter(cameraPosition.target);
+                    if (mapLayout.isCurtainOpen()) {
+                        mapLayout.hideCurtainView();
+                    }
                 }
             });
 

@@ -49,13 +49,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:visibility="gone"
+        android:visibility="invisible"
         curtainView:curtainGravity="bottom"
         curtainView:curtainStatus="closed"
         curtainView:fixedValue="56dp"
         curtainView:reboundMode="half"
-        curtainView:scrollDuration="1300">
-
+        curtainView:scrollDuration="500">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -71,20 +70,20 @@
                 android:orientation="horizontal">
 
                 <Button
+                    android:id="@+id/btn_send_request"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
                     android:layout_marginLeft="4dp"
                     android:layout_marginRight="2dp"
                     android:layout_marginTop="4dp"
                     android:layout_weight="1"
                     android:onClick="onSendRequestClicked"
-                    android:text="SEND REQUSET" />
+                    android:text="SEND REQUEST"
+                    android:enabled="false"/>
 
                 <Button
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
                     android:layout_marginLeft="2dp"
                     android:layout_marginRight="4dp"
                     android:layout_marginTop="4dp"
@@ -98,12 +97,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_margin="4dp">
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="-10dp"
+                    android:layout_marginTop="33dp"
                     android:text="Radius:"
                     android:textColor="@android:color/black"/>
 
@@ -113,72 +113,51 @@
                     android:layout_width="match_parent"
                     android:layout_height="72dp"
                     custom:tickStart="0"
-                    custom:tickInterval="100"
+                    custom:tickInterval="10"
                     custom:tickEnd="1000"
                     custom:rangeBar="false"
                     android:layout_marginLeft="4dp"/>
+            </LinearLayout>
 
+            <!-- Select date and time layout -->
+            <LinearLayout
+                android:id="@+id/date_time_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
+                android:orientation="vertical">
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="From:"
+                    android:clickable="true" />
+
+                <TextView
+                    android:id="@+id/from"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10dp"
+                    android:textColor="#44000000"
+                    style="@android:style/Widget.Holo.Light.Spinner" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:text="To:"
+                    android:clickable="true" />
+
+                <TextView
+                    android:id="@+id/to"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10dp"
+                    android:textColor="#44000000"
+                    style="@android:style/Widget.Holo.Light.Spinner" />
             </LinearLayout>
 
         </LinearLayout>
-
-
     </chau.streetparking.ui.curtain.CurtainView>
-
-    <!--<LinearLayout-->
-    <!--android:id="@+id/schedule_cancel_layout"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="100dp"-->
-    <!--android:orientation="horizontal"-->
-    <!--android:layout_gravity="bottom"-->
-    <!--android:background="#ffffff"-->
-    <!--android:visibility="gone">-->
-
-    <!--<Button-->
-    <!--android:layout_width="0dp"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_weight="1"-->
-    <!--android:layout_marginLeft="4dp"-->
-    <!--android:layout_marginBottom="4dp"-->
-    <!--android:layout_marginTop="4dp"-->
-    <!--android:layout_marginRight="2dp"-->
-    <!--android:text="SCHEDULE"-->
-    <!--android:onClick="onScheduleClicked"/>-->
-
-    <!--<Button-->
-    <!--android:layout_width="0dp"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_weight="1"-->
-    <!--android:layout_marginLeft="2dp"-->
-    <!--android:layout_marginBottom="4dp"-->
-    <!--android:layout_marginTop="4dp"-->
-    <!--android:layout_marginRight="4dp"-->
-    <!--android:text="CANCEL"-->
-    <!--android:onClick="onCancelClicked"/>-->
-    <!--</LinearLayout>-->
-
-    <!--<LinearLayout-->
-        <!--android:id="@+id/seek_bar_layout"-->
-        <!--android:layout_width="30dp"-->
-        <!--android:layout_height="wrap_crtical"-->
-        <!--android:layout_gravity="centeration="veontent"-->
-        <!--android:orient_vertical|right"-->
-        <!--android:visibility="gone">-->
-
-        <!--<chau.streetparking.ui.VerticalSeekBar-->
-            <!--android:id="@+id/seek_bar"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="300dp"-->
-            <!--android:max="1000"-->
-            <!--android:progress="100" />-->
-
-        <!--<TextView-->
-            <!--android:id="@+id/range_indicator"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:text="10 ft" />-->
-    <!--</LinearLayout>-->
-
-
 </FrameLayout>

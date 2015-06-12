@@ -6,4 +6,8 @@
     <!-- status bar color -->
     <color name="primary_dark">#005827</color>
 
+    <!-- Date and time picker color -->
+    <color name="mdtp_accent_color">#018509</color>
+    <color name="mdtp_accent_color_dark">#005827</color>
+
 </resources>

@@ -5,9 +5,9 @@ import android.view.animation.Interpolator;
 
 public interface ICurtainViewBase {
 
-    public static final int DEFAULT_SCROLL_DURATION = 1000;
+    int DEFAULT_SCROLL_DURATION = 1000;
 
-    public static final float FIXED_RATE = (float) 1 / 3;
+    float FIXED_RATE = (float) 1 / 3;
 
     /**
      * @return CurtainGravity describe the side of a CurtainView that to be fixed,
@@ -17,50 +17,50 @@ public interface ICurtainViewBase {
      * right side.
      * Be sure to distinguish with the attribute:"android:layout_gravity".
      */
-    public CurtainGravity getCurtainGravity();
+    CurtainGravity getCurtainGravity();
 
     /**
      * @return The Status of CurtainView,can be OPENED or CLOSED
      */
-    public CurtainStatus getCurtainStatus();
+    CurtainStatus getCurtainStatus();
 
     /**
      * @return The ReboundMode of CurtainView,which determines where the CurtainView move to when
      * you lift your finger after certain movement.
      */
-    public ReboundMode getReboundMode();
+    ReboundMode getReboundMode();
 
     /**
      * @return The minimum width or height that the CurtainView appears on
      * screen.
      */
-    public int getFixedValue();
+    int getFixedValue();
 
     /**
      * @return The ceiling movement of a CurtainView.
      */
-    public int getMaxFloatingValue();
+    int getMaxFloatingValue();
 
     /**
      * @return Can be the width or height of the CurtainView,depends on current CurtainGravity.
      * And : fixedValue + maxFloatingValue = totalValue.
      */
-    public int getTotalValue();
+    int getTotalValue();
 
     /**
      * @return The scroll duration that takes the CurtainView moving to destination when you lift
      * your finger.
      */
-    public int getScrollDuration();
+    int getScrollDuration();
 
     /**
      * @return Whether the CurtainView is enabled to be pulled.
      */
-    public boolean permitsPull();
+    boolean permitsPull();
 
-    public boolean isPulling();
+    boolean isPulling();
 
-    public boolean isAutoScrolling();
+    boolean isAutoScrolling();
 
     /**
      * Note that:
@@ -72,13 +72,13 @@ public interface ICurtainViewBase {
      * @param fixedValue     If fixedValue <=0,a default value (see also:FIXED_RATE) will
      *                       be set.
      */
-    public void setCurtainGravityAndFixedValue(CurtainGravity curtainGravity, int fixedValue);
+    void setCurtainGravityAndFixedValue(CurtainGravity curtainGravity, int fixedValue);
 
-    public void setCurtainStatus(CurtainStatus curtainStatus);
+    void setCurtainStatus(CurtainStatus curtainStatus);
 
-    public void setReboundMode(ReboundMode reboundMode);
+    void setReboundMode(ReboundMode reboundMode);
 
-    public void setScrollDuration(int scrollDuration);
+    void setScrollDuration(int scrollDuration);
 
     /**
      * Note that:
@@ -89,13 +89,13 @@ public interface ICurtainViewBase {
      * @param interpolator Interpolator for the Scroller which process the movement after you
      *                     lift your finger off the CurtainView.
      */
-    public void setScrollerInterpolator(Interpolator interpolator);
+    void setScrollerInterpolator(Interpolator interpolator);
 
-    public void setOnPullingListener(OnPullingListener onPullingListener);
+    void setOnPullingListener(OnPullingListener onPullingListener);
 
-    public void setAutoScrollingListener(AutoScrollingListener autoScrollingListener);
+    void setAutoScrollingListener(AutoScrollingListener autoScrollingListener);
 
-    public static enum CurtainGravity {
+    enum CurtainGravity {
 
         LEFT(0x0),
 
@@ -130,7 +130,7 @@ public interface ICurtainViewBase {
 
     }
 
-    public static enum CurtainStatus {
+    enum CurtainStatus {
 
         OPENED(0x0),
 
@@ -160,7 +160,7 @@ public interface ICurtainViewBase {
         }
     }
 
-    public static enum ReboundMode {
+    enum ReboundMode {
 
         ALWAYS_BACK(0x0),
 
@@ -193,8 +193,8 @@ public interface ICurtainViewBase {
     /**
      * A monitor with the pulling event
      */
-    public interface OnPullingListener {
-        public void onPulling(int rawStart, int diff, CurtainGravity cGravity,
+    interface OnPullingListener {
+        void onPulling(int rawStart, int diff, CurtainGravity cGravity,
                               CurtainStatus cStatus);
     }
 
@@ -202,9 +202,9 @@ public interface ICurtainViewBase {
      * When the finger lift off the CurtainView,An auto scrolling will happens.
      * See also:ReboundMode
      */
-    public interface AutoScrollingListener {
-        public void onScrolling(int currValue, int currVelocity, int startValue, int finalValue);
+    interface AutoScrollingListener {
+        void onScrolling(int currValue, int currVelocity, int startValue, int finalValue);
 
-        public void onScrollFinished();
+        void onScrollFinished();
     }
 }
