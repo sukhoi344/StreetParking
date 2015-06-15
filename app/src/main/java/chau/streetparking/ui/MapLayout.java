@@ -178,6 +178,12 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         return requestAddLayout.getVisibility() == View.VISIBLE? LAYOUT_REQUEST_ADD : LAYOUT_SEND_CANCEL;
     }
 
+    public void setLocationLayoutOnClick(OnClickListener onClickListener) {
+        if (locationLayout != null && onClickListener != null) {
+            locationLayout.setOnClickListener(onClickListener);
+        }
+    }
+
     private void init(Context context) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.include_map_layout, this, true);

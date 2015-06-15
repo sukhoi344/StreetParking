@@ -1,5 +1,6 @@
 package chau.streetparking.ui;
 
+import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -39,9 +40,11 @@ import java.util.List;
 
 import chau.streetparking.R;
 import chau.streetparking.datamodels.SpotMarker;
+import chau.streetparking.ui.curtain.SearchLocationActivity;
 
 public class MapsActivity extends AppCompatActivity {
     private static final String TAG = "MapsActivity";
+    private static final int REQUEST_CODE_SEARCH = 1;
 
     private GoogleApiClient mGoogleApiClient;
     private GoogleMap googleMap; // Might be null if Google Play services APK is not available.
@@ -77,6 +80,21 @@ public class MapsActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         setUpMapIfNeeded();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode != RESULT_OK)
+            return;
+
+        if (requestCode == REQUEST_CODE_SEARCH) {
+            Address address = data.getParcelableExtra(SearchLocationActivity.EXTRA_ADDRESS);
+            if (address != null && address.hasLatitude() && address.hasLatitude()) {
+                LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                moveCamera(latLng);
+                updateLocationAddress(latLng);
+            }
+        }
     }
 
     /** Called when "REQUEST" button is clicked */
@@ -154,6 +172,14 @@ public class MapsActivity extends AppCompatActivity {
             }
         });
 
+        mapLayout.setLocationLayoutOnClick(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MapsActivity.this, SearchLocationActivity.class);
+                startActivityForResult(intent, REQUEST_CODE_SEARCH);
+            }
+        });
+
         googleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition cameraPosition) {
@@ -166,22 +192,23 @@ public class MapsActivity extends AppCompatActivity {
                 mapLayout.closeCurtain();
 
                 if (mapLayout.getCurrentLayout() == MapLayout.LAYOUT_SEND_CANCEL) {
-                    try {
-                        if (taskGetAddress != null && taskGetAddress.isLoading) {
-                            taskGetAddress.cancel(true);
-                        }
-
-                        taskGetAddress = new TaskGetAddress();
-                        taskGetAddress.execute(latLng);
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    updateLocationAddress(latLng);
                 }
             }
         });
 
         setUpClusterer();
+    }
+
+    private void updateLocationAddress(LatLng latLng) {
+        try {
+            if (latLng != null && taskGetAddress != null && taskGetAddress.isLoading) {
+                taskGetAddress.cancel(true);
+            }
+
+            taskGetAddress = new TaskGetAddress();
+            taskGetAddress.execute(latLng);
+        } catch (Exception e) {}
     }
 
     private void setupDrawer(Toolbar toolbar) {
@@ -261,6 +288,10 @@ public class MapsActivity extends AppCompatActivity {
     }
 
     private void showMyLocation(LatLng latLng) {
+        moveCamera(latLng);
+    }
+
+    private void moveCamera(LatLng latLng) {
         if (latLng != null && googleMap != null) {
 
             CameraPosition cameraPosition = new CameraPosition.Builder()
