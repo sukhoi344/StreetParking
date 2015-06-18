@@ -247,8 +247,15 @@ public class MapsActivity extends AppCompatActivity {
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
-                    public boolean onItemClick(AdapterView<?> adapterView, View view, int i, long l,
+                    public boolean onItemClick(AdapterView<?> adapterView, View view, int position, long id,
                                                IDrawerItem iDrawerItem) {
+                        switch (position) {
+                            case 0:
+                                Intent intent = new Intent(MapsActivity.this, ProfileActivity.class);
+                                startActivity(intent);
+                                return true;
+
+                        }
                         return false;
                     }
                 })
