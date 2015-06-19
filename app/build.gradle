@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "chau.streetparking"
-        minSdkVersion 15
+        minSdkVersion 19
         targetSdkVersion 22
         versionCode 1
         versionName "1.0"
@@ -36,4 +36,5 @@ dependencies {
     compile 'com.google.maps.android:android-maps-utils:+'
     compile 'com.appyvet:materialrangebar:+'
     compile 'com.wdullaer:materialdatetimepicker:+'
+    compile 'com.readystatesoftware.systembartint:systembartint:+'
 }

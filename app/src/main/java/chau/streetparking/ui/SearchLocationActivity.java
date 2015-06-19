@@ -1,4 +1,4 @@
-package chau.streetparking.ui.curtain;
+package chau.streetparking.ui;
 
 import android.location.Address;
 import android.location.Geocoder;
@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Locale;
 
 import chau.streetparking.R;
-import chau.streetparking.ui.LocationsAdapter;
 
 /**
  * Created by Chau Thai on 6/14/2015.

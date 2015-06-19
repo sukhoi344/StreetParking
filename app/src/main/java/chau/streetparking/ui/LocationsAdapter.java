@@ -12,7 +12,6 @@ import android.widget.TextView;
 import java.util.List;
 
 import chau.streetparking.R;
-import chau.streetparking.ui.curtain.SearchLocationActivity;
 
 /**
  * Created by Chau Thai on 6/14/2015.

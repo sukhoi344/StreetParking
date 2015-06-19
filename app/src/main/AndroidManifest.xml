@@ -47,9 +47,10 @@
             android:label="@string/app_name"
             android:screenOrientation="portrait" />
 
-        <activity android:name=".ui.curtain.SearchLocationActivity"
+        <activity android:name=".ui.SearchLocationActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/SearchLocationTheme"/>
 
         <activity android:name=".ui.ProfileActivity"
             android:label="@string/app_name"

@@ -8,11 +8,12 @@
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+
+        <item name="android:windowTranslucentStatus">true</item>
     </style>
 
     <style name="SearchLocationTheme" parent="AppTheme">
         <item name="android:windowTranslucentStatus">false</item>
     </style>
-
 
 </resources>
