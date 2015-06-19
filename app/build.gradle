@@ -26,7 +26,7 @@ repositories {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:+'
     compile 'com.android.support:recyclerview-v7:+'
     compile 'com.google.android.gms:play-services:+'
@@ -37,4 +37,5 @@ dependencies {
     compile 'com.appyvet:materialrangebar:+'
     compile 'com.wdullaer:materialdatetimepicker:+'
     compile 'com.readystatesoftware.systembartint:systembartint:+'
+    compile project(':countrypicker')
 }
