@@ -184,7 +184,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:clickable="true"
-                        android:text="From:"
+                        android:text="Start:"
                         android:textColor="@android:color/black"/>
 
                     <TextView
@@ -209,7 +209,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:clickable="true"
-                        android:text="To:"
+                        android:text="End:"
                         android:textColor="@android:color/black"/>
 
                     <TextView

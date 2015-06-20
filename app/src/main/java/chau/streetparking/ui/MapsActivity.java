@@ -40,6 +40,7 @@ import java.util.List;
 
 import chau.streetparking.R;
 import chau.streetparking.datamodels.SpotMarker;
+import chau.streetparking.ui.curtain.PaymentActivity;
 
 public class MapsActivity extends AppCompatActivity {
     private static final String TAG = "MapsActivity";
@@ -249,10 +250,16 @@ public class MapsActivity extends AppCompatActivity {
                     public boolean onItemClick(AdapterView<?> adapterView, View view, int position, long id,
                                                IDrawerItem iDrawerItem) {
                         switch (position) {
-                            case 0:
+                            case 0: {
                                 Intent intent = new Intent(MapsActivity.this, ProfileActivity.class);
                                 startActivity(intent);
                                 return true;
+                            }
+                            case 1: {
+                                Intent intent = new Intent(MapsActivity.this, PaymentActivity.class);
+                                startActivity(intent);
+                                return true;
+                            }
 
                         }
                         return false;
