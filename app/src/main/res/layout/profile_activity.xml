@@ -13,7 +13,7 @@
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -56,7 +56,8 @@
                 android:layout_height="wrap_content"
                 android:inputType="textPersonName"
                 android:nextFocusDown="@+id/last_name"
-                android:enabled="false"/>
+                android:enabled="false"
+                android:textColor="@android:color/black"/>
         </LinearLayout>
 
         <!--  Last name-->
@@ -77,6 +78,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPersonName"
+                android:textColor="@android:color/black"
                 android:enabled="false"/>
         </LinearLayout>
     </LinearLayout>

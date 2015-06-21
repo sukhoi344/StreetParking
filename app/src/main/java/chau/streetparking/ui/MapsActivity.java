@@ -40,7 +40,6 @@ import java.util.List;
 
 import chau.streetparking.R;
 import chau.streetparking.datamodels.SpotMarker;
-import chau.streetparking.ui.curtain.PaymentActivity;
 
 public class MapsActivity extends AppCompatActivity {
     private static final String TAG = "MapsActivity";
