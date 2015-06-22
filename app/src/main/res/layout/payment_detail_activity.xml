@@ -169,5 +169,4 @@
         android:layout_marginRight="15dp"
         style="@android:style/Widget.Holo.Light.Spinner"/>
 
-
 </LinearLayout>

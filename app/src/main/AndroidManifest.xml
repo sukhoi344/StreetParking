@@ -12,7 +12,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_launcher_icon"
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
         tools:replace="android:icon">
@@ -62,6 +62,18 @@
             android:screenOrientation="portrait" />
 
         <activity android:name=".ui.PaymentDetailActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait" />
+
+        <activity android:name=".ui.AddPaymentActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait" />
+
+        <activity android:name=".ui.MyGarageActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait" />
+
+        <activity android:name=".ui.AddGarageActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" />
     </application>

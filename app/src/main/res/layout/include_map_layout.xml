@@ -11,6 +11,27 @@
         android:layout_height="match_parent"
         tools:context=".MapsActivity" />
 
+    <!-- Cross layout -->
+    <FrameLayout
+        android:id="@+id/cross_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="invisible">
+
+        <View
+            android:layout_width="100dp"
+            android:layout_height="1dp"
+            android:background="@android:color/holo_red_dark"
+            android:layout_gravity="center"/>
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="100dp"
+            android:background="@android:color/holo_red_dark"
+            android:layout_gravity="center"/>
+    </FrameLayout>
+
     <!-- Location layout  -->
     <RelativeLayout
         android:id="@+id/location_layout"
@@ -21,41 +42,39 @@
         android:clickable="true"
         android:visibility="invisible">
 
-    <ImageView
-        android:id="@+id/search_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:src="@drawable/ic_action_search"/>
+        <ImageView
+            android:id="@+id/search_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_action_search" />
 
         <TextView
             android:id="@+id/title1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:layout_centerHorizontal="true"
             android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
             android:text="PARKING LOCATION"
-            android:textStyle="bold"
             android:textColor="@color/primary"
-            android:textSize="12sp"/>
+            android:textSize="12sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tv_location"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginRight="40dp"
-            android:layout_marginBottom="5dp"
-            android:gravity="center"
             android:layout_below="@id/title1"
+            android:layout_marginBottom="5dp"
+            android:layout_marginRight="40dp"
             android:layout_toRightOf="@id/search_icon"
+            android:gravity="center"
             android:singleLine="true"
-            android:textColor="@android:color/black"
-            android:text="4849 Connecticut ave NW"/>
-
-
+            android:text="4849 Connecticut ave NW"
+            android:textColor="@android:color/black" />
     </RelativeLayout>
 
     <!--  REQUEST and ADD buttons layout -->
@@ -86,10 +105,11 @@
             android:layout_marginRight="4dp"
             android:layout_marginTop="4dp"
             android:layout_weight="1"
-            android:onClick="onAddClicked"
-            android:text="Add" />
+            android:onClick="onReportSpotClicked"
+            android:text="Report Spot" />
     </LinearLayout>
 
+    <!-- Send Request and Cancel CurtainView-->
     <chau.streetparking.ui.curtain.CurtainView xmlns:curtainView="http://schemas.android.com/apk/res-auto"
         android:id="@+id/curtain_view"
         android:layout_width="match_parent"
@@ -134,7 +154,7 @@
                     android:layout_marginRight="4dp"
                     android:layout_marginTop="4dp"
                     android:layout_weight="1"
-                    android:onClick="onCancelClicked"
+                    android:onClick="onCancelRequestClicked"
                     android:text="CANCEL" />
             </LinearLayout>
 
@@ -176,8 +196,8 @@
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:layout_marginRight="2dp"
+                    android:layout_weight="1"
                     android:orientation="vertical">
 
                     <TextView
@@ -185,7 +205,7 @@
                         android:layout_height="wrap_content"
                         android:clickable="true"
                         android:text="Start:"
-                        android:textColor="@android:color/black"/>
+                        android:textColor="@android:color/black" />
 
                     <TextView
                         android:id="@+id/from"
@@ -193,16 +213,16 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:paddingLeft="10dp"
-                        android:textColor="#44000000"
-                        android:text="Tap to select"/>
+                        android:text="Tap to select"
+                        android:textColor="#44000000" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="2dp"
                     android:layout_marginBottom="5dp"
+                    android:layout_marginLeft="2dp"
+                    android:layout_weight="1"
                     android:orientation="vertical">
 
                     <TextView
@@ -210,7 +230,7 @@
                         android:layout_height="wrap_content"
                         android:clickable="true"
                         android:text="End:"
-                        android:textColor="@android:color/black"/>
+                        android:textColor="@android:color/black" />
 
                     <TextView
                         android:id="@+id/to"
@@ -218,12 +238,101 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:paddingLeft="10dp"
-                        android:textColor="#44000000"
-                        android:text="Tap to select"/>
+                        android:text="Tap to select"
+                        android:textColor="#44000000" />
 
                 </LinearLayout>
             </LinearLayout>
-
         </LinearLayout>
     </chau.streetparking.ui.curtain.CurtainView>
+
+    <!-- Add Report Spot CurtainView-->
+    <chau.streetparking.ui.curtain.CurtainView xmlns:curtainView="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/curtain_view_report"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:visibility="invisible"
+        curtainView:curtainGravity="bottom"
+        curtainView:curtainStatus="closed"
+        curtainView:fixedValue="56dp"
+        curtainView:reboundMode="half"
+        curtainView:scrollDuration="500">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#ffffff"
+            android:orientation="vertical">
+
+            <!-- Add Spot and Cancel button -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#ffffff"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btn_add_spot"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginRight="2dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_weight="1"
+                    android:onClick="onAddSpotClicked"
+                    android:text="ADD SPOT" />
+
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginRight="4dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_weight="1"
+                    android:onClick="onCancelAddSpotClicked"
+                    android:text="CANCEL" />
+            </LinearLayout>
+
+            <!-- Free CheckBox and Price EditText-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#ffffff"
+                android:orientation="horizontal"
+                android:layout_margin="4dp">
+
+                <CheckBox
+                    android:id="@+id/check_box_free"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Free"
+                    android:checked="true"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginRight="5dp"
+                    android:text="Price:"
+                    android:textColor="@android:color/black" />
+
+                <EditText
+                    android:id="@+id/edit_text_price"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:text="0"
+                    android:enabled="false"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:textColor="@android:color/black"
+                    android:text="(USD)"/>
+            </LinearLayout>
+        </LinearLayout>
+    </chau.streetparking.ui.curtain.CurtainView>
+
 </FrameLayout>

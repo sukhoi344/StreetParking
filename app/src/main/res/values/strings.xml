@@ -6,4 +6,10 @@
         <item>Personal</item>
         <item>Business</item>
     </string-array>
+
+    <string-array name="price_type_array">
+        <item>Hour</item>
+        <item>Day</item>
+        <item>Month</item>
+    </string-array>
 </resources>

@@ -10,6 +10,9 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -39,11 +42,18 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     // Widgets
     private ViewGroup locationLayout;
     private ViewGroup requestAddLayout;
-    private CurtainView curtainView;
+    private CurtainView curtainViewRequest;
     private RangeBar seekBar;
     private TextView tvFrom, tvTo;
     private Button btnSendRequest;
     private TextView tvLocation;
+
+    // Add Spot Widgets
+    private CurtainView curtainViewReport;
+    private Button btnAddSpot;
+    private CheckBox checkBoxFree;
+    private EditText editTextPrice;
+    private View crossView;
 
     private String selectedTime;
     private String currentTag = TAG_FROM;
@@ -114,41 +124,61 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     /**
      * Change UI when the user selects "REQUEST" button
      */
-    public void showNext() {
+    public void showRequest() {
         reset();
 
         requestAddLayout.setVisibility(View.INVISIBLE);
-        curtainView.setVisibility(View.VISIBLE);
+        curtainViewRequest.setVisibility(View.VISIBLE);
 
         locationLayout.setVisibility(View.VISIBLE);
         Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.slide_in_up);
         locationLayout.startAnimation(animation);
 
-        if (curtainView.getCurtainStatus() == ICurtainViewBase.CurtainStatus.CLOSED) {
-            curtainView.toggleStatus();
+        if (curtainViewRequest.getCurtainStatus() == ICurtainViewBase.CurtainStatus.CLOSED) {
+            curtainViewRequest.toggleStatus();
         }
     }
 
     /**
-     * Change UI when the user selects "CANCEL" button
+     * Change UI when the user selects "REPORT SPOT" button
      */
-    public void cancel() {
-        if (curtainView.getCurtainStatus() == ICurtainViewBase.CurtainStatus.OPENED) {
-            curtainView.toggleStatus();
-            curtainView.setAutoScrollingListener(new ICurtainViewBase.AutoScrollingListener() {
+    public void showReportSpot() {
+        reset();
+
+        requestAddLayout.setVisibility(View.INVISIBLE);
+        curtainViewReport.setVisibility(View.VISIBLE);
+
+        locationLayout.setVisibility(View.VISIBLE);
+        Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.slide_in_up);
+        locationLayout.startAnimation(animation);
+
+        if (curtainViewReport.getCurtainStatus() == ICurtainViewBase.CurtainStatus.CLOSED) {
+            curtainViewReport.toggleStatus();
+        }
+
+        crossView.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * Change UI when the user selects "CANCEL" button while in Request mode
+     */
+    public void cancelRequest() {
+        if (curtainViewRequest.getCurtainStatus() == ICurtainViewBase.CurtainStatus.OPENED) {
+            curtainViewRequest.toggleStatus();
+            curtainViewRequest.setAutoScrollingListener(new ICurtainViewBase.AutoScrollingListener() {
                 @Override
                 public void onScrolling(int currValue, int currVelocity, int startValue, int finalValue) {
                 }
 
                 @Override
                 public void onScrollFinished() {
-                    curtainView.setVisibility(View.INVISIBLE);
+                    curtainViewRequest.setVisibility(View.INVISIBLE);
                     requestAddLayout.setVisibility(View.VISIBLE);
-                    curtainView.setAutoScrollingListener(null);
+                    curtainViewRequest.setAutoScrollingListener(null);
                 }
             });
         } else {
-            curtainView.setVisibility(View.INVISIBLE);
+            curtainViewRequest.setVisibility(View.INVISIBLE);
             requestAddLayout.setVisibility(View.VISIBLE);
         }
 
@@ -158,11 +188,50 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     }
 
     /**
-     * Close the curtain layout, which contains the settings for parking request
+     * Change UI when the user selects "CANCEL" button while in Report mode
      */
-    public void closeCurtain() {
-        if (curtainView.getCurtainStatus() != ICurtainViewBase.CurtainStatus.CLOSED) {
-            curtainView.toggleStatus();
+    public void cancelReport() {
+        if (curtainViewReport.getCurtainStatus() == ICurtainViewBase.CurtainStatus.OPENED) {
+            curtainViewReport.toggleStatus();
+            curtainViewReport.setAutoScrollingListener(new ICurtainViewBase.AutoScrollingListener() {
+                @Override
+                public void onScrolling(int currValue, int currVelocity, int startValue, int finalValue) {
+                }
+
+                @Override
+                public void onScrollFinished() {
+                    curtainViewReport.setVisibility(View.INVISIBLE);
+                    requestAddLayout.setVisibility(View.VISIBLE);
+                    curtainViewReport.setAutoScrollingListener(null);
+                }
+            });
+        } else {
+            curtainViewReport.setVisibility(View.INVISIBLE);
+            requestAddLayout.setVisibility(View.VISIBLE);
+        }
+
+        locationLayout.setVisibility(View.INVISIBLE);
+        Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.slide_out_up);
+        locationLayout.startAnimation(animation);
+
+        crossView.setVisibility(View.INVISIBLE);
+    }
+
+    /**
+     * Close the curtain request layout, which contains the settings for parking request
+     */
+    public void closeCurtainRequest() {
+        if (curtainViewRequest.getCurtainStatus() != ICurtainViewBase.CurtainStatus.CLOSED) {
+            curtainViewRequest.toggleStatus();
+        }
+    }
+
+    /**
+     * Close the curtain report layout, which contains the settings for parking request
+     */
+    public void closeCurtainReport() {
+        if (curtainViewReport.getCurtainStatus() != ICurtainViewBase.CurtainStatus.CLOSED) {
+            curtainViewReport.toggleStatus();
         }
     }
 
@@ -192,6 +261,13 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
 
         tvFrom.setOnClickListener(new TimeTextViewListener(TAG_FROM));
         tvTo.setOnClickListener(new TimeTextViewListener(TAG_TO));
+
+        checkBoxFree.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                editTextPrice.setEnabled(!isChecked);
+            }
+        });
     }
 
     private void reset() {
@@ -201,6 +277,11 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         tvTo.setText("Tap to select");
         btnSendRequest.setEnabled(false);
         tvLocation.setText("");
+
+        // Report layout
+        checkBoxFree.setChecked(true);
+        editTextPrice.setEnabled(false);
+        editTextPrice.setText("0");
     }
 
     private class TimeTextViewListener implements OnClickListener {
@@ -234,11 +315,17 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     private void getWidgets() {
         locationLayout = (ViewGroup) findViewById(R.id.location_layout);
         requestAddLayout = (ViewGroup) findViewById(R.id.request_add_layout);
-        curtainView = (CurtainView) findViewById(R.id.curtain_view);
+        curtainViewRequest = (CurtainView) findViewById(R.id.curtain_view);
         seekBar = (RangeBar) findViewById(R.id.seek_bar);
         tvFrom = (TextView) findViewById(R.id.from);
         tvTo = (TextView) findViewById(R.id.to);
         btnSendRequest = (Button) findViewById(R.id.btn_send_request);
         tvLocation = (TextView) findViewById(R.id.tv_location);
+
+        curtainViewReport = (CurtainView) findViewById(R.id.curtain_view_report);
+        btnAddSpot = (Button) findViewById(R.id.btn_add_spot);
+        checkBoxFree = (CheckBox) findViewById(R.id.check_box_free);
+        editTextPrice = (EditText) findViewById(R.id.edit_text_price);
+        crossView = findViewById(R.id.cross_view);
     }
 }

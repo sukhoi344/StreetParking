@@ -1,38 +1,38 @@
 package chau.streetparking.ui;
 
 import android.content.Intent;
+import android.location.Address;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.android.gms.wallet.WalletConstants;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import chau.streetparking.R;
-import chau.streetparking.datamodels.CardItem;
-import chau.streetparking.datamodels.CardTypes;
+import chau.streetparking.datamodels.Garage;
 
 /**
- * Created by Chau Thai on 6/19/15.
+ * Created by Chau Thai on 6/21/2015.
  */
-public class PaymentActivity extends ColoredBarActivity {
+public class MyGarageActivity extends ColoredBarActivity {
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
 
     @Override
     protected int getLayout() {
-        return R.layout.payment_activity;
+        return R.layout.my_garage_activity;
     }
 
     @Override
     protected String getTitleToolbar() {
-        return "Payment";
+        return "MY GARAGE";
     }
 
     @Override
@@ -44,7 +44,7 @@ public class PaymentActivity extends ColoredBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_payment, menu);
+        getMenuInflater().inflate(R.menu.menu_my_garage, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -52,7 +52,7 @@ public class PaymentActivity extends ColoredBarActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_add:
-                Intent intent = new Intent(this, AddPaymentActivity.class);
+                Intent intent = new Intent(this, AddGarageActivity.class);
                 startActivity(intent);
                 return true;
             default:
@@ -66,22 +66,36 @@ public class PaymentActivity extends ColoredBarActivity {
         recyclerView.setOverScrollMode(View.OVER_SCROLL_NEVER);
         recyclerView.addItemDecoration(new DividerItemDecoration(this, null));
 
-        recyclerView.setAdapter(new PaymentsAdapter(this, createTestSList()));
+        recyclerView.setAdapter(new GarageAdapter(this, createTestList()));
     }
 
-    private List<CardItem> createTestSList() {
-        List<CardItem> list = new ArrayList<>();
+    private List<Garage> createTestList() {
+        List<Garage> list = new ArrayList<>();
 
-        CardItem item1 = new CardItem(1, WalletConstants.CardNetwork.VISA,
-                CardTypes.PERSONAL, "2442 4441 2234 1124", 5,12,355,"US", "20015");
-        CardItem item2 = new CardItem(2, WalletConstants.CardNetwork.MASTERCARD,
-                CardTypes.BUSINESS, "2314 5535 1232, 5435", 5,12,123,"US", "20015");
-        CardItem item3 = new CardItem(3, WalletConstants.CardNetwork.DISCOVER,
-                CardTypes.PERSONAL, "2323 1312 1242 1341", 5,12,456,"US", "20015");
+        Address address1 = new Address(Locale.US);
+        address1.setAddressLine(0, "4849 Connecticut ave");
 
-        list.add(item1);
-        list.add(item2);
-        list.add(item3);
+        Garage garage1 = new Garage(
+                "Garage 1",
+                address1,
+                4, 3, 1.99, Garage.PRICE_TYPE_HOURLY
+        );
+
+        Garage garage2 = new Garage(
+                "Garage 2",
+                address1,
+                4, 3, 1.99, Garage.PRICE_TYPE_HOURLY
+        );
+
+        Garage garage3 = new Garage(
+                "Garage 3",
+                address1,
+                4, 3, 1.99, Garage.PRICE_TYPE_HOURLY
+        );
+
+        list.add(garage1);
+        list.add(garage2);
+        list.add(garage3);
 
         return list;
     }

@@ -98,28 +98,32 @@ public class MapsActivity extends AppCompatActivity {
 
     /** Called when "REQUEST" button is clicked */
     public void onRequestClicked(View v) {
-        if (googleMap != null) {
-            googleMap.setPadding(0, dpToPx(48), 0, 0);
-
-            LatLng latLng = googleMap.getCameraPosition().target;
-            new TaskGetAddress().execute(latLng);
-        }
-
-        mapLayout.showNext();
+        updateCurrentAddress();
+        mapLayout.showRequest();
         enableCircle();
-    }
-
-    public void onAddClicked(View v) {
     }
 
     public void onSendRequestClicked(View v) {
     }
 
-    public void onCancelClicked(View v) {
+    public void onCancelRequestClicked(View v) {
         if (googleMap != null)
             googleMap.setPadding(0, 0, 0, 0);
-        mapLayout.cancel();
+        mapLayout.cancelRequest();
         disableCircle();
+    }
+
+    public void onReportSpotClicked(View v) {
+        updateCurrentAddress();
+        mapLayout.showReportSpot();
+    }
+
+    public void onAddSpotClicked(View v) {
+
+    }
+
+    public void onCancelAddSpotClicked(View v) {
+        mapLayout.cancelReport();
     }
 
     /**
@@ -188,7 +192,8 @@ public class MapsActivity extends AppCompatActivity {
                     circle.setCenter(latLng);
                 }
 
-                mapLayout.closeCurtain();
+                mapLayout.closeCurtainRequest();
+                mapLayout.closeCurtainReport();
 
                 if (mapLayout.getCurrentLayout() == MapLayout.LAYOUT_SEND_CANCEL) {
                     updateLocationAddress(latLng);
@@ -197,6 +202,7 @@ public class MapsActivity extends AppCompatActivity {
         });
 
         setUpClusterer();
+
     }
 
     private void updateLocationAddress(LatLng latLng) {
@@ -208,6 +214,15 @@ public class MapsActivity extends AppCompatActivity {
             taskGetAddress = new TaskGetAddress();
             taskGetAddress.execute(latLng);
         } catch (Exception e) {}
+    }
+
+    private void updateCurrentAddress() {
+        if (googleMap != null) {
+            googleMap.setPadding(0, dpToPx(48), 0, 0);
+
+            LatLng latLng = googleMap.getCameraPosition().target;
+            new TaskGetAddress().execute(latLng);
+        }
     }
 
     private void setupDrawer(Toolbar toolbar) {
@@ -237,8 +252,8 @@ public class MapsActivity extends AppCompatActivity {
                                 .withIcon(R.drawable.ic_account_circle_black_24dp),
                         new PrimaryDrawerItem().withName("Payment")
                                 .withIcon(R.drawable.ic_credit_card_black_24dp),
-                        new PrimaryDrawerItem().withName("Setting")
-                                .withIcon(R.drawable.ic_settings_black_24dp),
+                        new PrimaryDrawerItem().withName("Manage My Garage")
+                                .withIcon(R.drawable.ic_home),
                         new PrimaryDrawerItem().withName("Help")
                                 .withIcon(R.drawable.ic_help_outline_black_24dp),
                         new PrimaryDrawerItem().withName("About")
@@ -256,6 +271,11 @@ public class MapsActivity extends AppCompatActivity {
                             }
                             case 1: {
                                 Intent intent = new Intent(MapsActivity.this, PaymentActivity.class);
+                                startActivity(intent);
+                                return true;
+                            }
+                            case 2: {
+                                Intent intent = new Intent(MapsActivity.this, MyGarageActivity.class);
                                 startActivity(intent);
                                 return true;
                             }

@@ -8,8 +8,8 @@ android {
         applicationId "chau.streetparking"
         minSdkVersion 19
         targetSdkVersion 22
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.0 Build 1506.02"
     }
     buildTypes {
         release {
@@ -37,5 +37,6 @@ dependencies {
     compile 'com.appyvet:materialrangebar:+'
     compile 'com.wdullaer:materialdatetimepicker:+'
     compile 'com.readystatesoftware.systembartint:systembartint:+'
+    compile 'com.github.dbachelder:CreditCardEntry:v1.3.0'
     compile project(':countrypicker')
 }
