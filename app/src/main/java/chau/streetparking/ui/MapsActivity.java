@@ -7,6 +7,8 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -39,11 +41,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import chau.streetparking.R;
+import chau.streetparking.datamodels.Request;
 import chau.streetparking.datamodels.SpotMarker;
 
 public class MapsActivity extends AppCompatActivity {
     private static final String TAG = "MapsActivity";
     private static final int REQUEST_CODE_SEARCH = 1;
+
+    private static final int ID_PROFILE = 0;
+    private static final int ID_PAYMENT = 1;
+    private static final int ID_SETTINGS = 2;
+    private static final int ID_HELP = 3;
+    private static final int ID_ABOUT =4;
 
     private GoogleApiClient mGoogleApiClient;
     private GoogleMap googleMap; // Might be null if Google Play services APK is not available.
@@ -53,6 +62,7 @@ public class MapsActivity extends AppCompatActivity {
     private Circle circle;  // Radius circle for parking
     private Geocoder geocoder;
     private TaskGetAddress taskGetAddress;
+    private TaskGetRequestList taskGetRequestList;
 
     // For testing purpose
     private List<SpotMarker> testList = new ArrayList<>();
@@ -64,6 +74,7 @@ public class MapsActivity extends AppCompatActivity {
         mapLayout = (MapLayout) findViewById(R.id.map_layout);
         geocoder = new Geocoder(this);
 
+        setupRequestList(mapLayout.getRecyclerViewRequest());
         setupTestList();
         setUpMapIfNeeded();
 
@@ -113,17 +124,14 @@ public class MapsActivity extends AppCompatActivity {
         disableCircle();
     }
 
-    public void onReportSpotClicked(View v) {
-        updateCurrentAddress();
-        mapLayout.showReportSpot();
-    }
+    public void onOfferClicked(View v) {
+        mapLayout.showOffer();
+        if  (taskGetRequestList != null && taskGetRequestList.isRunning) {
+            taskGetRequestList.cancel(true);
+        }
 
-    public void onAddSpotClicked(View v) {
-
-    }
-
-    public void onCancelAddSpotClicked(View v) {
-        mapLayout.cancelReport();
+        taskGetRequestList = new TaskGetRequestList();
+        taskGetRequestList.execute();
     }
 
     /**
@@ -193,11 +201,18 @@ public class MapsActivity extends AppCompatActivity {
                 }
 
                 mapLayout.closeCurtainRequest();
-                mapLayout.closeCurtainReport();
+//                mapLayout.closeCurtainReport();
 
                 if (mapLayout.getCurrentLayout() == MapLayout.LAYOUT_SEND_CANCEL) {
                     updateLocationAddress(latLng);
                 }
+            }
+        });
+
+        googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                Log.d(TAG, latLng.toString());
             }
         });
 
@@ -249,37 +264,37 @@ public class MapsActivity extends AppCompatActivity {
                 .withAccountHeader(headerResult)
                 .addDrawerItems(
                         new PrimaryDrawerItem().withName("Profile")
-                                .withIcon(R.drawable.ic_account_circle_black_24dp),
-                        new PrimaryDrawerItem().withName("Payment")
+                                .withIcon(R.drawable.ic_account_circle_black_24dp).withIdentifier(ID_PROFILE),
+                        new PrimaryDrawerItem().withName("Payment").withIdentifier(ID_PAYMENT)
                                 .withIcon(R.drawable.ic_credit_card_black_24dp),
-                        new PrimaryDrawerItem().withName("Manage My Garage")
-                                .withIcon(R.drawable.ic_home),
-                        new PrimaryDrawerItem().withName("Help")
+                        new PrimaryDrawerItem().withName("Settings")
+                                .withIcon(R.drawable.ic_settings_black_24dp).withIdentifier(ID_SETTINGS),
+                        new PrimaryDrawerItem().withName("Help").withIdentifier(ID_HELP)
                                 .withIcon(R.drawable.ic_help_outline_black_24dp),
-                        new PrimaryDrawerItem().withName("About")
+                        new PrimaryDrawerItem().withName("About").withIdentifier(ID_ABOUT)
                                 .withIcon(R.drawable.ic_info_outline_black_24dp)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
-                    public boolean onItemClick(AdapterView<?> adapterView, View view, int position, long id,
+                    public boolean onItemClick(AdapterView<?> adapterView, View view, int position, long id2,
                                                IDrawerItem iDrawerItem) {
-                        switch (position) {
-                            case 0: {
+                        int id = (int) id2;
+                        switch (id) {
+                            case ID_PROFILE: {
                                 Intent intent = new Intent(MapsActivity.this, ProfileActivity.class);
                                 startActivity(intent);
                                 return true;
                             }
-                            case 1: {
+                            case ID_PAYMENT: {
                                 Intent intent = new Intent(MapsActivity.this, PaymentActivity.class);
                                 startActivity(intent);
                                 return true;
                             }
-                            case 2: {
-                                Intent intent = new Intent(MapsActivity.this, MyGarageActivity.class);
+                            case ID_SETTINGS: {
+                                Intent intent = new Intent(MapsActivity.this, SettingsActivity.class);
                                 startActivity(intent);
                                 return true;
                             }
-
                         }
                         return false;
                     }
@@ -356,6 +371,12 @@ public class MapsActivity extends AppCompatActivity {
         }
     }
 
+    private void setupRequestList(RecyclerView recyclerView) {
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, null));
+    }
+
     private void setUpClusterer() {
         // Declare a variable for the cluster manager.
         ClusterManager<SpotMarker> mClusterManager;
@@ -392,6 +413,16 @@ public class MapsActivity extends AppCompatActivity {
         testList.add(new SpotMarker(38.96109242408757, -77.0695873349905));
         testList.add(new SpotMarker(38.96222516395402, -77.07205329090357));
         testList.add(new SpotMarker(38.96110180934844, -77.0732294395566));
+    }
+
+    private List<LatLng> getTestList() {
+        List<LatLng> list = new ArrayList<>();
+        list.add(new LatLng(38.95847675557191,-77.07176126539707));
+
+        list.add(new LatLng(38.96222516395402, -77.07205329090357));
+        list.add(new LatLng(38.96110180934844, -77.0732294395566));
+
+        return list;
     }
 
     private int dpToPx(int dp) {
@@ -434,6 +465,58 @@ public class MapsActivity extends AppCompatActivity {
                 }
             } catch (Exception e) {}
             finally {
+            }
+        }
+    }
+
+    private class TaskGetRequestList extends AsyncTask<Void, Void, List<Request>> {
+        private boolean isRunning = false;
+
+        public boolean isRunning() {
+            return isRunning;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            mapLayout.showProgressBarRequest();
+        }
+
+        @Override
+        protected List<Request> doInBackground(Void... params) {
+            isRunning = true;
+            List<LatLng> latLngs = getTestList();
+            List<Request> list = new ArrayList<>();
+
+            try {
+                for (LatLng latLng : latLngs) {
+                    List<Address> addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+                    Address address = addresses.get(0);
+
+                    Request request = new Request(
+                            1, address, "John", 1000, "07/12 11:00am", "07/12 4:00pm"
+                    );
+
+                    list.add(request);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+
+            return list;
+        }
+
+        @Override
+        protected void onPostExecute(List<Request> requests) {
+            try {
+                if (!isCancelled() && requests != null) {
+                    mapLayout.hideProgressBarRequest();
+                    mapLayout.getRecyclerViewRequest().swapAdapter(new RequestAdapter(MapsActivity.this,
+                            requests), true);
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }

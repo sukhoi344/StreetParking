@@ -3,6 +3,7 @@ package chau.streetparking.ui;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.appyvet.rangebar.RangeBar;
@@ -22,8 +24,10 @@ import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import java.util.Calendar;
+import java.util.List;
 
 import chau.streetparking.R;
+import chau.streetparking.datamodels.Request;
 import chau.streetparking.ui.curtain.CurtainView;
 import chau.streetparking.ui.curtain.ICurtainViewBase;
 
@@ -48,12 +52,11 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     private Button btnSendRequest;
     private TextView tvLocation;
 
-    // Add Spot Widgets
-    private CurtainView curtainViewReport;
-    private Button btnAddSpot;
-    private CheckBox checkBoxFree;
-    private EditText editTextPrice;
-    private View crossView;
+    // Offer layout widgets
+    private CurtainView curtainViewOffer;
+    private RecyclerView recyclerViewRequest;
+    private ProgressBar progressBar;
+    private Button btnCancelOffer1;
 
     private String selectedTime;
     private String currentTag = TAG_FROM;
@@ -140,23 +143,17 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     }
 
     /**
-     * Change UI when the user selects "REPORT SPOT" button
+     * Change UI when the user selects "OFFER" button
      */
-    public void showReportSpot() {
+    public void showOffer() {
         reset();
 
         requestAddLayout.setVisibility(View.INVISIBLE);
-        curtainViewReport.setVisibility(View.VISIBLE);
+        curtainViewOffer.setVisibility(View.VISIBLE);
 
-        locationLayout.setVisibility(View.VISIBLE);
-        Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.slide_in_up);
-        locationLayout.startAnimation(animation);
-
-        if (curtainViewReport.getCurtainStatus() == ICurtainViewBase.CurtainStatus.CLOSED) {
-            curtainViewReport.toggleStatus();
+        if (curtainViewOffer.getCurtainStatus() == ICurtainViewBase.CurtainStatus.CLOSED) {
+            curtainViewOffer.toggleStatus();
         }
-
-        crossView.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -188,33 +185,27 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     }
 
     /**
-     * Change UI when the user selects "CANCEL" button while in Report mode
+     * Change UI when the user selects "CANCEL" button while in Offer mode
      */
-    public void cancelReport() {
-        if (curtainViewReport.getCurtainStatus() == ICurtainViewBase.CurtainStatus.OPENED) {
-            curtainViewReport.toggleStatus();
-            curtainViewReport.setAutoScrollingListener(new ICurtainViewBase.AutoScrollingListener() {
+    public void cancelOffer() {
+        if (curtainViewOffer.getCurtainStatus() == ICurtainViewBase.CurtainStatus.OPENED) {
+            curtainViewOffer.toggleStatus();
+            curtainViewOffer.setAutoScrollingListener(new ICurtainViewBase.AutoScrollingListener() {
                 @Override
                 public void onScrolling(int currValue, int currVelocity, int startValue, int finalValue) {
                 }
 
                 @Override
                 public void onScrollFinished() {
-                    curtainViewReport.setVisibility(View.INVISIBLE);
+                    curtainViewOffer.setVisibility(View.INVISIBLE);
                     requestAddLayout.setVisibility(View.VISIBLE);
-                    curtainViewReport.setAutoScrollingListener(null);
+                    curtainViewOffer.setAutoScrollingListener(null);
                 }
             });
         } else {
-            curtainViewReport.setVisibility(View.INVISIBLE);
+            curtainViewOffer.setVisibility(View.INVISIBLE);
             requestAddLayout.setVisibility(View.VISIBLE);
         }
-
-        locationLayout.setVisibility(View.INVISIBLE);
-        Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.slide_out_up);
-        locationLayout.startAnimation(animation);
-
-        crossView.setVisibility(View.INVISIBLE);
     }
 
     /**
@@ -230,8 +221,8 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
      * Close the curtain report layout, which contains the settings for parking request
      */
     public void closeCurtainReport() {
-        if (curtainViewReport.getCurtainStatus() != ICurtainViewBase.CurtainStatus.CLOSED) {
-            curtainViewReport.toggleStatus();
+        if (curtainViewOffer.getCurtainStatus() != ICurtainViewBase.CurtainStatus.CLOSED) {
+            curtainViewOffer.toggleStatus();
         }
     }
 
@@ -253,6 +244,20 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         }
     }
 
+    public RecyclerView getRecyclerViewRequest() {
+        return recyclerViewRequest;
+    }
+
+    public void showProgressBarRequest() {
+        progressBar.setVisibility(View.VISIBLE);
+        recyclerViewRequest.setVisibility(View.INVISIBLE);
+    }
+
+    public void hideProgressBarRequest() {
+        progressBar.setVisibility(View.INVISIBLE);
+        recyclerViewRequest.setVisibility(View.VISIBLE);
+    }
+
     private void init(Context context) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.include_map_layout, this, true);
@@ -262,12 +267,13 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         tvFrom.setOnClickListener(new TimeTextViewListener(TAG_FROM));
         tvTo.setOnClickListener(new TimeTextViewListener(TAG_TO));
 
-        checkBoxFree.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        btnCancelOffer1.setOnClickListener(new OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                editTextPrice.setEnabled(!isChecked);
+            public void onClick(View v) {
+                cancelOffer();
             }
         });
+
     }
 
     private void reset() {
@@ -277,11 +283,6 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         tvTo.setText("Tap to select");
         btnSendRequest.setEnabled(false);
         tvLocation.setText("");
-
-        // Report layout
-        checkBoxFree.setChecked(true);
-        editTextPrice.setEnabled(false);
-        editTextPrice.setText("0");
     }
 
     private class TimeTextViewListener implements OnClickListener {
@@ -322,10 +323,9 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         btnSendRequest = (Button) findViewById(R.id.btn_send_request);
         tvLocation = (TextView) findViewById(R.id.tv_location);
 
-        curtainViewReport = (CurtainView) findViewById(R.id.curtain_view_report);
-        btnAddSpot = (Button) findViewById(R.id.btn_add_spot);
-        checkBoxFree = (CheckBox) findViewById(R.id.check_box_free);
-        editTextPrice = (EditText) findViewById(R.id.edit_text_price);
-        crossView = findViewById(R.id.cross_view);
+        curtainViewOffer = (CurtainView) findViewById(R.id.curtain_view_offer);
+        recyclerViewRequest = (RecyclerView) findViewById(R.id.recycler_view_request);
+        progressBar = (ProgressBar) findViewById(R.id.progress_bar_offer_1);
+        btnCancelOffer1 = (Button) findViewById(R.id.btn_cancel_offer_1);
     }
 }
