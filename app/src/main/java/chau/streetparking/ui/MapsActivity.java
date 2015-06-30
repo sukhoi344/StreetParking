@@ -14,6 +14,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Toast;
 
 import com.appyvet.rangebar.RangeBar;
 import com.google.android.gms.common.ConnectionResult;
@@ -52,7 +53,7 @@ public class MapsActivity extends AppCompatActivity {
     private static final int ID_PAYMENT = 1;
     private static final int ID_SETTINGS = 2;
     private static final int ID_HELP = 3;
-    private static final int ID_ABOUT =4;
+    private static final int ID_ABOUT = 4;
 
     private GoogleApiClient mGoogleApiClient;
     private GoogleMap googleMap; // Might be null if Google Play services APK is not available.
@@ -188,6 +189,19 @@ public class MapsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MapsActivity.this, SearchLocationActivity.class);
                 startActivityForResult(intent, REQUEST_CODE_SEARCH);
+            }
+        });
+
+        mapLayout.setBackOffer2OnClick(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            }
+        });
+
+        mapLayout.setNextOffer2OnClick(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
             }
         });
 
@@ -472,10 +486,6 @@ public class MapsActivity extends AppCompatActivity {
     private class TaskGetRequestList extends AsyncTask<Void, Void, List<Request>> {
         private boolean isRunning = false;
 
-        public boolean isRunning() {
-            return isRunning;
-        }
-
         @Override
         protected void onPreExecute() {
             mapLayout.showProgressBarRequest();
@@ -511,8 +521,8 @@ public class MapsActivity extends AppCompatActivity {
             try {
                 if (!isCancelled() && requests != null) {
                     mapLayout.hideProgressBarRequest();
-                    mapLayout.getRecyclerViewRequest().swapAdapter(new RequestAdapter(MapsActivity.this,
-                            requests), true);
+                    mapLayout.getRecyclerViewRequest().swapAdapter(
+                            new RequestAdapter(MapsActivity.this,mapLayout, requests), true);
                 }
 
             } catch (Exception e) {
