@@ -1,4 +1,15 @@
 <resources>
     <string name="app_name">StreetParking</string>
     <string name="title_activity_maps">Map</string>
+
+    <string-array name="card_type_array">
+        <item>Personal</item>
+        <item>Business</item>
+    </string-array>
+
+    <string-array name="price_type_array">
+        <item>Hour</item>
+        <item>Day</item>
+        <item>Month</item>
+    </string-array>
 </resources>

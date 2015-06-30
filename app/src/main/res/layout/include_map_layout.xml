@@ -11,219 +11,37 @@
         android:layout_height="match_parent"
         tools:context=".MapsActivity" />
 
-    <!-- Location layout  -->
-    <RelativeLayout
-        android:id="@+id/location_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:background="@drawable/parking_location_selector"
-        android:clickable="true"
-        android:visibility="invisible">
-
-    <ImageView
-        android:id="@+id/search_icon"
+    <!-- Cross layout -->
+    <FrameLayout
+        android:id="@+id/cross_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:src="@drawable/ic_action_search"/>
+        android:layout_gravity="center"
+        android:visibility="invisible">
 
-        <TextView
-            android:id="@+id/title1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:layout_centerHorizontal="true"
-            android:layout_alignParentTop="true"
-            android:text="PARKING LOCATION"
-            android:textStyle="bold"
-            android:textColor="@color/primary"
-            android:textSize="12sp"/>
+        <View
+            android:layout_width="100dp"
+            android:layout_height="1dp"
+            android:background="@android:color/holo_red_dark"
+            android:layout_gravity="center"/>
 
-        <TextView
-            android:id="@+id/tv_location"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="40dp"
-            android:layout_marginBottom="5dp"
-            android:gravity="center"
-            android:layout_below="@id/title1"
-            android:layout_toRightOf="@id/search_icon"
-            android:singleLine="true"
-            android:textColor="@android:color/black"
-            android:text="4849 Connecticut ave NW"/>
+        <View
+            android:layout_width="1dp"
+            android:layout_height="100dp"
+            android:background="@android:color/holo_red_dark"
+            android:layout_gravity="center"/>
+    </FrameLayout>
 
+    <!-- Location layout  -->
+    <include layout="@layout/location_layout_include" />
 
-    </RelativeLayout>
+    <!--  first layout -->
+    <include layout="@layout/curtain_view_main_layout_include" />
 
-    <!--  REQUEST and ADD buttons layout -->
-    <LinearLayout
-        android:id="@+id/request_add_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:background="#ffffff"
-        android:orientation="horizontal">
+    <!-- Send Request and Cancel CurtainView-->
+    <include layout="@layout/request_layout_include" />
 
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            android:layout_marginLeft="4dp"
-            android:layout_marginRight="2dp"
-            android:layout_marginTop="4dp"
-            android:layout_weight="1"
-            android:onClick="onRequestClicked"
-            android:text="Request" />
+    <!-- Add Offer CurtainView-->
+    <include layout="@layout/offer_layout_include" />
 
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            android:layout_marginLeft="2dp"
-            android:layout_marginRight="4dp"
-            android:layout_marginTop="4dp"
-            android:layout_weight="1"
-            android:onClick="onAddClicked"
-            android:text="Add" />
-    </LinearLayout>
-
-    <chau.streetparking.ui.curtain.CurtainView xmlns:curtainView="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/curtain_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:visibility="invisible"
-        curtainView:curtainGravity="bottom"
-        curtainView:curtainStatus="closed"
-        curtainView:fixedValue="56dp"
-        curtainView:reboundMode="half"
-        curtainView:scrollDuration="500">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#ffffff"
-            android:orientation="vertical">
-
-            <!-- Sent Request & Cancel Layout-->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#ffffff"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/btn_send_request"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="4dp"
-                    android:layout_marginRight="2dp"
-                    android:layout_marginTop="4dp"
-                    android:layout_weight="1"
-                    android:enabled="false"
-                    android:onClick="onSendRequestClicked"
-                    android:text="SEND REQUEST" />
-
-                <Button
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="2dp"
-                    android:layout_marginRight="4dp"
-                    android:layout_marginTop="4dp"
-                    android:layout_weight="1"
-                    android:onClick="onCancelClicked"
-                    android:text="CANCEL" />
-            </LinearLayout>
-
-            <!--  SeekBar layout -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="4dp"
-                android:layout_marginRight="4dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="33dp"
-                    android:text="Radius (ft):"
-                    android:textColor="@android:color/black" />
-
-                <com.appyvet.rangebar.RangeBar xmlns:custom="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/seek_bar"
-                    android:layout_width="match_parent"
-                    android:layout_height="72dp"
-                    android:layout_marginLeft="4dp"
-                    custom:rangeBar="false"
-                    custom:tickEnd="3000"
-                    custom:tickInterval="30"
-                    custom:tickStart="150" />
-            </LinearLayout>
-
-            <!-- Select date and time layout -->
-            <LinearLayout
-                android:id="@+id/date_time_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="4dp"
-                android:layout_marginRight="4dp"
-                android:orientation="horizontal">
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginRight="2dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:text="Start:"
-                        android:textColor="@android:color/black"/>
-
-                    <TextView
-                        android:id="@+id/from"
-                        style="@android:style/Widget.Holo.Light.Spinner"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="10dp"
-                        android:textColor="#44000000"
-                        android:text="Tap to select"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginLeft="2dp"
-                    android:layout_marginBottom="5dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:text="End:"
-                        android:textColor="@android:color/black"/>
-
-                    <TextView
-                        android:id="@+id/to"
-                        style="@android:style/Widget.Holo.Light.Spinner"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="10dp"
-                        android:textColor="#44000000"
-                        android:text="Tap to select"/>
-
-                </LinearLayout>
-            </LinearLayout>
-
-        </LinearLayout>
-    </chau.streetparking.ui.curtain.CurtainView>
 </FrameLayout>

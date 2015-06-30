@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<chau.streetparking.ui.curtain.CurtainView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:curtainView="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/curtain_view_offer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:visibility="invisible"
+    curtainView:curtainGravity="bottom"
+    curtainView:curtainStatus="closed"
+    curtainView:fixedValue="56dp"
+    curtainView:reboundMode="half"
+    curtainView:scrollDuration="500"
+    tools:showIn="@layout/include_map_layout">
+
+    <FrameLayout
+        android:id="@+id/offer_layout_1"
+        android:layout_width="match_parent"
+        android:layout_height="280dp"
+        android:background="#ffffff"
+        android:padding="10dp">
+
+        <LinearLayout
+            android:id="@+id/offer_layout_1_inside"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Current requests:"
+                android:textSize="20sp"/>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="200dp">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/recycler_view_request"
+                    android:scrollbars="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:layout_margin="10dp"/>
+
+                <ProgressBar
+                    android:id="@+id/progress_bar_offer_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
+
+            <Button
+                android:id="@+id/btn_cancel_offer_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="CANCEL"
+                android:layout_gravity="center_horizontal"/>
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:background="#ffffff"-->
+        <!--android:orientation="vertical">-->
+
+        <!--&lt;!&ndash; Add Spot and Cancel button &ndash;&gt;-->
+        <!--<LinearLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:background="#ffffff"-->
+            <!--android:orientation="horizontal">-->
+
+            <!--<Button-->
+                <!--android:id="@+id/btn_add_spot"-->
+                <!--android:layout_width="0dp"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_marginLeft="4dp"-->
+                <!--android:layout_marginRight="2dp"-->
+                <!--android:layout_marginTop="4dp"-->
+                <!--android:layout_weight="1"-->
+                <!--android:onClick="onAddSpotClicked"-->
+                <!--android:text="ADD SPOT" />-->
+
+            <!--<Button-->
+                <!--android:layout_width="0dp"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_marginLeft="2dp"-->
+                <!--android:layout_marginRight="4dp"-->
+                <!--android:layout_marginTop="4dp"-->
+                <!--android:layout_weight="1"-->
+                <!--android:onClick="onCancelAddSpotClicked"-->
+                <!--android:text="CANCEL" />-->
+        <!--</LinearLayout>-->
+
+    <!--</LinearLayout>-->
+</chau.streetparking.ui.curtain.CurtainView>
