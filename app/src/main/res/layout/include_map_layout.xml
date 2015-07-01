@@ -4,33 +4,42 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <fragment
-        android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".MapsActivity" />
-
-    <!-- Cross layout -->
     <FrameLayout
-        android:id="@+id/cross_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:visibility="invisible">
+        android:id="@+id/map_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <View
-            android:layout_width="100dp"
-            android:layout_height="1dp"
-            android:background="@android:color/holo_red_dark"
-            android:layout_gravity="center"/>
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="top"
+            tools:context=".MapsActivity" />
 
-        <View
-            android:layout_width="1dp"
-            android:layout_height="100dp"
-            android:background="@android:color/holo_red_dark"
-            android:layout_gravity="center"/>
+        <!-- Cross layout -->
+        <FrameLayout
+            android:id="@+id/cross_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="visible">
+
+            <View
+                android:layout_width="100dp"
+                android:layout_height="1dp"
+                android:background="@android:color/holo_red_dark"
+                android:layout_gravity="center"/>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="100dp"
+                android:background="@android:color/holo_red_dark"
+                android:layout_gravity="center"/>
+        </FrameLayout>
     </FrameLayout>
+
+
 
     <!-- Location layout  -->
     <include layout="@layout/location_layout_include" />

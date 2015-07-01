@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Toast;
 
@@ -61,6 +62,7 @@ public class MapsActivity extends AppCompatActivity {
     private MapLayout mapLayout;
 
     private Circle circle;  // Radius circle for parking
+    private Circle requestCircle;       // Circle for the incoming request
     private Geocoder geocoder;
     private TaskGetAddress taskGetAddress;
     private TaskGetRequestList taskGetRequestList;
@@ -102,37 +104,21 @@ public class MapsActivity extends AppCompatActivity {
             Address address = data.getParcelableExtra(SearchLocationActivity.EXTRA_ADDRESS);
             if (address != null && address.hasLatitude() && address.hasLatitude()) {
                 LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                moveCamera(latLng);
+                moveCamera(latLng, false);
                 updateLocationAddress(latLng);
             }
         }
-    }
-
-    /** Called when "REQUEST" button is clicked */
-    public void onRequestClicked(View v) {
-        updateCurrentAddress();
-        mapLayout.showRequest();
-        enableCircle();
     }
 
     public void onSendRequestClicked(View v) {
     }
 
     public void onCancelRequestClicked(View v) {
-        if (googleMap != null)
-            googleMap.setPadding(0, 0, 0, 0);
+//        if (googleMap != null)
+//            googleMap.setPadding(0, 0, 0, 0);
+        mapLayout.setMyLocationBtnMargin(dpToPx(10));
         mapLayout.cancelRequest();
         disableCircle();
-    }
-
-    public void onOfferClicked(View v) {
-        mapLayout.showOffer();
-        if  (taskGetRequestList != null && taskGetRequestList.isRunning) {
-            taskGetRequestList.cancel(true);
-        }
-
-        taskGetRequestList = new TaskGetRequestList();
-        taskGetRequestList.execute();
     }
 
     /**
@@ -174,6 +160,26 @@ public class MapsActivity extends AppCompatActivity {
         buildGoogleApiClient();
         googleMap.setMyLocationEnabled(true);
 
+        mapLayout.setBtnRequestListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateCurrentAddress();
+                enableCircle();
+            }
+        });
+
+        mapLayout.setBtnOfferListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if  (taskGetRequestList != null && taskGetRequestList.isRunning) {
+                    taskGetRequestList.cancel(true);
+                }
+
+                taskGetRequestList = new TaskGetRequestList();
+                taskGetRequestList.execute();
+            }
+        });
+
         mapLayout.setSeekBarListener(new RangeBar.OnRangeBarChangeListener() {
             @Override
             public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex, int rightPinIndex,
@@ -195,13 +201,37 @@ public class MapsActivity extends AppCompatActivity {
         mapLayout.setBackOffer2OnClick(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (requestCircle != null) {
+                    requestCircle.remove();
+                    requestCircle = null;
+                }
             }
         });
 
         mapLayout.setNextOffer2OnClick(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+            }
+        });
 
+        mapLayout.setOnRequestSelectedListener(new MapLayout.OnRequestSelectedListener() {
+            @Override
+            public void onRequestSelected(Request request) {
+                if (request != null) {
+                    if (requestCircle != null) {
+                        requestCircle.remove();
+                        requestCircle = null;
+                    }
+
+                    Address address = request.getAddress();
+                    if (address.hasLatitude() && address.hasLongitude()) {
+                        LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                        addRequestCircle(latLng, request.getRadius());
+
+                        LatLng latLngCam = new LatLng(latLng.latitude, latLng.longitude);
+                        moveCamera(latLngCam, true);
+                    }
+                }
             }
         });
 
@@ -215,7 +245,7 @@ public class MapsActivity extends AppCompatActivity {
                 }
 
                 mapLayout.closeCurtainRequest();
-//                mapLayout.closeCurtainReport();
+//                mapLayout.closeCurtainOffer();
 
                 if (mapLayout.getCurrentLayout() == MapLayout.LAYOUT_SEND_CANCEL) {
                     updateLocationAddress(latLng);
@@ -231,7 +261,6 @@ public class MapsActivity extends AppCompatActivity {
         });
 
         setUpClusterer();
-
     }
 
     private void updateLocationAddress(LatLng latLng) {
@@ -247,8 +276,9 @@ public class MapsActivity extends AppCompatActivity {
 
     private void updateCurrentAddress() {
         if (googleMap != null) {
-            googleMap.setPadding(0, dpToPx(48), 0, 0);
+//            googleMap.setPadding(0, dpToPx(48), 0, 0);
 
+            mapLayout.setMyLocationBtnMargin(dpToPx(55));
             LatLng latLng = googleMap.getCameraPosition().target;
             new TaskGetAddress().execute(latLng);
         }
@@ -349,10 +379,10 @@ public class MapsActivity extends AppCompatActivity {
     }
 
     private void showMyLocation(LatLng latLng) {
-        moveCamera(latLng);
+        moveCamera(latLng, false);
     }
 
-    private void moveCamera(LatLng latLng) {
+    private void moveCamera(LatLng latLng, boolean animate) {
         if (latLng != null && googleMap != null) {
 
             CameraPosition cameraPosition = new CameraPosition.Builder()
@@ -361,7 +391,10 @@ public class MapsActivity extends AppCompatActivity {
                     .bearing(0)                 // Sets the orientation of the camera to north
                     .build();                   // Creates a CameraPosition from the builder
 
-            googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            if (!animate)
+                googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            else
+                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         }
     }
 
@@ -371,8 +404,8 @@ public class MapsActivity extends AppCompatActivity {
                 circle = googleMap.addCircle(new CircleOptions()
                         .center(currentCamPosition)
                         .radius(100)
-                        .strokeColor(0xffff0000)
-                        .fillColor(0x44ff0000));
+                        .strokeColor(getResources().getColor(R.color.circle_stroke_color))
+                        .fillColor(getResources().getColor(R.color.circle_fill_color)));
 
                 circle.setStrokeWidth(3.0f);
         }
@@ -382,6 +415,24 @@ public class MapsActivity extends AppCompatActivity {
         if (googleMap != null && circle != null) {
             circle.remove();
             circle = null;
+        }
+    }
+
+    private void addRequestCircle(LatLng latLng, int radius) {
+        if (googleMap != null) {
+            requestCircle = googleMap.addCircle(new CircleOptions()
+                .center(latLng)
+                .radius(radius)
+                .strokeColor(getResources().getColor(R.color.circle_stroke_color))
+                .fillColor(getResources().getColor(R.color.circle_fill_color)));
+            requestCircle.setStrokeWidth(3.0f);
+        }
+    }
+
+    private void removeRequestCircle() {
+        if (googleMap != null && requestCircle != null) {
+            requestCircle.remove();
+            requestCircle = null;
         }
     }
 
@@ -503,7 +554,7 @@ public class MapsActivity extends AppCompatActivity {
                     Address address = addresses.get(0);
 
                     Request request = new Request(
-                            1, address, "John", 1000, "07/12 11:00am", "07/12 4:00pm"
+                            1, address, "John", 100, "07/12 11:00am", "07/12 4:00pm"
                     );
 
                     list.add(request);
