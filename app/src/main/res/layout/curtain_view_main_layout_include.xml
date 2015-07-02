@@ -7,7 +7,8 @@
     android:layout_gravity="bottom"
     android:background="#ffffff"
     android:orientation="horizontal"
-    tools:showIn="@layout/include_map_layout">
+    tools:showIn="@layout/include_map_layout"
+    android:layout_alignParentBottom="true">
 
     <Button
         android:id="@+id/btn_request"

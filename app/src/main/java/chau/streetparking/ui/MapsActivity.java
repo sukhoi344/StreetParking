@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.appyvet.rangebar.RangeBar;
@@ -45,6 +46,7 @@ import java.util.List;
 import chau.streetparking.R;
 import chau.streetparking.datamodels.Request;
 import chau.streetparking.datamodels.SpotMarker;
+import chau.streetparking.util.ImageUtil;
 
 public class MapsActivity extends AppCompatActivity {
     private static final String TAG = "MapsActivity";
@@ -56,11 +58,17 @@ public class MapsActivity extends AppCompatActivity {
     private static final int ID_HELP = 3;
     private static final int ID_ABOUT = 4;
 
-    private GoogleApiClient mGoogleApiClient;
-    private GoogleMap googleMap; // Might be null if Google Play services APK is not available.
-    private Drawer drawer;
-    private MapLayout mapLayout;
+    // Toolbars
+    private Toolbar toolbar;
+    private int     actionBarHeight;
 
+    // Maps
+    private GoogleApiClient mGoogleApiClient;
+    private GoogleMap       googleMap; // Might be null if Google Play services APK is not available.
+    private Drawer          drawer;
+    private MapLayout       mapLayout;
+
+    // Global variables
     private Circle circle;  // Radius circle for parking
     private Circle requestCircle;       // Circle for the incoming request
     private Geocoder geocoder;
@@ -75,6 +83,7 @@ public class MapsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         mapLayout = (MapLayout) findViewById(R.id.map_layout);
+
         geocoder = new Geocoder(this);
 
         setupRequestList(mapLayout.getRecyclerViewRequest());
@@ -82,7 +91,8 @@ public class MapsActivity extends AppCompatActivity {
         setUpMapIfNeeded();
 
         // Setup toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        actionBarHeight = ImageUtil.getActionBarHeight(this);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(getString(R.string.app_name));
 
@@ -114,8 +124,6 @@ public class MapsActivity extends AppCompatActivity {
     }
 
     public void onCancelRequestClicked(View v) {
-//        if (googleMap != null)
-//            googleMap.setPadding(0, 0, 0, 0);
         mapLayout.setMyLocationBtnMargin(dpToPx(10));
         mapLayout.cancelRequest();
         disableCircle();
@@ -171,7 +179,7 @@ public class MapsActivity extends AppCompatActivity {
         mapLayout.setBtnOfferListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if  (taskGetRequestList != null && taskGetRequestList.isRunning) {
+                if (taskGetRequestList != null && taskGetRequestList.isRunning) {
                     taskGetRequestList.cancel(true);
                 }
 
@@ -235,6 +243,17 @@ public class MapsActivity extends AppCompatActivity {
             }
         });
 
+        mapLayout.setOnLayoutMoved(new MapLayout.OnLayoutMoved() {
+            @Override
+            public void onLayoutMoved(double ratio) {
+                int topMargin = -(int) (actionBarHeight * ratio);
+
+                LinearLayout.MarginLayoutParams params = (LinearLayout.MarginLayoutParams) toolbar.getLayoutParams();
+                params.setMargins(params.leftMargin, topMargin, params.rightMargin, params.bottomMargin);
+                toolbar.setLayoutParams(params);
+            }
+        });
+
         googleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition cameraPosition) {
@@ -276,8 +295,6 @@ public class MapsActivity extends AppCompatActivity {
 
     private void updateCurrentAddress() {
         if (googleMap != null) {
-//            googleMap.setPadding(0, dpToPx(48), 0, 0);
-
             mapLayout.setMyLocationBtnMargin(dpToPx(55));
             LatLng latLng = googleMap.getCameraPosition().target;
             new TaskGetAddress().execute(latLng);

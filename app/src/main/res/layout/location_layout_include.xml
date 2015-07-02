@@ -8,7 +8,8 @@
     android:background="@drawable/parking_location_selector"
     android:clickable="true"
     android:visibility="invisible"
-    tools:showIn="@layout/include_map_layout">
+    tools:showIn="@layout/include_map_layout"
+    android:layout_alignTop="@+id/map_container">
 
     <ImageView
         android:id="@+id/search_icon"

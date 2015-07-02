@@ -49,13 +49,13 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     private static final String TAG_FROM = "from";
     private static final String TAG_TO = "to";
     private static final int SEEK_BAR_DEFAULT_VALUE = 300;
-    private static final int LAYOUT_UPDATE_INTERVAL = 50;
 
     // The map
     private View map;
     private View mapContainer;
-    private int mapHeight;
     private View myLocationBtn;
+    private int mapHeight;      // Map height without removing the bottom curtain view
+    private int actionBarHeight;
 
     // Widgets
     private ViewGroup   locationLayout;
@@ -74,6 +74,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     private CurtainView                 curtainViewOffer;
     private OnRequestSelectedListener   onRequestSelectedListener;
     private OnLayoutChangeListener      onLayoutChangeListener;
+    private OnLayoutMoved               onLayoutMoved;
 
     // Offer layout 1 widgets
     private View            offerLayout1;
@@ -99,6 +100,13 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
 
     public interface OnRequestSelectedListener {
         void onRequestSelected(Request request);
+    }
+
+    public interface OnLayoutMoved {
+        /**
+         * @param ratio 0 means the layout hasn't been changed, 1 means changed entirely
+         */
+        void onLayoutMoved(double ratio);
     }
 
     public MapLayout(Context context) {
@@ -315,6 +323,10 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         this.onRequestSelectedListener = onRequestSelectedListener;
     }
 
+    public void setOnLayoutMoved(OnLayoutMoved onLayoutMoved) {
+        this.onLayoutMoved = onLayoutMoved;
+    }
+
     public RecyclerView getRecyclerViewRequest() {
         return recyclerViewRequest;
     }
@@ -342,8 +354,14 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         inflater.inflate(R.layout.include_map_layout, this, true);
         getWidgets();
 
-        mapHeight = ImageUtil.getAppScreenHeight(getContext()) -
-                ImageUtil.getActionBarHeight(getContext());
+        // Set height and margin of the map container
+        actionBarHeight = ImageUtil.getActionBarHeight(getContext());
+        mapHeight = ImageUtil.getAppScreenHeight(getContext()) - actionBarHeight;  // this is tricky (hack)
+
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) mapContainer.getLayoutParams();
+        params.height = mapHeight - context.getResources().getDimensionPixelSize(R.dimen.curtain_view_fixed);
+        params.setMargins(0, actionBarHeight, 0, 0);
+        mapContainer.setLayoutParams(params);
 
         btnOffer.setOnClickListener(new OnClickListener() {
             @Override
@@ -404,6 +422,10 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     private OnLayoutChangeListener getCurtainViewOfferListener() {
         final Wrapper wrapper = new Wrapper();
         wrapper.l = SystemClock.elapsedRealtime();
+        final int curtainViewHeight = getResources().getDimensionPixelOffset(R.dimen.curtain_view_offer_height);
+        final int curtainViewFixedHeight = getResources()
+                .getDimensionPixelOffset(R.dimen.curtain_view_fixed);
+        final int withoutFixedHeight = curtainViewHeight - curtainViewFixedHeight;
 
         return new OnLayoutChangeListener() {
             @Override
@@ -412,18 +434,20 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
                 if (top == oldTop)
                     return;
 
-                long t2 = SystemClock.elapsedRealtime();
-                if (t2 - wrapper.l < LAYOUT_UPDATE_INTERVAL) {
-                    return;
-                }
-                wrapper.l = t2;
+                int diff = mapHeight - top;
+                int topMargin =  -(int) (diff * 0.5) + actionBarHeight;
+//                if (topMargin > 0) {
+//                    topMargin = 0;
+//                }
 
-                ViewGroup.LayoutParams params = mapContainer.getLayoutParams();
-                params.height = mapHeight - (mapHeight - top);
-
-                if (params.height > mapHeight)
-                    params.height = mapHeight;
+                ViewGroup.MarginLayoutParams params = (MarginLayoutParams) mapContainer.getLayoutParams();
+                params.setMargins(params.leftMargin, topMargin, params.rightMargin, params.topMargin);
                 mapContainer.setLayoutParams(params);
+
+                if (onLayoutMoved != null) {
+                    double ratio = (double) diff / withoutFixedHeight;
+                    onLayoutMoved.onLayoutMoved(ratio);
+                }
             }
         };
     }

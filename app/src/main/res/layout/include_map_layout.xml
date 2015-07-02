@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -7,7 +7,8 @@
     <FrameLayout
         android:id="@+id/map_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true">
 
         <fragment
             android:id="@+id/map"
@@ -26,20 +27,18 @@
             android:visibility="visible">
 
             <View
-                android:layout_width="100dp"
-                android:layout_height="1dp"
+                android:layout_width="40dp"
+                android:layout_height="2dp"
                 android:background="@android:color/holo_red_dark"
                 android:layout_gravity="center"/>
 
             <View
-                android:layout_width="1dp"
-                android:layout_height="100dp"
+                android:layout_width="2dp"
+                android:layout_height="40dp"
                 android:background="@android:color/holo_red_dark"
                 android:layout_gravity="center"/>
         </FrameLayout>
     </FrameLayout>
-
-
 
     <!-- Location layout  -->
     <include layout="@layout/location_layout_include" />
@@ -47,10 +46,10 @@
     <!--  first layout -->
     <include layout="@layout/curtain_view_main_layout_include" />
 
-    <!-- Send Request and Cancel CurtainView-->
+    <!-- Send Request and Cancel CurtainView -->
     <include layout="@layout/request_layout_include" />
 
     <!-- Add Offer CurtainView-->
     <include layout="@layout/offer_layout_include" />
 
-</FrameLayout>
+</RelativeLayout>
