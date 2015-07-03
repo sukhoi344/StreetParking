@@ -9,10 +9,11 @@
     android:visibility="invisible"
     curtainView:curtainGravity="bottom"
     curtainView:curtainStatus="closed"
-    curtainView:fixedValue="56dp"
+    curtainView:fixedValue="@dimen/curtain_view_fixed"
     curtainView:reboundMode="half"
     curtainView:scrollDuration="500"
-    tools:showIn="@layout/include_map_layout">
+    tools:showIn="@layout/include_map_layout"
+    android:layout_alignParentBottom="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,7 +25,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#ffffff"
             android:orientation="horizontal">
 
             <Button

@@ -12,4 +12,8 @@
     <color name="mdtp_accent_color">#018509</color>
     <color name="mdtp_accent_color_dark">#005827</color>
 
+    <!-- Circle color -->
+    <color name="circle_stroke_color">#ffff0000</color>
+    <color name="circle_fill_color">#44ff0000</color>
+
 </resources>

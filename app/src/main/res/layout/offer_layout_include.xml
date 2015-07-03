@@ -9,23 +9,24 @@
     android:visibility="invisible"
     curtainView:curtainGravity="bottom"
     curtainView:curtainStatus="closed"
-    curtainView:fixedValue="56dp"
+    curtainView:fixedValue="@dimen/curtain_view_fixed"
     curtainView:reboundMode="half"
     curtainView:scrollDuration="500"
-    tools:showIn="@layout/include_map_layout">
+    tools:showIn="@layout/include_map_layout"
+    android:layout_alignParentBottom="true">
 
     <FrameLayout
-        android:id="@+id/offer_layout_1"
         android:layout_width="match_parent"
-        android:layout_height="280dp"
-        android:background="#ffffff"
-        android:padding="10dp">
+        android:layout_height="@dimen/curtain_view_offer_height"
+        android:background="#ffffff">
 
+        <!--  layout 1 -->
         <LinearLayout
-            android:id="@+id/offer_layout_1_inside"
+            android:id="@+id/offer_layout_1"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="10dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -60,42 +61,220 @@
                 android:layout_gravity="center_horizontal"/>
         </LinearLayout>
 
+        <!--  layout 2 -->
+        <LinearLayout
+            android:id="@+id/offer_layout_2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="invisible">
+
+            <!--  Back and Next buttons-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btn_offer_2_back"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="2dp"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_weight="1"
+                    android:text="BACK" />
+
+                <Button
+                    android:id="@+id/btn_offer_2_next"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginRight="4dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_weight="1"
+                    android:text="NEXT" />
+            </LinearLayout>
+
+            <!--  Requested by -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="5dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:text="Requested by "/>
+
+                <TextView
+                    android:id="@+id/request_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+                <ImageView
+                    android:id="@+id/request_avatar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/img_no_avatar"/>
+            </LinearLayout>
+
+            <!--  Location -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:text="Location: "/>
+
+                <TextView
+                    android:id="@+id/request_location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"/>
+            </LinearLayout>
+
+            <!--  Range -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:text="Range: "/>
+
+                <TextView
+                    android:id="@+id/request_range"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"/>
+            </LinearLayout>
+
+            <!-- Start, End -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Start: "
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/request_start"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:text="End: "
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/request_end"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/offer_layout_3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="invisible">
+
+            <!--  Back and Next buttons-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btn_offer_3_back"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="2dp"
+                    android:layout_marginLeft="4dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_weight="1"
+                    android:text="BACK" />
+
+                <Button
+                    android:id="@+id/btn_offer_3_offer"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginRight="4dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_weight="1"
+                    android:text="OFFER" />
+            </LinearLayout>
+
+            <!-- Set price -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Price"/>
+
+                <EditText
+                    android:id="@+id/edit_text_price_offer_3"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="20dp"
+                    android:inputType="numberDecimal"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:text="Per: "/>
+
+                <Spinner
+                    style="@android:style/Widget.Holo.Light.Spinner"
+                    android:id="@+id/spinner_offer_3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                </Spinner>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
     </FrameLayout>
-
-    <!--<LinearLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:background="#ffffff"-->
-        <!--android:orientation="vertical">-->
-
-        <!--&lt;!&ndash; Add Spot and Cancel button &ndash;&gt;-->
-        <!--<LinearLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:background="#ffffff"-->
-            <!--android:orientation="horizontal">-->
-
-            <!--<Button-->
-                <!--android:id="@+id/btn_add_spot"-->
-                <!--android:layout_width="0dp"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_marginLeft="4dp"-->
-                <!--android:layout_marginRight="2dp"-->
-                <!--android:layout_marginTop="4dp"-->
-                <!--android:layout_weight="1"-->
-                <!--android:onClick="onAddSpotClicked"-->
-                <!--android:text="ADD SPOT" />-->
-
-            <!--<Button-->
-                <!--android:layout_width="0dp"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_marginLeft="2dp"-->
-                <!--android:layout_marginRight="4dp"-->
-                <!--android:layout_marginTop="4dp"-->
-                <!--android:layout_weight="1"-->
-                <!--android:onClick="onCancelAddSpotClicked"-->
-                <!--android:text="CANCEL" />-->
-        <!--</LinearLayout>-->
-
-    <!--</LinearLayout>-->
 </chau.streetparking.ui.curtain.CurtainView>

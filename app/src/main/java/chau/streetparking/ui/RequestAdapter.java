@@ -19,27 +19,26 @@ import chau.streetparking.datamodels.Request;
 public class RequestAdapter extends RecyclerView.Adapter {
     private List<Request> dataSet;
     private Activity activity;
+    private MapLayout mapLayout;
 
     private static class ViewHolder extends RecyclerView.ViewHolder {
         TextView    address,
-                    radius,
                     start,
                     end;
         View view;
-
 
         public ViewHolder(View itemView) {
             super(itemView);
             view = itemView;
             address = (TextView) itemView.findViewById(R.id.address);
-            radius = (TextView) itemView.findViewById(R.id.radius);
             start = (TextView) itemView.findViewById(R.id.start);
             end = (TextView) itemView.findViewById(R.id.end);
         }
     }
 
-    public RequestAdapter(Activity activity, List<Request> dataSet) {
+    public RequestAdapter(Activity activity, MapLayout mapLayout, List<Request> dataSet) {
         this.activity = activity;
+        this.mapLayout = mapLayout;
         this.dataSet = dataSet;
     }
 
@@ -62,9 +61,14 @@ public class RequestAdapter extends RecyclerView.Adapter {
                 viewHolder.address.setText(address.getAddressLine(0));
             }
 
-            viewHolder.radius.setText(request.getRadius() + " ft");
             viewHolder.start.setText(request.getFrom());
             viewHolder.end.setText(request.getTo());
+            viewHolder.view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mapLayout.showSelectedRequest(request);
+                }
+            });
         }
     }
 

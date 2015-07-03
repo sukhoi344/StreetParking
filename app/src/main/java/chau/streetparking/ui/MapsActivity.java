@@ -13,7 +13,10 @@ import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.appyvet.rangebar.RangeBar;
 import com.google.android.gms.common.ConnectionResult;
@@ -43,6 +46,7 @@ import java.util.List;
 import chau.streetparking.R;
 import chau.streetparking.datamodels.Request;
 import chau.streetparking.datamodels.SpotMarker;
+import chau.streetparking.util.ImageUtil;
 
 public class MapsActivity extends AppCompatActivity {
     private static final String TAG = "MapsActivity";
@@ -52,14 +56,21 @@ public class MapsActivity extends AppCompatActivity {
     private static final int ID_PAYMENT = 1;
     private static final int ID_SETTINGS = 2;
     private static final int ID_HELP = 3;
-    private static final int ID_ABOUT =4;
+    private static final int ID_ABOUT = 4;
 
+    // Toolbars
+    private Toolbar toolbar;
+    private int     actionBarHeight;
+
+    // Maps
     private GoogleApiClient mGoogleApiClient;
-    private GoogleMap googleMap; // Might be null if Google Play services APK is not available.
-    private Drawer drawer;
-    private MapLayout mapLayout;
+    private GoogleMap       googleMap; // Might be null if Google Play services APK is not available.
+    private Drawer          drawer;
+    private MapLayout       mapLayout;
 
+    // Global variables
     private Circle circle;  // Radius circle for parking
+    private Circle requestCircle;       // Circle for the incoming request
     private Geocoder geocoder;
     private TaskGetAddress taskGetAddress;
     private TaskGetRequestList taskGetRequestList;
@@ -72,6 +83,7 @@ public class MapsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         mapLayout = (MapLayout) findViewById(R.id.map_layout);
+
         geocoder = new Geocoder(this);
 
         setupRequestList(mapLayout.getRecyclerViewRequest());
@@ -79,7 +91,8 @@ public class MapsActivity extends AppCompatActivity {
         setUpMapIfNeeded();
 
         // Setup toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        actionBarHeight = ImageUtil.getActionBarHeight(this);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(getString(R.string.app_name));
 
@@ -101,37 +114,19 @@ public class MapsActivity extends AppCompatActivity {
             Address address = data.getParcelableExtra(SearchLocationActivity.EXTRA_ADDRESS);
             if (address != null && address.hasLatitude() && address.hasLatitude()) {
                 LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                moveCamera(latLng);
+                moveCamera(latLng, false);
                 updateLocationAddress(latLng);
             }
         }
-    }
-
-    /** Called when "REQUEST" button is clicked */
-    public void onRequestClicked(View v) {
-        updateCurrentAddress();
-        mapLayout.showRequest();
-        enableCircle();
     }
 
     public void onSendRequestClicked(View v) {
     }
 
     public void onCancelRequestClicked(View v) {
-        if (googleMap != null)
-            googleMap.setPadding(0, 0, 0, 0);
+        mapLayout.setMyLocationBtnMargin(dpToPx(10));
         mapLayout.cancelRequest();
         disableCircle();
-    }
-
-    public void onOfferClicked(View v) {
-        mapLayout.showOffer();
-        if  (taskGetRequestList != null && taskGetRequestList.isRunning) {
-            taskGetRequestList.cancel(true);
-        }
-
-        taskGetRequestList = new TaskGetRequestList();
-        taskGetRequestList.execute();
     }
 
     /**
@@ -173,6 +168,26 @@ public class MapsActivity extends AppCompatActivity {
         buildGoogleApiClient();
         googleMap.setMyLocationEnabled(true);
 
+        mapLayout.setBtnRequestListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateCurrentAddress();
+                enableCircle();
+            }
+        });
+
+        mapLayout.setBtnOfferListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (taskGetRequestList != null && taskGetRequestList.isRunning) {
+                    taskGetRequestList.cancel(true);
+                }
+
+                taskGetRequestList = new TaskGetRequestList();
+                taskGetRequestList.execute();
+            }
+        });
+
         mapLayout.setSeekBarListener(new RangeBar.OnRangeBarChangeListener() {
             @Override
             public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex, int rightPinIndex,
@@ -191,6 +206,54 @@ public class MapsActivity extends AppCompatActivity {
             }
         });
 
+        mapLayout.setBackOffer2OnClick(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (requestCircle != null) {
+                    requestCircle.remove();
+                    requestCircle = null;
+                }
+            }
+        });
+
+        mapLayout.setNextOffer2OnClick(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            }
+        });
+
+        mapLayout.setOnRequestSelectedListener(new MapLayout.OnRequestSelectedListener() {
+            @Override
+            public void onRequestSelected(Request request) {
+                if (request != null) {
+                    if (requestCircle != null) {
+                        requestCircle.remove();
+                        requestCircle = null;
+                    }
+
+                    Address address = request.getAddress();
+                    if (address.hasLatitude() && address.hasLongitude()) {
+                        LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                        addRequestCircle(latLng, request.getRadius());
+
+                        LatLng latLngCam = new LatLng(latLng.latitude, latLng.longitude);
+                        moveCamera(latLngCam, true);
+                    }
+                }
+            }
+        });
+
+        mapLayout.setOnLayoutMoved(new MapLayout.OnLayoutMoved() {
+            @Override
+            public void onLayoutMoved(double ratio) {
+                int topMargin = -(int) (actionBarHeight * ratio);
+
+                LinearLayout.MarginLayoutParams params = (LinearLayout.MarginLayoutParams) toolbar.getLayoutParams();
+                params.setMargins(params.leftMargin, topMargin, params.rightMargin, params.bottomMargin);
+                toolbar.setLayoutParams(params);
+            }
+        });
+
         googleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition cameraPosition) {
@@ -201,7 +264,7 @@ public class MapsActivity extends AppCompatActivity {
                 }
 
                 mapLayout.closeCurtainRequest();
-//                mapLayout.closeCurtainReport();
+//                mapLayout.closeCurtainOffer();
 
                 if (mapLayout.getCurrentLayout() == MapLayout.LAYOUT_SEND_CANCEL) {
                     updateLocationAddress(latLng);
@@ -217,7 +280,6 @@ public class MapsActivity extends AppCompatActivity {
         });
 
         setUpClusterer();
-
     }
 
     private void updateLocationAddress(LatLng latLng) {
@@ -233,8 +295,7 @@ public class MapsActivity extends AppCompatActivity {
 
     private void updateCurrentAddress() {
         if (googleMap != null) {
-            googleMap.setPadding(0, dpToPx(48), 0, 0);
-
+            mapLayout.setMyLocationBtnMargin(dpToPx(55));
             LatLng latLng = googleMap.getCameraPosition().target;
             new TaskGetAddress().execute(latLng);
         }
@@ -335,10 +396,10 @@ public class MapsActivity extends AppCompatActivity {
     }
 
     private void showMyLocation(LatLng latLng) {
-        moveCamera(latLng);
+        moveCamera(latLng, false);
     }
 
-    private void moveCamera(LatLng latLng) {
+    private void moveCamera(LatLng latLng, boolean animate) {
         if (latLng != null && googleMap != null) {
 
             CameraPosition cameraPosition = new CameraPosition.Builder()
@@ -347,7 +408,10 @@ public class MapsActivity extends AppCompatActivity {
                     .bearing(0)                 // Sets the orientation of the camera to north
                     .build();                   // Creates a CameraPosition from the builder
 
-            googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            if (!animate)
+                googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            else
+                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         }
     }
 
@@ -357,8 +421,8 @@ public class MapsActivity extends AppCompatActivity {
                 circle = googleMap.addCircle(new CircleOptions()
                         .center(currentCamPosition)
                         .radius(100)
-                        .strokeColor(0xffff0000)
-                        .fillColor(0x44ff0000));
+                        .strokeColor(getResources().getColor(R.color.circle_stroke_color))
+                        .fillColor(getResources().getColor(R.color.circle_fill_color)));
 
                 circle.setStrokeWidth(3.0f);
         }
@@ -368,6 +432,24 @@ public class MapsActivity extends AppCompatActivity {
         if (googleMap != null && circle != null) {
             circle.remove();
             circle = null;
+        }
+    }
+
+    private void addRequestCircle(LatLng latLng, int radius) {
+        if (googleMap != null) {
+            requestCircle = googleMap.addCircle(new CircleOptions()
+                .center(latLng)
+                .radius(radius)
+                .strokeColor(getResources().getColor(R.color.circle_stroke_color))
+                .fillColor(getResources().getColor(R.color.circle_fill_color)));
+            requestCircle.setStrokeWidth(3.0f);
+        }
+    }
+
+    private void removeRequestCircle() {
+        if (googleMap != null && requestCircle != null) {
+            requestCircle.remove();
+            requestCircle = null;
         }
     }
 
@@ -472,10 +554,6 @@ public class MapsActivity extends AppCompatActivity {
     private class TaskGetRequestList extends AsyncTask<Void, Void, List<Request>> {
         private boolean isRunning = false;
 
-        public boolean isRunning() {
-            return isRunning;
-        }
-
         @Override
         protected void onPreExecute() {
             mapLayout.showProgressBarRequest();
@@ -493,7 +571,7 @@ public class MapsActivity extends AppCompatActivity {
                     Address address = addresses.get(0);
 
                     Request request = new Request(
-                            1, address, "John", 1000, "07/12 11:00am", "07/12 4:00pm"
+                            1, address, "John", 100, "07/12 11:00am", "07/12 4:00pm"
                     );
 
                     list.add(request);
@@ -511,8 +589,8 @@ public class MapsActivity extends AppCompatActivity {
             try {
                 if (!isCancelled() && requests != null) {
                     mapLayout.hideProgressBarRequest();
-                    mapLayout.getRecyclerViewRequest().swapAdapter(new RequestAdapter(MapsActivity.this,
-                            requests), true);
+                    mapLayout.getRecyclerViewRequest().swapAdapter(
+                            new RequestAdapter(MapsActivity.this,mapLayout, requests), true);
                 }
 
             } catch (Exception e) {

@@ -505,6 +505,7 @@ public class CurtainView extends FrameLayout implements ICurtainViewBase {
             scrollingListenerOnScrollFinished();
             return;
         }
+
         switch (mCGravity) {
             case LEFT:
             case RIGHT:

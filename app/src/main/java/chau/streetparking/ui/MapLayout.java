@@ -3,8 +3,11 @@ package chau.streetparking.ui;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.os.SystemClock;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,10 +18,13 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.appyvet.rangebar.RangeBar;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
@@ -30,6 +36,7 @@ import chau.streetparking.R;
 import chau.streetparking.datamodels.Request;
 import chau.streetparking.ui.curtain.CurtainView;
 import chau.streetparking.ui.curtain.ICurtainViewBase;
+import chau.streetparking.util.ImageUtil;
 
 /**
  * Created by Chau Thai on 6/9/2015.
@@ -43,23 +50,64 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     private static final String TAG_TO = "to";
     private static final int SEEK_BAR_DEFAULT_VALUE = 300;
 
+    // The map
+    private View map;
+    private View mapContainer;
+    private View myLocationBtn;
+    private int mapHeight;      // Map height without removing the bottom curtain view
+    private int actionBarHeight;
+
     // Widgets
-    private ViewGroup locationLayout;
-    private ViewGroup requestAddLayout;
+    private ViewGroup   locationLayout;
+    private ViewGroup   requestAddLayout;
     private CurtainView curtainViewRequest;
-    private RangeBar seekBar;
-    private TextView tvFrom, tvTo;
-    private Button btnSendRequest;
-    private TextView tvLocation;
+    private RangeBar    seekBar;
+    private TextView    tvFrom, tvTo;
+    private Button      btnSendRequest;
+    private TextView    tvLocation;
+
+    // First layout
+    private Button          btnRequest, btnOffer;
+    private OnClickListener btnRequestListener, btnOfferListener;
 
     // Offer layout widgets
-    private CurtainView curtainViewOffer;
-    private RecyclerView recyclerViewRequest;
-    private ProgressBar progressBar;
-    private Button btnCancelOffer1;
+    private CurtainView                 curtainViewOffer;
+    private OnRequestSelectedListener   onRequestSelectedListener;
+    private OnLayoutChangeListener      onLayoutChangeListener;
+    private OnLayoutMoved               onLayoutMoved;
+
+    // Offer layout 1 widgets
+    private View            offerLayout1;
+    private RecyclerView    recyclerViewRequest;
+    private ProgressBar     progressBar;
+    private Button          btnCancelOffer1;
+
+    // Offer layout 2 widgets
+    private View        offerLayout2;
+    private Button      btnBackOffer2;
+    private Button      btnNextOffer2;
+    private TextView    tvRequestName;
+    private ImageView   ivRequestAvatar;
+    private TextView    tvRequestLocation;
+    private TextView    tvRequestRange;
+    private TextView    tvRequestStart;
+    private TextView    tvRequestEnd;
+    private OnClickListener onClickBackOffer2;
+    private OnClickListener onClickNextOffer2;
 
     private String selectedTime;
     private String currentTag = TAG_FROM;
+
+    public interface OnRequestSelectedListener {
+        void onRequestSelected(Request request);
+    }
+
+    public interface OnLayoutMoved {
+        /**
+         * @param ratio 0 means the layout hasn't been changed, 1 means changed entirely
+         */
+        void onLayoutMoved(double ratio);
+    }
 
     public MapLayout(Context context) {
         super(context);
@@ -127,7 +175,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     /**
      * Change UI when the user selects "REQUEST" button
      */
-    public void showRequest() {
+    private void showRequest() {
         reset();
 
         requestAddLayout.setVisibility(View.INVISIBLE);
@@ -145,8 +193,9 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     /**
      * Change UI when the user selects "OFFER" button
      */
-    public void showOffer() {
+    private void showOffer() {
         reset();
+        curtainViewOffer.addOnLayoutChangeListener(onLayoutChangeListener);
 
         requestAddLayout.setVisibility(View.INVISIBLE);
         curtainViewOffer.setVisibility(View.VISIBLE);
@@ -197,6 +246,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
 
                 @Override
                 public void onScrollFinished() {
+                    curtainViewOffer.removeOnLayoutChangeListener(onLayoutChangeListener);
                     curtainViewOffer.setVisibility(View.INVISIBLE);
                     requestAddLayout.setVisibility(View.VISIBLE);
                     curtainViewOffer.setAutoScrollingListener(null);
@@ -218,12 +268,21 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     }
 
     /**
-     * Close the curtain report layout, which contains the settings for parking request
+     * Show the selected request in the request list
+     * @param request
      */
-    public void closeCurtainReport() {
-        if (curtainViewOffer.getCurtainStatus() != ICurtainViewBase.CurtainStatus.CLOSED) {
-            curtainViewOffer.toggleStatus();
-        }
+    public void showSelectedRequest(Request request) {
+        offerLayout1.setVisibility(View.INVISIBLE);
+        offerLayout2.setVisibility(View.VISIBLE);
+
+        tvRequestName.setText(request.getName());
+        if (request.getAddress().getMaxAddressLineIndex() > 0)
+            tvRequestLocation.setText(request.getAddress().getAddressLine(0));
+        tvRequestRange.setText(request.getRadius() + " ft");
+        tvRequestStart.setText(request.getFrom());
+        tvRequestEnd.setText(request.getTo());
+
+        onRequestSelectedListener.onRequestSelected(request);
     }
 
     /**
@@ -244,6 +303,30 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         }
     }
 
+    public void setBtnRequestListener(OnClickListener onClickListener) {
+        btnRequestListener = onClickListener;
+    }
+
+    public void setBtnOfferListener(OnClickListener onClickListener) {
+        btnOfferListener = onClickListener;
+    }
+
+    public void setBackOffer2OnClick(OnClickListener onClick) {
+        onClickBackOffer2 = onClick;
+    }
+
+    public void setNextOffer2OnClick(OnClickListener onClick) {
+        onClickNextOffer2 = onClick;
+    }
+
+    public void setOnRequestSelectedListener(OnRequestSelectedListener onRequestSelectedListener) {
+        this.onRequestSelectedListener = onRequestSelectedListener;
+    }
+
+    public void setOnLayoutMoved(OnLayoutMoved onLayoutMoved) {
+        this.onLayoutMoved = onLayoutMoved;
+    }
+
     public RecyclerView getRecyclerViewRequest() {
         return recyclerViewRequest;
     }
@@ -258,10 +341,46 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         recyclerViewRequest.setVisibility(View.VISIBLE);
     }
 
+    public void setMyLocationBtnMargin(int top) {
+        if (myLocationBtn != null) {
+            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) myLocationBtn.getLayoutParams();
+            layoutParams.setMargins(layoutParams.leftMargin, top, layoutParams.rightMargin, layoutParams.bottomMargin);
+            myLocationBtn.setLayoutParams(layoutParams);
+        }
+    }
+
     private void init(Context context) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.include_map_layout, this, true);
         getWidgets();
+
+        // Set height and margin of the map container
+        actionBarHeight = ImageUtil.getActionBarHeight(getContext());
+        mapHeight = ImageUtil.getAppScreenHeight(getContext()) - actionBarHeight;  // this is tricky (hack)
+
+        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) mapContainer.getLayoutParams();
+        params.height = mapHeight - context.getResources().getDimensionPixelSize(R.dimen.curtain_view_fixed);
+        params.setMargins(0, actionBarHeight, 0, 0);
+        mapContainer.setLayoutParams(params);
+
+        btnOffer.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showOffer();
+                if (btnOfferListener != null)
+                    btnOfferListener.onClick(v);
+            }
+        });
+
+        btnRequest.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showRequest();
+                if (btnRequestListener != null)
+                    btnRequestListener.onClick(v);
+            }
+        });
+
         seekBar.setSeekPinByValue(SEEK_BAR_DEFAULT_VALUE);
 
         tvFrom.setOnClickListener(new TimeTextViewListener(TAG_FROM));
@@ -274,6 +393,73 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
             }
         });
 
+        btnBackOffer2.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openCurtainViewOffer();
+
+                offerLayout2.setVisibility(View.INVISIBLE);
+                offerLayout1.setVisibility(View.VISIBLE);
+
+                if (onClickBackOffer2 != null)
+                    onClickBackOffer2.onClick(v);
+            }
+        });
+
+        btnNextOffer2.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Do sth
+
+                if (onClickNextOffer2 != null)
+                    onClickNextOffer2.onClick(v);
+            }
+        });
+
+        onLayoutChangeListener = getCurtainViewOfferListener();
+    }
+
+    private OnLayoutChangeListener getCurtainViewOfferListener() {
+        final Wrapper wrapper = new Wrapper();
+        wrapper.l = SystemClock.elapsedRealtime();
+        final int curtainViewHeight = getResources().getDimensionPixelOffset(R.dimen.curtain_view_offer_height);
+        final int curtainViewFixedHeight = getResources()
+                .getDimensionPixelOffset(R.dimen.curtain_view_fixed);
+        final int withoutFixedHeight = curtainViewHeight - curtainViewFixedHeight;
+
+        return new OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft,
+                                       int oldTop, int oldRight, int oldBottom) {
+                if (top == oldTop)
+                    return;
+
+                int diff = mapHeight - top;
+                int topMargin =  -(int) (diff * 0.5) + actionBarHeight;
+//                if (topMargin > 0) {
+//                    topMargin = 0;
+//                }
+
+                ViewGroup.MarginLayoutParams params = (MarginLayoutParams) mapContainer.getLayoutParams();
+                params.setMargins(params.leftMargin, topMargin, params.rightMargin, params.topMargin);
+                mapContainer.setLayoutParams(params);
+
+                if (onLayoutMoved != null) {
+                    double ratio = (double) diff / withoutFixedHeight;
+                    onLayoutMoved.onLayoutMoved(ratio);
+                }
+            }
+        };
+    }
+
+    private class Wrapper {
+        long l;
+    }
+
+    private void openCurtainViewOffer() {
+        if (curtainViewOffer.getCurtainStatus() != ICurtainViewBase.CurtainStatus.OPENED) {
+            curtainViewOffer.toggleStatus();
+        }
     }
 
     private void reset() {
@@ -314,6 +500,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     }
 
     private void getWidgets() {
+        mapContainer = findViewById(R.id.map_container);
         locationLayout = (ViewGroup) findViewById(R.id.location_layout);
         requestAddLayout = (ViewGroup) findViewById(R.id.request_add_layout);
         curtainViewRequest = (CurtainView) findViewById(R.id.curtain_view);
@@ -322,10 +509,31 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         tvTo = (TextView) findViewById(R.id.to);
         btnSendRequest = (Button) findViewById(R.id.btn_send_request);
         tvLocation = (TextView) findViewById(R.id.tv_location);
+        btnRequest = (Button) findViewById(R.id.btn_request);
+        btnOffer = (Button) findViewById(R.id.btn_offer);
 
         curtainViewOffer = (CurtainView) findViewById(R.id.curtain_view_offer);
+
+        offerLayout1 = findViewById(R.id.offer_layout_1);
         recyclerViewRequest = (RecyclerView) findViewById(R.id.recycler_view_request);
         progressBar = (ProgressBar) findViewById(R.id.progress_bar_offer_1);
         btnCancelOffer1 = (Button) findViewById(R.id.btn_cancel_offer_1);
+
+        offerLayout2 = findViewById(R.id.offer_layout_2);
+        btnBackOffer2 = (Button) findViewById(R.id.btn_offer_2_back);
+        btnNextOffer2 = (Button) findViewById(R.id.btn_offer_2_next);
+        tvRequestName = (TextView) findViewById(R.id.request_name);
+        ivRequestAvatar = (ImageView) findViewById(R.id.request_avatar);
+        tvRequestLocation = (TextView) findViewById(R.id.request_location);
+        tvRequestRange = (TextView) findViewById(R.id.request_range);
+        tvRequestStart = (TextView) findViewById(R.id.request_start);
+        tvRequestEnd = (TextView) findViewById(R.id.request_end);
+
+        SupportMapFragment supportMapFragment = (SupportMapFragment) ((FragmentActivity) getContext())
+                .getSupportFragmentManager().findFragmentById(R.id.map);
+        map = supportMapFragment.getView();
+
+        // This is a hack!!! Beware new Google Play Service update
+        myLocationBtn = map.findViewById(2);
     }
 }
