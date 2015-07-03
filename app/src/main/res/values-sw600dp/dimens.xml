@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="curtain_view_fixed">56dp</dimen>
+    <!-- TODO: fix the bug which causes the map size smaller than normal -->
+    <dimen name="curtain_view_fixed">66dp</dimen>
     <dimen name="curtain_view_offer_height">290dp</dimen>
 </resources>

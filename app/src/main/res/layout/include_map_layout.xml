@@ -18,13 +18,31 @@
             android:layout_gravity="top"
             tools:context=".MapsActivity" />
 
+        <!--  Set offer location layout -->
+        <FrameLayout
+            android:id="@+id/set_offer_location_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:layout_marginBottom="50dp"
+            android:layout_gravity="center"
+            android:visibility="invisible"
+            android:clickable="true"
+            android:background="@drawable/parking_location_selector">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SET OFFER LOCATION"/>
+        </FrameLayout>
+
         <!-- Cross layout -->
         <FrameLayout
             android:id="@+id/cross_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:visibility="visible">
+            android:visibility="invisible">
 
             <View
                 android:layout_width="40dp"

@@ -58,6 +58,8 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     private int actionBarHeight;
 
     // Widgets
+    private ViewGroup   setOfferLocatonLayout;
+    private ViewGroup   crossLayout;
     private ViewGroup   locationLayout;
     private ViewGroup   requestAddLayout;
     private CurtainView curtainViewRequest;
@@ -181,9 +183,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         requestAddLayout.setVisibility(View.INVISIBLE);
         curtainViewRequest.setVisibility(View.VISIBLE);
 
-        locationLayout.setVisibility(View.VISIBLE);
-        Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.slide_in_up);
-        locationLayout.startAnimation(animation);
+        showLocationLayout();
 
         if (curtainViewRequest.getCurtainStatus() == ICurtainViewBase.CurtainStatus.CLOSED) {
             curtainViewRequest.toggleStatus();
@@ -228,9 +228,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
             requestAddLayout.setVisibility(View.VISIBLE);
         }
 
-        locationLayout.setVisibility(View.INVISIBLE);
-        Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.slide_out_up);
-        locationLayout.startAnimation(animation);
+        hideLocationLayout();
     }
 
     /**
@@ -272,8 +270,13 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
      * @param request
      */
     public void showSelectedRequest(Request request) {
+        showLocationLayout();
+
         offerLayout1.setVisibility(View.INVISIBLE);
         offerLayout2.setVisibility(View.VISIBLE);
+
+        setOfferLocatonLayout.setVisibility(View.VISIBLE);
+        crossLayout.setVisibility(View.VISIBLE);
 
         tvRequestName.setText(request.getName());
         if (request.getAddress().getMaxAddressLineIndex() > 0)
@@ -349,6 +352,18 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         }
     }
 
+    private void hideLocationLayout() {
+        locationLayout.setVisibility(View.INVISIBLE);
+        Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.slide_out_up);
+        locationLayout.startAnimation(animation);
+    }
+
+    private void showLocationLayout() {
+        locationLayout.setVisibility(View.VISIBLE);
+        Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.slide_in_up);
+        locationLayout.startAnimation(animation);
+    }
+
     private void init(Context context) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.include_map_layout, this, true);
@@ -396,10 +411,13 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         btnBackOffer2.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                hideLocationLayout();
                 openCurtainViewOffer();
 
                 offerLayout2.setVisibility(View.INVISIBLE);
                 offerLayout1.setVisibility(View.VISIBLE);
+                setOfferLocatonLayout.setVisibility(View.INVISIBLE);
+                crossLayout.setVisibility(View.INVISIBLE);
 
                 if (onClickBackOffer2 != null)
                     onClickBackOffer2.onClick(v);
@@ -501,6 +519,8 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
 
     private void getWidgets() {
         mapContainer = findViewById(R.id.map_container);
+        setOfferLocatonLayout = (ViewGroup) findViewById(R.id.set_offer_location_layout);
+        crossLayout = (ViewGroup) findViewById(R.id.cross_view);
         locationLayout = (ViewGroup) findViewById(R.id.location_layout);
         requestAddLayout = (ViewGroup) findViewById(R.id.request_add_layout);
         curtainViewRequest = (CurtainView) findViewById(R.id.curtain_view);
