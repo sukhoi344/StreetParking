@@ -6,6 +6,8 @@ import android.content.Context;
 import android.os.SystemClock;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -21,6 +24,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.appyvet.rangebar.RangeBar;
@@ -83,11 +87,12 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     private RecyclerView    recyclerViewRequest;
     private ProgressBar     progressBar;
     private Button          btnCancelOffer1;
+    private OnClickListener onClickCancelOffer1;
 
     // Offer layout 2 widgets
     private View        offerLayout2;
     private Button      btnBackOffer2;
-    private Button      btnNextOffer2;
+//    private Button      btnNextOffer2;
     private TextView    tvRequestName;
     private ImageView   ivRequestAvatar;
     private TextView    tvRequestLocation;
@@ -96,6 +101,18 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     private TextView    tvRequestEnd;
     private OnClickListener onClickBackOffer2;
     private OnClickListener onClickNextOffer2;
+
+    // Offer layout 3 widgets
+    private ViewGroup       offerLayout3;
+    private Button          btnBackOffer3;
+    private Button          btnOffer3;
+    private Button          btnAddPhotos;
+    private EditText        etPriceOffer3;
+    private Spinner         spinnerOffer3;
+    private RecyclerView    recyclerViewPhotos;
+    private OnClickListener onClickSetOfferLocation;
+    private OnClickListener onClickBackOffer3;
+    private OnClickListener onClickAddPhotos;
 
     private String selectedTime;
     private String currentTag = TAG_FROM;
@@ -314,6 +331,10 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         btnOfferListener = onClickListener;
     }
 
+    public void setCancelOffer1OnClick(OnClickListener onClick) {
+        onClickCancelOffer1 = onClick;
+    }
+
     public void setBackOffer2OnClick(OnClickListener onClick) {
         onClickBackOffer2 = onClick;
     }
@@ -350,6 +371,22 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
             layoutParams.setMargins(layoutParams.leftMargin, top, layoutParams.rightMargin, layoutParams.bottomMargin);
             myLocationBtn.setLayoutParams(layoutParams);
         }
+    }
+
+    public void setSetOfferLocationListener(OnClickListener onClick) {
+        onClickSetOfferLocation = onClick;
+    }
+
+    public void setBackOffer3Listener(OnClickListener onClick) {
+        onClickBackOffer3 = onClick;
+    }
+
+    public void setAddPhotosListener(OnClickListener onClick) {
+        onClickAddPhotos = onClick;
+    }
+
+    public RecyclerView getRecyclerViewPhotos() {
+        return recyclerViewPhotos;
     }
 
     private void hideLocationLayout() {
@@ -405,6 +442,8 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
             @Override
             public void onClick(View v) {
                 cancelOffer();
+                if (onClickCancelOffer1 != null)
+                    onClickCancelOffer1.onClick(v);
             }
         });
 
@@ -424,17 +463,71 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
             }
         });
 
-        btnNextOffer2.setOnClickListener(new OnClickListener() {
+        setOfferLocatonLayout.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Do sth
+                offerLayout3.setVisibility(View.VISIBLE);
+                offerLayout2.setVisibility(View.INVISIBLE);
+                setOfferLocatonLayout.setVisibility(View.INVISIBLE);
+                locationLayout.setEnabled(false);
 
-                if (onClickNextOffer2 != null)
-                    onClickNextOffer2.onClick(v);
+                if (onClickSetOfferLocation != null)
+                    onClickSetOfferLocation.onClick(v);
+            }
+        });
+
+        btnBackOffer3.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                offerLayout2.setVisibility(View.VISIBLE);
+                offerLayout3.setVisibility(View.INVISIBLE);
+                setOfferLocatonLayout.setVisibility(View.VISIBLE);
+                locationLayout.setEnabled(true);
+
+                if (onClickBackOffer3 != null)
+                    onClickBackOffer3.onClick(v);
+            }
+        });
+
+        etPriceOffer3.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s == null || s.length() == 0) {
+                    btnOffer3.setEnabled(false);
+                } else {
+                    btnOffer3.setEnabled(true);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+        setupSpinnerPrice();
+
+        btnAddPhotos.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (onClickAddPhotos != null)
+                    onClickAddPhotos.onClick(v);
             }
         });
 
         onLayoutChangeListener = getCurtainViewOfferListener();
+    }
+
+    private void setupSpinnerPrice() {
+        if (spinnerOffer3 != null) {
+            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
+                    R.array.price_type_array, android.R.layout.simple_spinner_item);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinnerOffer3.setAdapter(adapter);
+            spinnerOffer3.setOnItemSelectedListener(null);
+        }
     }
 
     private OnLayoutChangeListener getCurtainViewOfferListener() {
@@ -454,9 +547,6 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
 
                 int diff = mapHeight - top;
                 int topMargin =  -(int) (diff * 0.5) + actionBarHeight;
-//                if (topMargin > 0) {
-//                    topMargin = 0;
-//                }
 
                 ViewGroup.MarginLayoutParams params = (MarginLayoutParams) mapContainer.getLayoutParams();
                 params.setMargins(params.leftMargin, topMargin, params.rightMargin, params.topMargin);
@@ -541,13 +631,21 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
 
         offerLayout2 = findViewById(R.id.offer_layout_2);
         btnBackOffer2 = (Button) findViewById(R.id.btn_offer_2_back);
-        btnNextOffer2 = (Button) findViewById(R.id.btn_offer_2_next);
+//        btnNextOffer2 = (Button) findViewById(R.id.btn_offer_2_next);
         tvRequestName = (TextView) findViewById(R.id.request_name);
         ivRequestAvatar = (ImageView) findViewById(R.id.request_avatar);
         tvRequestLocation = (TextView) findViewById(R.id.request_location);
         tvRequestRange = (TextView) findViewById(R.id.request_range);
         tvRequestStart = (TextView) findViewById(R.id.request_start);
         tvRequestEnd = (TextView) findViewById(R.id.request_end);
+
+        offerLayout3 = (ViewGroup) findViewById(R.id.offer_layout_3);
+        btnBackOffer3  = (Button) findViewById(R.id.btn_offer_3_back);
+        btnOffer3 = (Button) findViewById(R.id.btn_offer_3_offer);
+        etPriceOffer3 = (EditText) findViewById(R.id.edit_text_price_offer_3);
+        spinnerOffer3 = (Spinner) findViewById(R.id.spinner_offer_3);
+        btnAddPhotos = (Button) findViewById(R.id.btn_add_photos);
+        recyclerViewPhotos = (RecyclerView) findViewById(R.id.recycler_view_photos);
 
         SupportMapFragment supportMapFragment = (SupportMapFragment) ((FragmentActivity) getContext())
                 .getSupportFragmentManager().findFragmentById(R.id.map);

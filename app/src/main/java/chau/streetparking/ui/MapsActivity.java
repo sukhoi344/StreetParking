@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -14,9 +15,11 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
+import android.widget.CheckBox;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.appyvet.rangebar.RangeBar;
 import com.google.android.gms.common.ConnectionResult;
@@ -51,6 +54,7 @@ import chau.streetparking.util.ImageUtil;
 public class MapsActivity extends AppCompatActivity {
     private static final String TAG = "MapsActivity";
     private static final int REQUEST_CODE_SEARCH = 1;
+    private static final int REQUEST_CODE_IMAGE = 2;
 
     private static final int ID_PROFILE = 0;
     private static final int ID_PAYMENT = 1;
@@ -61,6 +65,10 @@ public class MapsActivity extends AppCompatActivity {
     // Toolbars
     private Toolbar toolbar;
     private int     actionBarHeight;
+
+    // Notification setting
+    private View        notificationLayout;
+    private CheckBox    notificationCheckBox;
 
     // Maps
     private GoogleApiClient mGoogleApiClient;
@@ -74,6 +82,7 @@ public class MapsActivity extends AppCompatActivity {
     private Geocoder geocoder;
     private TaskGetAddress taskGetAddress;
     private TaskGetRequestList taskGetRequestList;
+    private List<Uri> photoList = new ArrayList<>();
 
     // For testing purpose
     private List<SpotMarker> testList = new ArrayList<>();
@@ -82,17 +91,17 @@ public class MapsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        mapLayout = (MapLayout) findViewById(R.id.map_layout);
+        getWidgets();
 
         geocoder = new Geocoder(this);
 
         setupRequestList(mapLayout.getRecyclerViewRequest());
+        setupPhotoRecyclerView();
         setupTestList();
         setUpMapIfNeeded();
 
         // Setup toolbar
         actionBarHeight = ImageUtil.getActionBarHeight(this);
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(getString(R.string.app_name));
 
@@ -118,6 +127,16 @@ public class MapsActivity extends AppCompatActivity {
                 updateLocationAddress(latLng);
             }
         }
+
+        if (requestCode == REQUEST_CODE_IMAGE) {
+            final Uri uri = data.getData();
+            photoList.add(uri);
+
+            mapLayout.getRecyclerViewPhotos().swapAdapter(
+                    new PhotosAdapter(MapsActivity.this, photoList),
+                    true
+            );
+        }
     }
 
     public void onSendRequestClicked(View v) {
@@ -127,6 +146,7 @@ public class MapsActivity extends AppCompatActivity {
         mapLayout.setMyLocationBtnMargin(dpToPx(10));
         mapLayout.cancelRequest();
         disableCircle();
+        showNotificationLayout();
     }
 
     /**
@@ -173,6 +193,7 @@ public class MapsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 updateCurrentAddress();
                 enableCircle();
+                hideNotificationLayout();
             }
         });
 
@@ -185,6 +206,8 @@ public class MapsActivity extends AppCompatActivity {
 
                 taskGetRequestList = new TaskGetRequestList();
                 taskGetRequestList.execute();
+
+                hideNotificationLayout();
             }
         });
 
@@ -203,6 +226,13 @@ public class MapsActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MapsActivity.this, SearchLocationActivity.class);
                 startActivityForResult(intent, REQUEST_CODE_SEARCH);
+            }
+        });
+
+        mapLayout.setCancelOffer1OnClick(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showNotificationLayout();
             }
         });
 
@@ -251,6 +281,37 @@ public class MapsActivity extends AppCompatActivity {
                 LinearLayout.MarginLayoutParams params = (LinearLayout.MarginLayoutParams) toolbar.getLayoutParams();
                 params.setMargins(params.leftMargin, topMargin, params.rightMargin, params.bottomMargin);
                 toolbar.setLayoutParams(params);
+            }
+        });
+
+        mapLayout.setSetOfferLocationListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                googleMap.getUiSettings().setScrollGesturesEnabled(false);
+            }
+        });
+
+        mapLayout.setBackOffer3Listener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                googleMap.getUiSettings().setScrollGesturesEnabled(true);
+                photoList.clear();
+                final RecyclerView.Adapter adapter = mapLayout.getRecyclerViewPhotos().getAdapter();
+                if (adapter != null) {
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        });
+
+        mapLayout.setAddPhotosListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/*");
+//                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE);
+
+                Intent chooser = Intent.createChooser(intent, "Choose a Picture");
+                startActivityForResult(chooser, REQUEST_CODE_IMAGE);
             }
         });
 
@@ -459,6 +520,27 @@ public class MapsActivity extends AppCompatActivity {
         recyclerView.addItemDecoration(new DividerItemDecoration(this, null));
     }
 
+    private void setupPhotoRecyclerView() {
+        if (mapLayout != null) {
+            final RecyclerView recyclerView = mapLayout.getRecyclerViewPhotos();
+            recyclerView.setLayoutManager(new LinearLayoutManager(this,
+                    LinearLayoutManager.HORIZONTAL, false));
+            recyclerView.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        }
+    }
+
+    private void hideNotificationLayout() {
+        notificationLayout.setVisibility(View.INVISIBLE);
+        Animation animation = AnimationUtils.loadAnimation(this, R.anim.slide_out_up);
+        notificationLayout.startAnimation(animation);
+    }
+
+    private void showNotificationLayout() {
+        notificationLayout.setVisibility(View.VISIBLE);
+        Animation animation = AnimationUtils.loadAnimation(this, R.anim.slide_in_up);
+        notificationLayout.startAnimation(animation);
+    }
+
     private void setUpClusterer() {
         // Declare a variable for the cluster manager.
         ClusterManager<SpotMarker> mClusterManager;
@@ -510,6 +592,13 @@ public class MapsActivity extends AppCompatActivity {
     private int dpToPx(int dp) {
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         return (int)((dp * displayMetrics.density) + 0.5);
+    }
+
+    private void getWidgets() {
+        mapLayout = (MapLayout) findViewById(R.id.map_layout);
+        notificationLayout = findViewById(R.id.notification_layout);
+        notificationCheckBox = (CheckBox) findViewById(R.id.check_box_notification);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
     }
 
     private class TaskGetAddress extends AsyncTask<LatLng, Void, String> {
