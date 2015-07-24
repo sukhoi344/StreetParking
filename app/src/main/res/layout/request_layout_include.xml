@@ -71,8 +71,8 @@
                 android:layout_height="72dp"
                 android:layout_marginLeft="4dp"
                 custom:rangeBar="false"
-                custom:tickEnd="3000"
-                custom:tickInterval="30"
+                custom:tickEnd="1500"
+                custom:tickInterval="150"
                 custom:tickStart="150" />
         </LinearLayout>
 
@@ -96,7 +96,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:clickable="true"
-                    android:text="Start:"
+                    android:text="Start Date:"
                     android:textColor="@android:color/black" />
 
                 <TextView
@@ -121,7 +121,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:clickable="true"
-                    android:text="End:"
+                    android:text="End Date:"
                     android:textColor="@android:color/black" />
 
                 <TextView

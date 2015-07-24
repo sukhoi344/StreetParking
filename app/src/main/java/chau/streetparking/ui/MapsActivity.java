@@ -58,9 +58,10 @@ public class MapsActivity extends AppCompatActivity {
 
     private static final int ID_PROFILE = 0;
     private static final int ID_PAYMENT = 1;
-    private static final int ID_SETTINGS = 2;
+//    private static final int ID_SETTINGS = 5;
     private static final int ID_HELP = 3;
     private static final int ID_ABOUT = 4;
+    private static final int ID_MY_PARKING_LOTS = 2;
 
     // Toolbars
     private Toolbar toolbar;
@@ -324,7 +325,7 @@ public class MapsActivity extends AppCompatActivity {
                     circle.setCenter(latLng);
                 }
 
-                mapLayout.closeCurtainRequest();
+//                mapLayout.closeCurtainRequest();
 //                mapLayout.closeCurtainOffer();
 
                 if (mapLayout.getCurrentLayout() == MapLayout.LAYOUT_SEND_CANCEL) {
@@ -389,8 +390,8 @@ public class MapsActivity extends AppCompatActivity {
                                 .withIcon(R.drawable.ic_account_circle_black_24dp).withIdentifier(ID_PROFILE),
                         new PrimaryDrawerItem().withName("Payment").withIdentifier(ID_PAYMENT)
                                 .withIcon(R.drawable.ic_credit_card_black_24dp),
-                        new PrimaryDrawerItem().withName("Settings")
-                                .withIcon(R.drawable.ic_settings_black_24dp).withIdentifier(ID_SETTINGS),
+                        new PrimaryDrawerItem().withName("My Parking Lots")
+                                .withIcon(R.drawable.ic_home).withIdentifier(ID_MY_PARKING_LOTS),
                         new PrimaryDrawerItem().withName("Help").withIdentifier(ID_HELP)
                                 .withIcon(R.drawable.ic_help_outline_black_24dp),
                         new PrimaryDrawerItem().withName("About").withIdentifier(ID_ABOUT)
@@ -412,8 +413,8 @@ public class MapsActivity extends AppCompatActivity {
                                 startActivity(intent);
                                 return true;
                             }
-                            case ID_SETTINGS: {
-                                Intent intent = new Intent(MapsActivity.this, SettingsActivity.class);
+                            case ID_MY_PARKING_LOTS: {
+                                Intent intent = new Intent(MapsActivity.this, MyGarageActivity.class);
                                 startActivity(intent);
                                 return true;
                             }
