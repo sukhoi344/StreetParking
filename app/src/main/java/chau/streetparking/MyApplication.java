@@ -2,6 +2,7 @@ package chau.streetparking;
 
 import android.app.Application;
 
+import com.backendless.Backendless;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -16,6 +17,7 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         initImageLoader();
+        initBackendless();
     }
 
     private void initImageLoader() {
@@ -32,5 +34,13 @@ public class MyApplication extends Application {
 
         // Initialize ImageLoader with configuration.
         ImageLoader.getInstance().init(config.build());
+    }
+
+    private void initBackendless() {
+        final String applicationId = getString(R.string.backendless_app_id);
+        final String secretKey = getString(R.string.backendless_secret_key);
+        final String version = getString(R.string.backendless_version);
+
+        Backendless.initApp(this, applicationId, secretKey, version);
     }
 }

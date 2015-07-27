@@ -1,4 +1,4 @@
-package chau.streetparking.ui;
+package chau.streetparking.ui.login;
 
 import android.content.Intent;
 import android.os.Bundle;

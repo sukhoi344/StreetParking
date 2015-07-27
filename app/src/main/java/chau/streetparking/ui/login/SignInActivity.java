@@ -1,4 +1,4 @@
-package chau.streetparking.ui;
+package chau.streetparking.ui.login;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,16 +6,22 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import chau.streetparking.R;
+import chau.streetparking.ui.ColoredBarActivity;
+import chau.streetparking.ui.MapsActivity;
 
 /**
  * Created by Chau Thai on 6/7/2015.
  */
-public class SignInActivity extends AppCompatActivity {
+public class SignInActivity extends ColoredBarActivity {
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.sign_in_activity);
+    protected int getLayout() {
+        return R.layout.sign_in_activity;
+    }
+
+    @Override
+    protected String getTitleToolbar() {
+        return "SIGN IN";
     }
 
     @Override
