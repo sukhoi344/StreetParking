@@ -17,6 +17,19 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES.txt'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/dependencies.txt'
+        exclude 'META-INF/LGPL2.1'
+    }
 }
 
 repositories {
@@ -38,5 +51,7 @@ dependencies {
     compile 'com.wdullaer:materialdatetimepicker:+'
     compile 'com.readystatesoftware.systembartint:systembartint:+'
     compile 'com.github.dbachelder:CreditCardEntry:v1.3.0'
+    compile 'com.backendless:android:2.0.1'
     compile project(':countrypicker')
+    compile files('libs/universal-image-loader-1.9.4.jar')
 }
