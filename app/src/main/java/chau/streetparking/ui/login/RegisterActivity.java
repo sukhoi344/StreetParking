@@ -68,6 +68,10 @@ public class RegisterActivity extends ColoredBarActivity {
             return;
         }
 
+        if (password.length() < 5) {
+            Toast.makeText(this, "Password must have at least 5 characters", Toast.LENGTH_SHORT).show();
+        }
+
         if (!DeviceUtil.hasConnection(this)) {
             Toast.makeText(this, "No Internet connection", Toast.LENGTH_SHORT).show();
             return;

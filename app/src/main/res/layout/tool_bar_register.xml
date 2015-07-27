@@ -4,17 +4,26 @@
     android:layout_height="?attr/actionBarSize"
     android:background="@color/primary">
 
-    <TextView
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="10dp"
-        android:text="CANCEL"
-        android:textColor="#ffffff"
+        android:paddingLeft="10dp"
+        android:orientation="vertical"
+        android:gravity="center"
         android:clickable="true"
-        android:onClick="onCancelClicked"/>
+        android:onClick="onCancelClicked">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:duplicateParentState="true"
+            android:text="CANCEL"
+            android:textColor="@drawable/text_selector"
+            android:clickable="false" />
+    </LinearLayout>
 
     <TextView
         android:layout_width="wrap_content"
@@ -24,15 +33,25 @@
         android:textColor="#ffffff"
         android:textSize="20sp"/>
 
-    <TextView
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
-        android:layout_marginRight="10dp"
-        android:text="NEXT"
-        android:textColor="#ffffff"
+        android:paddingRight="10dp"
+        android:orientation="vertical"
+        android:gravity="center"
         android:clickable="true"
-        android:onClick="onNextClicked"/>
+        android:onClick="onNextClicked">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="NEXT"
+            android:textColor="@drawable/text_selector"
+            android:clickable="false"
+            android:duplicateParentState="true"/>
+    </LinearLayout>
+
 </RelativeLayout>

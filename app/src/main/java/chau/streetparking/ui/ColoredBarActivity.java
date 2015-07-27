@@ -11,7 +11,7 @@ import chau.streetparking.R;
 
 /**
  * Activity with colored status bar and action bar.
- * The layout must contain Toolbar with id="toolbar".
+ * The layout should contain Toolbar with id="toolbar".
  *
  * Created by Chau Thai on 6/18/2015.
  */

@@ -30,7 +30,7 @@
             android:layout_marginEnd="5dp"
             android:layout_marginRight="5dp"
             android:layout_weight="1"
-            android:background="#000000" />
+            android:background="#55000000" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -43,7 +43,7 @@
             android:layout_marginLeft="5dp"
             android:layout_marginStart="5dp"
             android:layout_weight="1"
-            android:background="#000000" />
+            android:background="#55000000" />
     </LinearLayout>
 
     <!--  EditText input layout -->
@@ -51,7 +51,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:background="#ffffff"
+        android:background="@drawable/border_solid_white"
         android:orientation="vertical">
 
         <!--  Email -->
@@ -63,8 +63,9 @@
             android:padding="10dp">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
+                android:gravity="right"
                 android:text="Email" />
 
             <EditText
@@ -73,7 +74,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:textColor="@android:color/black"
-                android:inputType="textEmailAddress"/>
+                android:inputType="textEmailAddress"
+                android:hint="name@example.com"
+                android:textColorHint="@color/hint_color"/>
         </LinearLayout>
 
         <View
@@ -90,8 +93,9 @@
             android:padding="10dp">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
+                android:gravity="right"
                 android:text="Mobile" />
 
             <EditText
@@ -117,8 +121,9 @@
             android:padding="10dp">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="70dp"
                 android:layout_height="wrap_content"
+                android:gravity="right"
                 android:text="Password" />
 
             <EditText
@@ -127,7 +132,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:textColor="@android:color/black"
-                android:inputType="textPassword"/>
+                android:inputType="textPassword"
+                android:hint="Min 5 characters"
+                android:textColorHint="@color/hint_color"/>
         </LinearLayout>
 
     </LinearLayout>
