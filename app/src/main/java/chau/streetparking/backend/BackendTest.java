@@ -29,7 +29,7 @@ public class BackendTest {
         Log.d(TAG, "Test begins");
 
         final String whereClause = UserProperties.EMAIL + " = 'DavidBeckham@gmail.com' "
-                + " OR " + UserProperties.MOBILE + " = 2023301969";
+                + " OR " + UserProperties.MOBILE + " = '2023301969'";
         final BackendlessDataQuery query = new BackendlessDataQuery();
         query.setWhereClause(whereClause);
 
