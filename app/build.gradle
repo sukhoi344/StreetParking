@@ -8,8 +8,8 @@ android {
         applicationId "chau.streetparking"
         minSdkVersion 17
         targetSdkVersion 22
-        versionCode 3
-        versionName "1.0 Build 1506.04"
+        versionCode 4
+        versionName "1.0 Build 1507.01"
     }
     buildTypes {
         release {
@@ -52,6 +52,8 @@ dependencies {
     compile 'com.readystatesoftware.systembartint:systembartint:+'
     compile 'com.github.dbachelder:CreditCardEntry:v1.3.0'
     compile 'com.backendless:android:2.0.1'
+    compile 'com.makeramen:roundedimageview:+'
+    compile 'com.soundcloud.android:android-crop:1.0.0@aar'
     compile project(':countrypicker')
     compile files('libs/universal-image-loader-1.9.4.jar')
 }

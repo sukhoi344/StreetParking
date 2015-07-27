@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#22018509"
+    android:background="@color/background_green_light"
     android:gravity="center_horizontal"
     android:orientation="vertical">
 
@@ -136,6 +136,21 @@
                 android:hint="Min 5 characters"
                 android:textColorHint="@color/hint_color"/>
         </LinearLayout>
-
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/text_view_error_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="10dp"
+        android:textColor="@android:color/holo_red_dark"/>
+
+    <TextView
+        android:id="@+id/text_view_error_2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="10dp"
+        android:textColor="@android:color/holo_red_dark"/>
 </LinearLayout>

@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.backendless.exceptions.BackendlessFault;
@@ -26,6 +27,8 @@ public class RegisterActivity extends ColoredBarActivity {
     private EditText    etEmail,
                         etMobile,
                         etPassword;
+    private TextView    tvError1,
+                        tvError2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,9 +62,10 @@ public class RegisterActivity extends ColoredBarActivity {
      * Called when "NEXT" TextView is clicked
      */
     public void onNextClicked(View v) {
-        String email = etEmail.getText().toString();
-        String mobile = etMobile.getText().toString();
-        String password = etPassword.getText().toString();
+        // TODO: format phone number
+        final String email = etEmail.getText().toString();
+        final String mobile = etMobile.getText().toString();
+        final String password = etPassword.getText().toString();
 
         if (email.isEmpty() || mobile.isEmpty() || password.isEmpty()) {
             Toast.makeText(this, "Please complete the form", Toast.LENGTH_SHORT).show();
@@ -70,6 +74,7 @@ public class RegisterActivity extends ColoredBarActivity {
 
         if (password.length() < 5) {
             Toast.makeText(this, "Password must have at least 5 characters", Toast.LENGTH_SHORT).show();
+            return;
         }
 
         if (!DeviceUtil.hasConnection(this)) {
@@ -80,19 +85,11 @@ public class RegisterActivity extends ColoredBarActivity {
         final IdentityVerifier identityVerifier = new IdentityVerifier(this, new IdentityVerifier.ResultCallback() {
             @Override
             public void handleResult(int result) {
-                switch (result) {
-                    case IdentityVerifier.RESULT_PASS:
-                        Logger.d(TAG, "Pass");
-                        break;
-                    case IdentityVerifier.RESULT_DUPLICATE_EMAIL:
-                        Logger.d(TAG, "Duplicate email");
-                        break;
-                    case IdentityVerifier.RESULT_DUPLICATE_MOBILE:
-                        Logger.d(TAG, "Duplicate mobile");
-                        break;
-                    case IdentityVerifier.RESULT_DUPLICATE_BOTH:
-                        Logger.d(TAG, "Duplicate both");
-                        break;
+                if (result == IdentityVerifier.RESULT_PASS) {
+                    clearError();
+                    goToCreateProfile(email, mobile, password);
+                } else {
+                    showError(result);
                 }
             }
 
@@ -113,9 +110,40 @@ public class RegisterActivity extends ColoredBarActivity {
         finish();
     }
 
+    private void goToCreateProfile(String email, String mobile, String pass) {
+        Intent intent = new Intent(this, CreateProfileActivity.class);
+        intent.putExtra(CreateProfileActivity.EXTRA_EMAIL, email);
+        intent.putExtra(CreateProfileActivity.EXTRA_PASSWORD, pass);
+        intent.putExtra(CreateProfileActivity.EXTRA_MOBILE, mobile);
+
+        startActivity(intent);
+    }
+
+    private void showError(int errorCode) {
+        switch (errorCode) {
+            case IdentityVerifier.RESULT_DUPLICATE_EMAIL:
+                tvError1.setText(getString(R.string.error_duplicate_email));
+                break;
+            case IdentityVerifier.RESULT_DUPLICATE_MOBILE:
+                tvError1.setText(getString(R.string.error_duplicate_mobile));
+                break;
+            case IdentityVerifier.RESULT_DUPLICATE_BOTH:
+                tvError1.setText(getString(R.string.error_duplicate_email));
+                tvError2.setText(getString(R.string.error_duplicate_mobile));
+                break;
+        }
+    }
+
+    private void clearError() {
+        tvError1.setText("");
+        tvError2.setText("");
+    }
+
     private void getWidgets() {
         etEmail = (EditText) findViewById(R.id.edit_text_email);
         etMobile = (EditText) findViewById(R.id.edit_text_mobile);
         etPassword = (EditText) findViewById(R.id.edit_text_password);
+        tvError1 = (TextView) findViewById(R.id.text_view_error_1);
+        tvError2 = (TextView) findViewById(R.id.text_view_error_2);
     }
 }

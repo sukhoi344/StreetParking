@@ -18,4 +18,7 @@
         <item>Day</item>
         <item>Month</item>
     </string-array>
+
+    <string name="error_duplicate_email">* This email has already been registered</string>
+    <string name="error_duplicate_mobile">* The mobile number has already been registered</string>
 </resources>

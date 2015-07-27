@@ -14,5 +14,9 @@
         <item name="android:windowTranslucentStatus">false</item>
     </style>
 
+    <style name="PickerTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+
+    </style>
+
 
 </resources>

@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
-    android:background="#22018509"
+    android:background="@color/background_green_light"
     android:orientation="vertical">
 
     <include layout="@layout/tool_bar_sign_in" />
