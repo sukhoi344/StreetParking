@@ -74,7 +74,8 @@ public class CreateProfileActivity extends ColoredBarActivity {
         switch (item.getItemId()) {
             case R.id.menu_next:
                 if (checkName()) {
-
+                    Intent intent = new Intent(this, LinkPaymentActivity.class);
+                    startActivity(intent);
                 }
                 return true;
             default:

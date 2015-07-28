@@ -5,7 +5,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.devmarvel.creditcardentry.library.CreditCard;
 import com.devmarvel.creditcardentry.library.CreditCardForm;
 
 import chau.country.picker.CountryPicker;
@@ -40,11 +42,25 @@ public class AddPaymentActivity extends ColoredBarActivity {
     }
 
     public void onAddPaymentClicked(View v) {
+        if (checkInput()) {
 
+        }
     }
 
     public void onPaypalClicked(View v) {
 
+    }
+
+    private boolean checkInput() {
+        String countryCode = textViewCountry.getText().toString();
+        String zipCode = editTextZip.getText().toString();
+
+        if (!creditCardForm.isCreditCardValid() || countryCode.isEmpty() || zipCode.isEmpty()) {
+            Toast.makeText(this, "Please complete the form", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        return true;
     }
 
     private void setCountryPicker() {
@@ -65,6 +81,7 @@ public class AddPaymentActivity extends ColoredBarActivity {
             }
         });
 
+        textViewCountry.setText("US");
     }
 
     private void getWidgets() {
