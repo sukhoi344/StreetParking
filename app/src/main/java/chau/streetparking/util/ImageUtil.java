@@ -1,23 +1,31 @@
 package chau.streetparking.util;
 
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
+import android.media.ExifInterface;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * Created by Chau Thai on 12/19/14.
@@ -269,7 +277,7 @@ public class ImageUtil {
     /**
      * The actual application screen height is the different between
      * the physical screen height and the status bar height.
-     * @param context corrent context
+     * @param context current context
      * @return the actual application screen height (not the physical one)
      */
     public static int getAppScreenHeight(Context context) {
@@ -285,6 +293,182 @@ public class ImageUtil {
         }
 
         return 0;
+    }
+
+    /**
+     * Return real path from an image uri
+     * @param context current context
+     * @param photoUri uri of the image
+     * @return Real path from the uri, null if fails.
+     */
+    public static String getPathFromUri(Context context, Uri photoUri) {
+        try {
+            String[] proj = {MediaStore.Images.Media.DATA};
+            CursorLoader loader = new CursorLoader(context, photoUri, proj, null, null, null);
+            Cursor cursor = loader.loadInBackground();
+
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            String result = cursor.getString(column_index);
+            cursor.close();
+
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    /**
+     * Return the orientation of the image. The value should be 0, 90, 180, 270
+     * @param context current context
+     * @param photoUri uri of the image
+     * @return Orientation of the image in degree. Return 0 if error occurs
+     */
+    public static int getOrientation(Context context, Uri photoUri) {
+        int orientation = -1;
+
+        try {
+            Cursor cursor = context.getContentResolver().query(photoUri,
+                    new String[] { MediaStore.Images.ImageColumns.ORIENTATION }, null, null, null);
+
+            if (cursor.getCount() >= 1) {
+                cursor.moveToFirst();
+                orientation = cursor.getInt(0);
+            }
+        } catch (Exception e) {
+            orientation = -1;
+        }
+
+        if (orientation == -1) {
+            orientation = 0;
+            String path = getPathFromUri(context, photoUri);
+
+            if (path != null && !path.isEmpty()) {
+                try {
+                    ExifInterface exifInterface = new ExifInterface(path);
+                    int attr = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+                    orientation = 0;
+
+
+                    switch (attr) {
+                        case ExifInterface.ORIENTATION_NORMAL:
+                            orientation = 0;
+                            break;
+                        case ExifInterface.ORIENTATION_ROTATE_90:
+                            orientation = 90;
+                            break;
+                        case ExifInterface.ORIENTATION_ROTATE_180:
+                            orientation = 180;
+                            break;
+                        case ExifInterface.ORIENTATION_ROTATE_270:
+                            orientation = 270;
+                            break;
+                    }
+
+                    return orientation;
+
+                } catch (Exception e) {}
+            }
+        }
+
+        return orientation;
+    }
+
+    /**
+     * Rotate a image to get correct orientation.
+     * @param context current context
+     * @param photoUri uri of the image
+     * @param MAX_IMAGE_DIMENSION max output image dimension
+     * @return correctly rotated bitmap, null if fails.
+     */
+    public static Bitmap getCorrectlyOrientedImage(Context context, Uri photoUri, final int MAX_IMAGE_DIMENSION) {
+        try {
+            InputStream is = context.getContentResolver().openInputStream(photoUri);
+            BitmapFactory.Options dbo = new BitmapFactory.Options();
+            dbo.inJustDecodeBounds = true;
+            BitmapFactory.decodeStream(is, null, dbo);
+            is.close();
+
+            int rotatedWidth, rotatedHeight;
+            int orientation = getOrientation(context, photoUri);
+
+            if (orientation == 90 || orientation == 270) {
+                rotatedWidth = dbo.outHeight;
+                rotatedHeight = dbo.outWidth;
+            } else {
+                rotatedWidth = dbo.outWidth;
+                rotatedHeight = dbo.outHeight;
+            }
+
+            Bitmap srcBitmap;
+            is = context.getContentResolver().openInputStream(photoUri);
+            if (rotatedWidth > MAX_IMAGE_DIMENSION || rotatedHeight > MAX_IMAGE_DIMENSION) {
+                float widthRatio = ((float) rotatedWidth) / ((float) MAX_IMAGE_DIMENSION);
+                float heightRatio = ((float) rotatedHeight) / ((float) MAX_IMAGE_DIMENSION);
+                float maxRatio = Math.max(widthRatio, heightRatio);
+
+                // Create the bitmap from file
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inSampleSize = (int) maxRatio;
+                srcBitmap = BitmapFactory.decodeStream(is, null, options);
+            } else {
+                srcBitmap = BitmapFactory.decodeStream(is);
+            }
+            is.close();
+
+            /*
+             * if the orientation is not 0 (or -1, which means we don't know), we
+             * have to do a rotation.
+             */
+            if (orientation > 0) {
+                Matrix matrix = new Matrix();
+                matrix.postRotate(orientation);
+
+                srcBitmap = Bitmap.createBitmap(srcBitmap, 0, 0, srcBitmap.getWidth(),
+                        srcBitmap.getHeight(), matrix, true);
+            }
+
+            return srcBitmap;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    /**
+     * Save bitmap into internal storage
+     * @param context current context
+     * @param bitmap bitmap that will be stored
+     * @param fileName file name of the bitmap
+     * @param format format of the bitmap
+     * @param quality quality of the bitmap (max is 100)
+     * @return true if success, false otherwise
+     */
+    public static boolean saveBitmap(Context context, Bitmap bitmap, String fileName,
+                                     Bitmap.CompressFormat format, int quality) {
+        if (context == null || bitmap == null || fileName == null)
+            return false;
+
+        OutputStream os = null;
+
+        try {
+            os = context.openFileOutput(fileName, Context.MODE_PRIVATE);
+            bitmap.compress(format, quality, os);
+            return true;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (os != null)
+                    os.close();
+            } catch (Exception ignore) {}
+        }
+
+        return false;
     }
 
 }
