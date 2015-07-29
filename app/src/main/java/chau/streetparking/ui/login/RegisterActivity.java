@@ -123,9 +123,11 @@ public class RegisterActivity extends ColoredBarActivity {
         switch (errorCode) {
             case IdentityVerifier.RESULT_DUPLICATE_EMAIL:
                 tvError1.setText(getString(R.string.error_duplicate_email));
+                tvError2.setText("");
                 break;
             case IdentityVerifier.RESULT_DUPLICATE_MOBILE:
                 tvError1.setText(getString(R.string.error_duplicate_mobile));
+                tvError2.setText("");
                 break;
             case IdentityVerifier.RESULT_DUPLICATE_BOTH:
                 tvError1.setText(getString(R.string.error_duplicate_email));

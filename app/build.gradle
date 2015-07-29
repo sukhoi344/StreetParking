@@ -47,7 +47,9 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:+'
     compile 'com.android.support:recyclerview-v7:+'
-    compile 'com.google.android.gms:play-services:+'
+    compile 'com.google.android.gms:play-services-maps:+'
+    compile 'com.google.android.gms:play-services-location:+'
+    compile 'com.google.android.gms:play-services-wallet:+'
     compile('com.mikepenz:materialdrawer:3.0.6@aar') {
         transitive = true
     }
@@ -59,6 +61,7 @@ dependencies {
     compile 'com.backendless:android:2.0.1'
     compile 'com.makeramen:roundedimageview:+'
     compile 'com.soundcloud.android:android-crop:1.0.0@aar'
+    compile 'com.braintreepayments.api:braintree:1.+'
     compile project(':countrypicker')
     compile files('libs/universal-image-loader-1.9.4.jar')
 }

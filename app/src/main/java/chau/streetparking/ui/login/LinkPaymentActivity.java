@@ -9,13 +9,17 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.braintreepayments.api.Braintree;
+import com.braintreepayments.api.dropin.BraintreePaymentActivity;
 import com.devmarvel.creditcardentry.library.CreditCard;
 import com.devmarvel.creditcardentry.library.CreditCardForm;
+import com.google.gson.JsonSyntaxException;
 
 import chau.country.picker.CountryPicker;
 import chau.country.picker.CountryPickerListener;
 import chau.streetparking.R;
 import chau.streetparking.ui.ColoredBarActivity;
+import chau.streetparking.util.Logger;
 
 /**
  * Created by Chau Thai on 7/28/15.g
@@ -27,6 +31,8 @@ public class LinkPaymentActivity extends ColoredBarActivity {
     public static final String EXTRA_FIRST = "extra_first";
     public static final String EXTRA_LAST = "extra_last";
     public static final String EXTRA_AVATAR_SELECTED = "extra_avatar_selected";
+
+    private static final String TAG = LinkPaymentActivity.class.getSimpleName();
 
     // Widgets
     private CreditCardForm creditCardForm;
@@ -72,6 +78,20 @@ public class LinkPaymentActivity extends ColoredBarActivity {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 100) {
+            if (resultCode == BraintreePaymentActivity.RESULT_OK) {
+                String paymentMethodNonce = data.getStringExtra(BraintreePaymentActivity.EXTRA_PAYMENT_METHOD_NONCE);
+                Logger.d(TAG, "nonce: " + paymentMethodNonce);
+            } else {
+                JsonSyntaxException jsonSyntaxException = (JsonSyntaxException) data.getSerializableExtra(
+                        BraintreePaymentActivity.EXTRA_ERROR_MESSAGE);
+                Logger.d(TAG, "error: " + jsonSyntaxException.getMessage());
+            }
         }
     }
 

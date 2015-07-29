@@ -17,8 +17,13 @@
 #}
 
 -keep class weborb.** {*;}
+-keep class com.backendless.**{*;}
 -keep class chau.streetparking.datamodels.** {*;}
 
 -dontwarn com.backendless.**
 -dontwarn weborb.**
 -dontwarn com.makeramen.roundedimageview.**
+
+# these are for the Braintree
+-dontwarn com.google.android.gms.**
+-dontwarn android.support.v4.**

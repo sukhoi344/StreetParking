@@ -1,8 +1,5 @@
 package chau.streetparking.util;
 
-/**
- * Created by idgmi_dc on 7/27/15.
- */
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageInfo;

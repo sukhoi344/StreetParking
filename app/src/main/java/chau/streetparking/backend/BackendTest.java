@@ -9,10 +9,12 @@ import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessFault;
 import com.backendless.persistence.BackendlessDataQuery;
 
+import java.util.Date;
 import java.util.List;
 
 import chau.streetparking.datamodels.UserProperties;
 import chau.streetparking.datamodels.Users;
+import chau.streetparking.util.Logger;
 
 /**
  * Created by Chau Thai on 7/26/2015.
@@ -26,7 +28,7 @@ public class BackendTest {
     }
 
     public void testFind() {
-        Log.d(TAG, "Test begins");
+        Logger.d(TAG, "testFind() begins");
 
         final String whereClause = UserProperties.EMAIL + " = 'DavidBeckham@gmail.com' "
                 + " OR " + UserProperties.MOBILE + " = '2023301969'";
