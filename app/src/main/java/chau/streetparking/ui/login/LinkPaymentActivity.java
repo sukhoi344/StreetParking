@@ -18,7 +18,7 @@ import chau.streetparking.R;
 import chau.streetparking.ui.ColoredBarActivity;
 
 /**
- * Created by Chau Thai on 7/28/15.
+ * Created by Chau Thai on 7/28/15.g
  */
 public class LinkPaymentActivity extends ColoredBarActivity {
     public static final String EXTRA_EMAIL = "extra_email";

@@ -16,6 +16,7 @@ import chau.streetparking.datamodels.UserProperties;
 import chau.streetparking.datamodels.Users;
 
 /**
+ * Check for valid mobile and email
  * Created by Chau Thai on 7/27/15.
  */
 public class IdentityVerifier {
@@ -40,6 +41,11 @@ public class IdentityVerifier {
         this.resultCallback = resultCallback;
     }
 
+    /**
+     * Async call to check for valid (not duplicated) email and mobile
+     * @param email new email to be registered
+     * @param mobile new mobile to be registered
+     */
     public void verify(final String email, final String mobile) {
         if (email != null && mobile != null) {
             final Dialog dialog = showProgressDialog();

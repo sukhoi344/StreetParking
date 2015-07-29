@@ -15,3 +15,10 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+-keep class weborb.** {*;}
+-keep class chau.streetparking.datamodels.** {*;}
+
+-dontwarn com.backendless.**
+-dontwarn weborb.**
+-dontwarn com.makeramen.roundedimageview.**
