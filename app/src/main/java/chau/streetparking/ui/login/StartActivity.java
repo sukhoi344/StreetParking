@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import chau.streetparking.R;
+import chau.streetparking.backend.BackendTest;
 
 /**
  * Created by Chau Thai on 6/7/2015.
@@ -32,5 +33,7 @@ public class StartActivity extends AppCompatActivity {
     public void onRegisterClicked(View v) {
         startActivity(new Intent(this, RegisterActivity.class));
         finish();
+//        BackendTest test = new BackendTest(this);
+//        test.testEvent();
     }
 }

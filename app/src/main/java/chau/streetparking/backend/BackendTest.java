@@ -9,8 +9,9 @@ import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessFault;
 import com.backendless.persistence.BackendlessDataQuery;
 
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import chau.streetparking.datamodels.UserProperties;
 import chau.streetparking.datamodels.Users;
@@ -62,4 +63,22 @@ public class BackendTest {
         });
     }
 
+    public void testEvent() {
+        Backendless.Events.dispatch(EventManager.RequestToken.NAME, new HashMap(), new AsyncCallback<Map>() {
+            @Override
+            public void handleResponse(Map response) {
+                if (response != null) {
+                    String clientToken = (String) response.get(EventManager.RequestToken.KEY_TOKEN);
+                    Logger.d(TAG, "clientToken: " + clientToken);
+                } else {
+                    Logger.d(TAG, "null response");
+                }
+            }
+
+            @Override
+            public void handleFault(BackendlessFault fault) {
+                Logger.d(TAG, "error: " + fault.getMessage());
+            }
+        });
+    }
 }
