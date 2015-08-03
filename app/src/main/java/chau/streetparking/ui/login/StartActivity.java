@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
+import com.parse.ParseObject;
+
 import chau.streetparking.R;
 import chau.streetparking.backend.BackendTest;
 
@@ -33,7 +35,8 @@ public class StartActivity extends AppCompatActivity {
     public void onRegisterClicked(View v) {
         startActivity(new Intent(this, RegisterActivity.class));
         finish();
+
 //        BackendTest test = new BackendTest(this);
-//        test.testEvent();
+//        test.testParse();
     }
 }

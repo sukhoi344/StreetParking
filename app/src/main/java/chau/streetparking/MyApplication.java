@@ -7,6 +7,7 @@ import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
+import com.parse.Parse;
 
 /**
  * Created by Chau Thai on 7/4/2015.
@@ -18,6 +19,7 @@ public class MyApplication extends Application {
         super.onCreate();
         initImageLoader();
         initBackendless();
+        initParse();
     }
 
     private void initImageLoader() {
@@ -43,4 +45,10 @@ public class MyApplication extends Application {
 
         Backendless.initApp(this, applicationId, secretKey, version);
     }
+
+    private void initParse() {
+        Parse.enableLocalDatastore(this);
+        Parse.initialize(this, "EfNQh6C6PBrmMAae6CDNpVjYVvgQOt2mV6Ym6CfP", "ybLexx78EtVwS7UOYbuEzBdzu9437lsRZOaX7Gt8");
+    }
+
 }

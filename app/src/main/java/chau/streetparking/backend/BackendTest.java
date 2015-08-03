@@ -8,6 +8,9 @@ import com.backendless.BackendlessCollection;
 import com.backendless.async.callback.AsyncCallback;
 import com.backendless.exceptions.BackendlessFault;
 import com.backendless.persistence.BackendlessDataQuery;
+import com.parse.FunctionCallback;
+import com.parse.ParseCloud;
+import com.parse.ParseException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -81,4 +84,15 @@ public class BackendTest {
             }
         });
     }
+
+    public void testParse() {
+        HashMap<String, Object> params = new HashMap<>();
+        ParseCloud.callFunctionInBackground("hello", params, new FunctionCallback<Object>() {
+            @Override
+            public void done(Object o, ParseException e) {
+                Log.d(TAG, "Parse response: " + o.toString());
+            }
+        });
+    }
+
 }
