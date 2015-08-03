@@ -9,8 +9,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.backendless.exceptions.BackendlessFault;
-
 import chau.streetparking.R;
 import chau.streetparking.backend.BackendTest;
 import chau.streetparking.backend.registration.IdentityVerifier;
@@ -82,27 +80,32 @@ public class RegisterActivity extends ColoredBarActivity {
             return;
         }
 
-        final IdentityVerifier identityVerifier = new IdentityVerifier(this, new IdentityVerifier.ResultCallback() {
-            @Override
-            public void handleResult(int result) {
-                if (result == IdentityVerifier.RESULT_PASS) {
-                    clearError();
-                    goToCreateProfile(email, mobile, password);
-                } else {
-                    showError(result);
-                }
-            }
+//        final IdentityVerifier identityVerifier = new IdentityVerifier(this, new IdentityVerifier.ResultCallback() {
+//            @Override
+//            public void handleResult(int result) {
+//                if (result == IdentityVerifier.RESULT_PASS) {
+//                    clearError();
+//                    goToCreateProfile(email, mobile, password);
+//                } else {
+//                    showError(result);
+//                }
+//            }
+//
+//            @Override
+//            public void handleFault(BackendlessFault fault) {
+//                if (fault != null) {
+//                    Logger.e(TAG, fault.getMessage());
+//                    Toast.makeText(RegisterActivity.this, fault.getMessage(), Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        });
+//
+//        identityVerifier.verify(email, mobile);
 
-            @Override
-            public void handleFault(BackendlessFault fault) {
-                if (fault != null) {
-                    Logger.e(TAG, fault.getMessage());
-                    Toast.makeText(RegisterActivity.this, fault.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+        // TODO: implement the verifier with Parse
 
-        identityVerifier.verify(email, mobile);
+        // Temporary bypass the verifier.
+        goToCreateProfile(email, mobile, password);
     }
 
     private void goBackToStart() {

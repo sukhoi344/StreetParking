@@ -9,11 +9,12 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.braintreepayments.api.Braintree;
-import com.braintreepayments.api.dropin.BraintreePaymentActivity;
 import com.devmarvel.creditcardentry.library.CreditCard;
 import com.devmarvel.creditcardentry.library.CreditCardForm;
-import com.google.gson.JsonSyntaxException;
+
+import com.stripe.android.*;
+import com.stripe.android.model.Card;
+import com.stripe.android.model.Token;
 
 import chau.country.picker.CountryPicker;
 import chau.country.picker.CountryPickerListener;
@@ -45,6 +46,8 @@ public class LinkPaymentActivity extends ColoredBarActivity {
                     firstName,
                     lastName;
     private boolean avatarSelected;
+
+    private Card card;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,16 +86,6 @@ public class LinkPaymentActivity extends ColoredBarActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 100) {
-            if (resultCode == BraintreePaymentActivity.RESULT_OK) {
-                String paymentMethodNonce = data.getStringExtra(BraintreePaymentActivity.EXTRA_PAYMENT_METHOD_NONCE);
-                Logger.d(TAG, "nonce: " + paymentMethodNonce);
-            } else {
-                JsonSyntaxException jsonSyntaxException = (JsonSyntaxException) data.getSerializableExtra(
-                        BraintreePaymentActivity.EXTRA_ERROR_MESSAGE);
-                Logger.d(TAG, "error: " + jsonSyntaxException.getMessage());
-            }
-        }
     }
 
     public void onPaypalClicked(View v) {
@@ -101,7 +94,24 @@ public class LinkPaymentActivity extends ColoredBarActivity {
 
     private void linkPayment() {
         if (checkInput()) {
+            try {
+                Stripe stripe = new Stripe(getString(R.string.stripe_test_publishable_key));
+                stripe.createToken(card, new TokenCallback() {
+                    @Override
+                    public void onError(Exception e) {
+                        Logger.d(TAG, "Error: " + e.getLocalizedMessage());
+                    }
 
+                    @Override
+                    public void onSuccess(Token token) {
+                        Logger.d(TAG, "token: " + token.toString());
+                    }
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(LinkPaymentActivity.this, "Error linking payment", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -111,6 +121,18 @@ public class LinkPaymentActivity extends ColoredBarActivity {
 
         if (!creditCardForm.isCreditCardValid() || countryCode.isEmpty() || zipCode.isEmpty()) {
             Toast.makeText(this, "Please complete the form", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        CreditCard creditCard = creditCardForm.getCreditCard();
+
+        if (creditCard != null) {
+            card = new Card(creditCard.getCardNumber(), creditCard.getExpMonth(), creditCard.getExpYear(),
+                    creditCard.getSecurityCode());
+        }
+
+        if (creditCard == null || card == null || !card.validateCard()) {
+            Toast.makeText(this, "Invalid credit card", Toast.LENGTH_SHORT).show();
             return false;
         }
 
