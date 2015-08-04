@@ -33,7 +33,7 @@ public class BackendTest {
         ParseCloud.callFunctionInBackground("hello2", params, new FunctionCallback<Object>() {
             @Override
             public void done(Object o, ParseException e) {
-                Log.d(TAG, "Parse response: " + o.toString());
+                Logger.d(TAG, "Parse response: " + o.toString());
             }
         });
 

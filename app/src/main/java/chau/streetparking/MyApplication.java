@@ -38,7 +38,7 @@ public class MyApplication extends Application {
 
     private void initParse() {
         Parse.enableLocalDatastore(this);
-        Parse.initialize(this, "iXsHecEs2tVoeL8ZpfZvtw6ijTxt7msiDqSCPJ0E", "om9Iq5eKkhsQJvU2fZZndfCQjXqkEJEROHy4Ug7n");
+        Parse.initialize(this, getString(R.string.parse_application_id), getString(R.string.parse_client_key));
     }
 
 }

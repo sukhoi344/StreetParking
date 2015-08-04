@@ -22,5 +22,8 @@
     <string name="error_duplicate_email">* This email has already been registered</string>
     <string name="error_duplicate_mobile">* The mobile number has already been registered</string>
 
+
+    <string name="parse_application_id">iXsHecEs2tVoeL8ZpfZvtw6ijTxt7msiDqSCPJ0E</string>
+    <string name="parse_client_key">om9Iq5eKkhsQJvU2fZZndfCQjXqkEJEROHy4Ug7n</string>
     <string name="stripe_test_publishable_key">pk_test_VjGWRUXYF5qls8RIL7Yrbiaf</string>
 </resources>

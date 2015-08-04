@@ -2,6 +2,7 @@ package chau.streetparking.ui.login;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Looper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,18 +13,28 @@ import android.widget.Toast;
 import com.devmarvel.creditcardentry.library.CreditCard;
 import com.devmarvel.creditcardentry.library.CreditCardForm;
 
+import com.google.gson.Gson;
+import com.parse.FunctionCallback;
+import com.parse.Parse;
+import com.parse.ParseCloud;
+import com.parse.ParseException;
 import com.stripe.android.*;
 import com.stripe.android.model.Card;
 import com.stripe.android.model.Token;
+import com.stripe.model.Charge;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import chau.country.picker.CountryPicker;
 import chau.country.picker.CountryPickerListener;
 import chau.streetparking.R;
+import chau.streetparking.backend.JsonHelper;
 import chau.streetparking.ui.ColoredBarActivity;
 import chau.streetparking.util.Logger;
 
 /**
- * Created by Chau Thai on 7/28/15.g
+ * Created by Chau Thai on 7/28/15
  */
 public class LinkPaymentActivity extends ColoredBarActivity {
     public static final String EXTRA_EMAIL = "extra_email";
@@ -104,7 +115,8 @@ public class LinkPaymentActivity extends ColoredBarActivity {
 
                     @Override
                     public void onSuccess(Token token) {
-                        Logger.d(TAG, "token: " + token.toString());
+                        Logger.d(TAG, "Got the token, now charging...");
+                        charge(token);
                     }
                 });
 
@@ -113,6 +125,35 @@ public class LinkPaymentActivity extends ColoredBarActivity {
                 Toast.makeText(LinkPaymentActivity.this, "Error linking payment", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private void charge(Token token) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("amount", 100); // 100 cents
+        params.put("currency", "usd");
+        params.put("card", token.getId());
+
+        ParseCloud.callFunctionInBackground("charge", params, new FunctionCallback<Object>() {
+            @Override
+            public void done(Object o, ParseException e) {
+                if (o != null) {
+                    Logger.d(TAG, "success");
+
+                    Charge charge = JsonHelper.jsonToCharge(o.toString());
+
+                    if (charge != null) {
+                        Logger.d(TAG, "charge: " + charge.toString());
+                    } else {
+                        Logger.d(TAG, "json error");
+                    }
+
+                } else if (e != null) {
+                    Logger.d(TAG, "error: " + e.getLocalizedMessage());
+                } else {
+                    Logger.d(TAG, "unknown error");
+                }
+            }
+        });
     }
 
     private boolean checkInput() {
