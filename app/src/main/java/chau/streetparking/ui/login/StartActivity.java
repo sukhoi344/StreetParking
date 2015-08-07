@@ -37,6 +37,6 @@ public class StartActivity extends AppCompatActivity {
         finish();
 
 //        BackendTest test = new BackendTest(this);
-//        test.testParse();
+//        test.testUser();
     }
 }

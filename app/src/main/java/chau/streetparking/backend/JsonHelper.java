@@ -1,6 +1,8 @@
 package chau.streetparking.backend;
 
+import com.stripe.model.Card;
 import com.stripe.model.Charge;
+import com.stripe.model.Customer;
 
 import org.json.JSONObject;
 
@@ -21,41 +23,39 @@ public class JsonHelper {
             return null;
 
         try {
-            // TODO: improve regex
-            String fixedString = jsonString.replaceFirst(", refunds=\\{[^{}]+\\}", "");
+            Charge charge = Charge.GSON.fromJson(jsonString, Charge.class);
 
-            Charge charge = new Charge();
-            JSONObject jsonObject = new JSONObject(fixedString);
+            try {
+                JSONObject jsonObject = new JSONObject(jsonString);
+                JSONObject cardJson = jsonObject.getJSONObject("source");
 
-            charge.setId(jsonObject.getString("id"));
-            charge.setCreated(jsonObject.getLong("created"));
-            charge.setLivemode(jsonObject.getBoolean("livemode"));
-            charge.setPaid(jsonObject.getBoolean("paid"));
-            charge.setAmount(jsonObject.getInt("amount"));
-            charge.setCurrency(jsonObject.getString("currency"));
-            charge.setRefunded(jsonObject.getBoolean("refunded"));
-            charge.setCaptured(jsonObject.getBoolean("captured"));
-            charge.setBalanceTransaction(jsonObject.getString("balance_transaction"));
-            charge.setFailureMessage(jsonObject.getString("failure_message"));
-            charge.setFailureCode(jsonObject.getString("failure_code"));
-            charge.setAmountRefunded(jsonObject.getInt("amount_refunded"));
-            charge.setCustomer(jsonObject.getString("customer"));
-            charge.setInvoice(jsonObject.getString("invoice"));
-            charge.setDescription(jsonObject.getString("description"));
-            charge.setStatementDescription(jsonObject.getString("statement_descriptor"));
-
-
-
-            // TODO: implement dispute parser
-            // TODO: implement Metadata parser
-            // TODO: implement fraud_detail parser
-            // TODO: implement refund parser
-
+                Card card = Card.GSON.fromJson(cardJson.toString(), Card.class);
+                charge.setCard(card);
+            } catch (Exception ignore) {}
 
             return charge;
         } catch (Exception e) {
             if (Logger.DEBUG)
                 e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    /**
+     * Convert json string to {@link Customer} object
+     * @param jsonString input string
+     * @return {@link Customer} object, null if fails
+     */
+    public static Customer jsonToCustomer(String jsonString) {
+        try {
+            Customer customer = Customer.GSON.fromJson(jsonString, Customer.class);
+            return customer;
+
+        } catch (Exception e) {
+            if (Logger.DEBUG) {
+                e.printStackTrace();
+            }
         }
 
         return null;

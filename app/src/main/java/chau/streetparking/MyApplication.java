@@ -7,6 +7,9 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.parse.Parse;
+import com.parse.ParseObject;
+
+import chau.streetparking.datamodels.parse.User;
 
 /**
  * Created by Chau Thai on 7/4/2015.
@@ -37,6 +40,8 @@ public class MyApplication extends Application {
     }
 
     private void initParse() {
+        ParseObject.registerSubclass(User.class);
+
         Parse.enableLocalDatastore(this);
         Parse.initialize(this, getString(R.string.parse_application_id), getString(R.string.parse_client_key));
     }

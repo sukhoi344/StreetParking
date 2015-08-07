@@ -29,6 +29,7 @@ import java.util.Map;
 import chau.country.picker.CountryPicker;
 import chau.country.picker.CountryPickerListener;
 import chau.streetparking.R;
+import chau.streetparking.backend.BackendTest;
 import chau.streetparking.backend.JsonHelper;
 import chau.streetparking.ui.ColoredBarActivity;
 import chau.streetparking.util.Logger;
@@ -105,55 +106,9 @@ public class LinkPaymentActivity extends ColoredBarActivity {
 
     private void linkPayment() {
         if (checkInput()) {
-            try {
-                Stripe stripe = new Stripe(getString(R.string.stripe_test_publishable_key));
-                stripe.createToken(card, new TokenCallback() {
-                    @Override
-                    public void onError(Exception e) {
-                        Logger.d(TAG, "Error: " + e.getLocalizedMessage());
-                    }
-
-                    @Override
-                    public void onSuccess(Token token) {
-                        Logger.d(TAG, "Got the token, now charging...");
-                        charge(token);
-                    }
-                });
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                Toast.makeText(LinkPaymentActivity.this, "Error linking payment", Toast.LENGTH_SHORT).show();
-            }
+            BackendTest test = new BackendTest(this);
+            test.testStripe(card);
         }
-    }
-
-    private void charge(Token token) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("amount", 100); // 100 cents
-        params.put("currency", "usd");
-        params.put("card", token.getId());
-
-        ParseCloud.callFunctionInBackground("charge", params, new FunctionCallback<Object>() {
-            @Override
-            public void done(Object o, ParseException e) {
-                if (o != null) {
-                    Logger.d(TAG, "success");
-
-                    Charge charge = JsonHelper.jsonToCharge(o.toString());
-
-                    if (charge != null) {
-                        Logger.d(TAG, "charge: " + charge.toString());
-                    } else {
-                        Logger.d(TAG, "json error");
-                    }
-
-                } else if (e != null) {
-                    Logger.d(TAG, "error: " + e.getLocalizedMessage());
-                } else {
-                    Logger.d(TAG, "unknown error");
-                }
-            }
-        });
     }
 
     private boolean checkInput() {
