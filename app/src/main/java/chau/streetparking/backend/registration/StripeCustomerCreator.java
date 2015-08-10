@@ -24,14 +24,9 @@ public class StripeCustomerCreator {
     private Card card;
     private Context context;
     private String email;
-    private ResultCallback resultCallback;
+    private ResultCallBack resultCallback;
 
-    public interface ResultCallback {
-        void success(String customerId);
-        void failure(String error);
-    }
-
-    public StripeCustomerCreator(Context context, Card card, String email, ResultCallback resultCallback) {
+    public StripeCustomerCreator(Context context, Card card, String email, ResultCallBack resultCallback) {
         this.context = context;
         this.card = card;
         this.email = email;

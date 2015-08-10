@@ -5,10 +5,13 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.parse.FunctionCallback;
+import com.parse.GetCallback;
 import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.parse.SignUpCallback;
 import com.stripe.android.Stripe;
 import com.stripe.android.TokenCallback;
@@ -18,6 +21,7 @@ import com.stripe.model.Charge;
 import com.stripe.model.Customer;
 import com.stripe.net.APIResource;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,12 +58,102 @@ public class BackendTest {
 
     }
 
+    public void testArray() {
+        final ParseObject postObject = new ParseObject("Post");
+        postObject.put("title", "I'm hungry");
+        postObject.put("content", "Where should we go to eat?");
+
+        ParseObject comment = new ParseObject("Comment");
+        comment.put("content", "Some burgers");
+
+        ArrayList<ParseObject> comments = new ArrayList<>();
+        comments.add(comment);
+
+        postObject.put("comment", comments);
+
+        postObject.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e != null) {
+                    Logger.d(TAG, "Error saving post: " + e.getLocalizedMessage());
+                } else {
+
+                }
+            }
+        });
+    }
+
+    public void testArrayRetrieve() {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Post");
+        query.getInBackground("blJlopUEYA", new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject post, ParseException e) {
+                if (post != null) {
+                    List<ParseObject> comments = post.getList("comment");
+
+                    for (ParseObject o : comments) {
+                        Logger.d(TAG, "comment: " + o.getObjectId());
+                        o.fetchIfNeededInBackground(new GetCallback<ParseObject>() {
+                            @Override
+                            public void done(ParseObject parseObject, ParseException e) {
+                                Logger.d(TAG, "fetched: " + parseObject.getString("content"));
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    }
+
+    public void testPointer() {
+        final ParseObject post = new ParseObject("Post");
+        post.put("title", "Hello");
+        post.put("content", "Who's Obama?");
+
+        ParseObject comment = new ParseObject("Comment");
+        comment.put("content", "Some burgers");
+
+        comment.put("post", post);
+
+        comment.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                Logger.d(TAG, "done");
+                if (e != null)
+                    Logger.d(TAG, e.getLocalizedMessage());
+            }
+        });
+    }
+
+    public void testPointerRetrive() {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Comment");
+        query.getInBackground("9UrLKxGiME", new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject comment, ParseException e) {
+                if (comment != null) {
+                    ParseObject post = comment.getParseObject("post");
+
+                    post.fetchIfNeededInBackground(new GetCallback<ParseObject>() {
+                        @Override
+                        public void done(ParseObject parseObject, ParseException e) {
+                            Logger.d(TAG, "post content: " + parseObject.getString("content"));
+                        }
+                    });
+
+
+                } else {
+                    Logger.d(TAG, "Error: " + e==null? "null" : e.getLocalizedMessage());
+                }
+            }
+        });
+    }
+
     public void testUser() {
         User user = new User();
         user.setUsername("sukhoi344@yahoo.com");
         user.setPassword("123456");
         user.setEmail("sukhoi344@yahoo.com");
-        user.setAvatar("myAvatar");
+//        user.setAvatar("myAvatar");
         user.setMobile("2023301969");
         user.setFirstName("Chau");
         user.setLastName("Thai");

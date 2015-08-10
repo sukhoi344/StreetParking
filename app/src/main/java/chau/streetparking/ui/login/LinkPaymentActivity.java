@@ -1,5 +1,6 @@
 package chau.streetparking.ui.login;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Looper;
@@ -31,7 +32,11 @@ import chau.country.picker.CountryPickerListener;
 import chau.streetparking.R;
 import chau.streetparking.backend.BackendTest;
 import chau.streetparking.backend.JsonHelper;
+import chau.streetparking.backend.registration.AccountCreator;
+import chau.streetparking.backend.registration.ResultCallBack;
+import chau.streetparking.backend.registration.StripeCustomerCreator;
 import chau.streetparking.ui.ColoredBarActivity;
+import chau.streetparking.ui.MapsActivity;
 import chau.streetparking.util.Logger;
 
 /**
@@ -106,9 +111,32 @@ public class LinkPaymentActivity extends ColoredBarActivity {
 
     private void linkPayment() {
         if (checkInput()) {
-            BackendTest test = new BackendTest(this);
-            test.testStripe(card);
+            AccountCreator accountCreator = new AccountCreator(
+                    this, card, email, mobile, firstName, lastName, lastName, avatarSelected,
+                    new ResultCallBack() {
+                        @Override
+                        public void success(String userId) {
+                            Logger.d(TAG, "saved, userId: " + userId);
+                            goToMainActivity();
+                        }
+
+                        @Override
+                        public void failure(String errorMessage) {
+                            Logger.d(TAG, "Error: " + errorMessage);
+                            showError(errorMessage);
+                        }
+                    }
+            );
+
+            accountCreator.saveAccount();
         }
+    }
+
+    private void goToMainActivity() {
+        Intent intent = new Intent(this, MapsActivity.class);
+        startActivity(intent);
+        setResult(RESULT_OK);
+        finish();
     }
 
     private boolean checkInput() {
@@ -174,5 +202,13 @@ public class LinkPaymentActivity extends ColoredBarActivity {
         creditCardForm = (CreditCardForm) findViewById(R.id.credit_card_form);
         textViewCountry = (TextView) findViewById(R.id.country);
         editTextZip = (EditText) findViewById(R.id.zip);
+    }
+
+    private void showError(String errorMessage) {
+        new AlertDialog.Builder(this, AlertDialog.THEME_HOLO_LIGHT)
+                .setMessage(errorMessage)
+                .setPositiveButton("Ok", null)
+                .show();
+
     }
 }

@@ -42,6 +42,7 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +50,7 @@ import java.util.List;
 import chau.streetparking.R;
 import chau.streetparking.datamodels.Request;
 import chau.streetparking.datamodels.SpotMarker;
+import chau.streetparking.datamodels.parse.User;
 import chau.streetparking.util.ImageUtil;
 
 public class MapsActivity extends AppCompatActivity {
@@ -85,6 +87,8 @@ public class MapsActivity extends AppCompatActivity {
     private TaskGetRequestList taskGetRequestList;
     private List<Uri> photoList = new ArrayList<>();
 
+    private User user;
+
     // For testing purpose
     private List<SpotMarker> testList = new ArrayList<>();
 
@@ -106,6 +110,7 @@ public class MapsActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(getString(R.string.app_name));
 
+        setupUser();
         setupDrawer(toolbar);
     }
 
@@ -364,12 +369,15 @@ public class MapsActivity extends AppCompatActivity {
     }
 
     private void setupDrawer(Toolbar toolbar) {
+        String name = user.getFirstName() + " " + user.getLastName();
+        String email = user.getEmail();
+
         // Create the AccountHeader
         AccountHeader headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.drawer_header)
                 .addProfiles(
-                        new ProfileDrawerItem().withName("Chau Thai").withEmail("chthai64@gmail.com")
+                        new ProfileDrawerItem().withName(name).withEmail(email)
                 )
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                     @Override
@@ -540,6 +548,11 @@ public class MapsActivity extends AppCompatActivity {
         notificationLayout.setVisibility(View.VISIBLE);
         Animation animation = AnimationUtils.loadAnimation(this, R.anim.slide_in_up);
         notificationLayout.startAnimation(animation);
+    }
+
+    private void setupUser() {
+        user = (User) ParseUser.getCurrentUser();
+
     }
 
     private void setUpClusterer() {

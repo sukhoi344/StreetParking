@@ -22,6 +22,7 @@ import chau.streetparking.util.Logger;
  * Created by Chau Thai on 6/8/2015.
  */
 public class RegisterActivity extends ColoredBarActivity {
+    public static final int REQUEST_EXIT = 1;
     private static final String TAG = "RegisterActivity";
 
     private EditText    etEmail,
@@ -34,6 +35,14 @@ public class RegisterActivity extends ColoredBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWidgets();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK && requestCode == REQUEST_EXIT) {
+            setResult(RESULT_OK);
+            finish();
+        }
     }
 
     @Override
@@ -109,7 +118,7 @@ public class RegisterActivity extends ColoredBarActivity {
     }
 
     private void goBackToStart() {
-        startActivity(new Intent(this, StartActivity.class));
+//        startActivity(new Intent(this, StartActivity.class));
         finish();
     }
 
@@ -119,7 +128,7 @@ public class RegisterActivity extends ColoredBarActivity {
         intent.putExtra(CreateProfileActivity.EXTRA_PASSWORD, pass);
         intent.putExtra(CreateProfileActivity.EXTRA_MOBILE, mobile);
 
-        startActivity(intent);
+        startActivityForResult(intent, REQUEST_EXIT);
     }
 
     private void showError(int errorCode) {

@@ -1,13 +1,17 @@
 package chau.streetparking.datamodels.parse;
 
 import com.parse.ParseClassName;
+import com.parse.ParseFile;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
+
+import java.util.List;
 
 /**
  * Created by Chau Thai on 8/7/15.
  */
 
-@ParseClassName("User")
+@ParseClassName("_User")
 public class User extends ParseUser {
 
     private static final String KEY_FIRST_NAME = "firstName";
@@ -16,6 +20,7 @@ public class User extends ParseUser {
     private static final String KEY_AVATAR = "avatar";
     private static final String KEY_MOBILE = "mobile";
     private static final String KEY_MOBILE_VERIFIED = "mobileVerified";
+    private static final String KEY_CREDIT_CARD = "creditCard";
 
 
     public String getFirstName() {
@@ -34,11 +39,11 @@ public class User extends ParseUser {
         put(KEY_LAST_NAME, lastName);
     }
 
-    public String getAvatar() {
-        return getString(KEY_AVATAR);
+    public ParseFile getAvatar() {
+        return getParseFile(KEY_AVATAR);
     }
 
-    public void setAvatar(String avatar) {
+    public void setAvatar(ParseFile avatar) {
         put(KEY_AVATAR, avatar);
     }
 
@@ -46,9 +51,9 @@ public class User extends ParseUser {
         return getBoolean(KEY_EMAIL_VERIFIED);
     }
 
-    public void setEmailVerified(boolean emailVerified) {
-        put(KEY_EMAIL_VERIFIED, emailVerified);
-    }
+//    public void setEmailVerified(boolean emailVerified) {
+//        put(KEY_EMAIL_VERIFIED, emailVerified);
+//    }
 
     public String getMobile() {
         return getString(KEY_MOBILE);
@@ -64,6 +69,11 @@ public class User extends ParseUser {
 
     public void setMobileVerified(boolean mobileVerified) {
         put(KEY_MOBILE_VERIFIED, mobileVerified);
+    }
+
+    // TODO: create Credit object instead of ParseObject
+    public List<ParseObject> getCredits() {
+        return getList(KEY_CREDIT_CARD);
     }
 
 }
