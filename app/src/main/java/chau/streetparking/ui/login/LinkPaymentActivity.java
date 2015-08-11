@@ -112,7 +112,7 @@ public class LinkPaymentActivity extends ColoredBarActivity {
     private void linkPayment() {
         if (checkInput()) {
             AccountCreator accountCreator = new AccountCreator(
-                    this, card, email, mobile, firstName, lastName, lastName, avatarSelected,
+                    this, card, email, mobile, password, firstName, lastName, avatarSelected,
                     new ResultCallBack() {
                         @Override
                         public void success(String userId) {

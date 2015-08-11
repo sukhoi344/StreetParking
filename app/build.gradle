@@ -50,7 +50,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-maps:+'
     compile 'com.google.android.gms:play-services-location:+'
     compile 'com.google.android.gms:play-services-wallet:+'
-    compile('com.mikepenz:materialdrawer:3.0.6@aar') {
+    compile('com.mikepenz:materialdrawer:3.1.2@aar') {
         transitive = true
     }
     compile 'com.google.maps.android:android-maps-utils:+'
@@ -62,8 +62,8 @@ dependencies {
     compile 'com.soundcloud.android:android-crop:1.0.0@aar'
     compile project(':countrypicker')
     compile files('libs/universal-image-loader-1.9.4.jar')
-
     compile 'com.parse.bolts:bolts-android:1.+'
-    compile fileTree(dir: 'libs', include: 'Parse-*.jar')
     compile 'com.stripe:stripe-android:+'
+    compile 'com.facebook.android:facebook-android-sdk:4.5.0'
+    compile files('libs/ParseFacebookUtilsV4-1.9.4.jar')
 }

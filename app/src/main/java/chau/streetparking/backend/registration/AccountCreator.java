@@ -11,7 +11,6 @@ import com.parse.SignUpCallback;
 import com.stripe.android.model.Card;
 
 import java.math.BigInteger;
-import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
 

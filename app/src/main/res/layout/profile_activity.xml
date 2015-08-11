@@ -56,8 +56,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="textPersonName"
                 android:nextFocusDown="@+id/last_name"
-                android:enabled="false"
-                android:textColor="@android:color/black"/>
+                android:enabled="false"/>
         </LinearLayout>
 
         <!--  Last name-->
@@ -78,7 +77,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPersonName"
-                android:textColor="@android:color/black"
                 android:enabled="false"/>
         </LinearLayout>
     </LinearLayout>
