@@ -11,16 +11,23 @@ import android.widget.Toast;
 
 import com.parse.LogInCallback;
 import com.parse.ParseException;
+import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
 
+import java.util.Arrays;
+import java.util.List;
+
+import chau.streetparking.MyApplication;
 import chau.streetparking.R;
 import chau.streetparking.ui.ColoredBarActivity;
 import chau.streetparking.ui.MapsActivity;
+import chau.streetparking.util.Logger;
 
 /**
  * Created by Chau Thai on 6/7/2015.
  */
 public class SignInActivity extends ColoredBarActivity {
+    private static final String TAG = SignInActivity.class.getSimpleName();
     private EditText etEmail, etPassword;
     private ProgressDialog dialog;
 
@@ -29,6 +36,25 @@ public class SignInActivity extends ColoredBarActivity {
         super.onCreate(savedInstanceState);
         etEmail = (EditText) findViewById(R.id.edit_text_email);
         etPassword = (EditText) findViewById(R.id.edit_text_password);
+
+        if (ParseUser.getCurrentUser() != null) {
+            ParseUser.getCurrentUser().logOutInBackground();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Logger.d(TAG, "requestCode: " + requestCode + ", resultCode: " + resultCode);
+
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case MyApplication.REQUEST_CODE_OFFSET:
+                    showProgressDialog("Logging in...");
+                    ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
+                    break;
+            }
+        }
     }
 
     @Override
@@ -44,6 +70,38 @@ public class SignInActivity extends ColoredBarActivity {
     @Override
     public void onBackPressed() {
         goBackToStart();
+    }
+
+    /**
+     * Called when "CONNECT WITH FACEBOOK" button is selected
+     */
+    public void onFacebookClicked(View v) {
+        List<String> permissions = Arrays.asList("public_profile", "email");
+        ParseFacebookUtils.logInWithReadPermissionsInBackground(this, permissions, new LogInCallback() {
+            @Override
+            public void done(ParseUser parseUser, ParseException e) {
+                if (e == null && parseUser != null) {
+                    Logger.d(TAG, "facebook login done!");
+
+                    if (parseUser.isNew()) {
+
+                    } else {
+
+                    }
+
+                    Intent intent = new Intent(SignInActivity.this, VerifyAccountActivity.class);
+                    startActivity(intent);
+                } else {
+                    // Error
+                    Logger.d(TAG, "Error message: " + e == null? "null" : e.getLocalizedMessage());
+                    if (parseUser == null)
+                        Logger.d(TAG, "parseUser is null");
+                }
+
+                if (dialog != null)
+                    dialog.dismiss();
+            }
+        });
     }
 
     /**
@@ -75,12 +133,11 @@ public class SignInActivity extends ColoredBarActivity {
     }
 
     private void goBackToStart() {
-        startActivity(new Intent(this, StartActivity.class));
         finish();
     }
 
     private void signIn(String email, String password) {
-        showProgressDialog();
+        showProgressDialog("Signing in...");
 
         ParseUser.logInInBackground(email, password, new LogInCallback() {
             @Override
@@ -102,13 +159,17 @@ public class SignInActivity extends ColoredBarActivity {
         });
     }
 
-    private void showProgressDialog() {
-            dialog = new ProgressDialog(this, ProgressDialog.THEME_HOLO_LIGHT);
-            dialog.setIndeterminate(true);
-            dialog.setCancelable(false);
-            dialog.setCanceledOnTouchOutside(false);
-            dialog.setMessage("Signing in...");
+    private void showProgressDialog(String message) {
+        if (dialog != null && dialog.isShowing()) {
+            dialog.dismiss();
+        }
 
-            dialog.show();
+        dialog = new ProgressDialog(this, ProgressDialog.THEME_HOLO_LIGHT);
+        dialog.setIndeterminate(true);
+        dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setMessage(message);
+
+        dialog.show();
     }
 }

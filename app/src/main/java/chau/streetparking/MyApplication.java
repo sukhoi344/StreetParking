@@ -26,6 +26,8 @@ import chau.streetparking.datamodels.parse.User;
  * Created by Chau Thai on 7/4/2015.
  */
 public class MyApplication extends Application {
+    /** For facebook login */
+    public static final int REQUEST_CODE_OFFSET = 300;
 
     @Override
     public void onCreate() {
@@ -93,15 +95,14 @@ public class MyApplication extends Application {
 
     private void initParse() {
         ParseObject.registerSubclass(User.class);
-
         Parse.enableLocalDatastore(this);
-        Parse.initialize(this, getString(R.string.parse_application_id), getString(R.string.parse_client_key));
 
+        Parse.initialize(this, getString(R.string.parse_application_id), getString(R.string.parse_client_key));
+        ParseFacebookUtils.initialize(this, REQUEST_CODE_OFFSET);
     }
 
     private void initFacebook() {
         FacebookSdk.sdkInitialize(getApplicationContext());
-        ParseFacebookUtils.initialize(this);
     }
 
 

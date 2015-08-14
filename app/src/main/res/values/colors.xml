@@ -19,4 +19,7 @@
 
     <color name="hint_color">#33000000</color>
 
+    <!-- facebook color -->
+    <color name="facebook">#FF3b5999</color>
+    <color name="facebook_light">#CC3b5999</color>
 </resources>
