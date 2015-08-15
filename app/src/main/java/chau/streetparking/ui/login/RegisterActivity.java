@@ -9,7 +9,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.backendless.exceptions.BackendlessFault;
+import com.parse.ParseException;
 
 import chau.streetparking.R;
 import chau.streetparking.backend.BackendTest;
@@ -22,6 +22,7 @@ import chau.streetparking.util.Logger;
  * Created by Chau Thai on 6/8/2015.
  */
 public class RegisterActivity extends ColoredBarActivity {
+    public static final int REQUEST_EXIT = 1;
     private static final String TAG = "RegisterActivity";
 
     private EditText    etEmail,
@@ -34,6 +35,14 @@ public class RegisterActivity extends ColoredBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWidgets();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK && requestCode == REQUEST_EXIT) {
+            setResult(RESULT_OK);
+            finish();
+        }
     }
 
     @Override
@@ -94,7 +103,7 @@ public class RegisterActivity extends ColoredBarActivity {
             }
 
             @Override
-            public void handleFault(BackendlessFault fault) {
+            public void handleFault(ParseException fault) {
                 if (fault != null) {
                     Logger.e(TAG, fault.getMessage());
                     Toast.makeText(RegisterActivity.this, fault.getMessage(), Toast.LENGTH_SHORT).show();
@@ -103,10 +112,13 @@ public class RegisterActivity extends ColoredBarActivity {
         });
 
         identityVerifier.verify(email, mobile);
+
+//        // Temporary bypass the verifier.
+//        goToCreateProfile(email, mobile, password);
     }
 
     private void goBackToStart() {
-        startActivity(new Intent(this, StartActivity.class));
+//        startActivity(new Intent(this, StartActivity.class));
         finish();
     }
 
@@ -116,7 +128,7 @@ public class RegisterActivity extends ColoredBarActivity {
         intent.putExtra(CreateProfileActivity.EXTRA_PASSWORD, pass);
         intent.putExtra(CreateProfileActivity.EXTRA_MOBILE, mobile);
 
-        startActivity(intent);
+        startActivityForResult(intent, REQUEST_EXIT);
     }
 
     private void showError(int errorCode) {

@@ -4,36 +4,36 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 
-import com.backendless.Backendless;
-import com.backendless.BackendlessCollection;
-import com.backendless.async.callback.AsyncCallback;
-import com.backendless.exceptions.BackendlessFault;
-import com.backendless.persistence.BackendlessDataQuery;
 
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
+
+import java.util.ArrayList;
 import java.util.List;
 
-import chau.streetparking.datamodels.UserProperties;
-import chau.streetparking.datamodels.Users;
+import chau.streetparking.util.Logger;
+
 
 /**
  * Check for valid mobile and email
  * Created by Chau Thai on 7/27/15.
  */
 public class IdentityVerifier {
+    private static final String TAG = IdentityVerifier.class.getSimpleName();
+
     public static final int RESULT_PASS = 0;
     public static final int RESULT_DUPLICATE_EMAIL = 1;
     public static final int RESULT_DUPLICATE_MOBILE = 2;
     public static final int RESULT_DUPLICATE_BOTH = 3;
-
-    private static final String whereClauseTemplate = UserProperties.EMAIL + " = '?'"
-            + " OR " + UserProperties.MOBILE + " = '?'";
 
     private Activity activity;
     private ResultCallback resultCallback;
 
     public interface ResultCallback {
         void handleResult(int result);
-        void handleFault(BackendlessFault fault);
+        void handleFault(ParseException e);
     }
 
     public IdentityVerifier(Activity activity, ResultCallback resultCallback) {
@@ -49,64 +49,65 @@ public class IdentityVerifier {
     public void verify(final String email, final String mobile) {
         if (email != null && mobile != null) {
             final Dialog dialog = showProgressDialog();
-            final BackendlessDataQuery query = getQuery(email, mobile);
 
-            Backendless.Persistence.of(Users.class).find(query, new AsyncCallback<BackendlessCollection<Users>>() {
+            getQuery(email, mobile).findInBackground(new FindCallback<ParseUser>() {
                 @Override
-                public void handleResponse(BackendlessCollection<Users> response) {
-                    if (dialog != null) {
+                public void done(List<ParseUser> list, ParseException e) {
+                    if (dialog != null)
                         dialog.dismiss();
+
+                    if (resultCallback != null) {
+                        handleResult(list, e, email, mobile);
                     }
-
-                    if (resultCallback == null)
-                        return;
-
-                    if (response != null && response.getCurrentPage() != null && response.getCurrentPage().size() > 0) {
-                        boolean hasMobile = false;
-                        boolean hasEmail = false;
-
-                        List<Users> usersList = response.getCurrentPage();
-
-                        for (Users user : usersList) {
-                            if (email.equalsIgnoreCase(user.getEmail()))
-                                hasEmail = true;
-                            if (mobile.equals(user.getMobile()))
-                                hasMobile = true;
-                        }
-
-                        if (hasMobile && hasEmail)
-                            resultCallback.handleResult(RESULT_DUPLICATE_BOTH);
-                        else if (hasMobile)
-                            resultCallback.handleResult(RESULT_DUPLICATE_MOBILE);
-                        else if (hasEmail)
-                            resultCallback.handleResult(RESULT_DUPLICATE_EMAIL);
-                        else
-                            resultCallback.handleResult(RESULT_PASS);
-
-                    } else {
-                        resultCallback.handleResult(RESULT_PASS);
-                    }
-
-                }
-
-                @Override
-                public void handleFault(BackendlessFault fault) {
-                    if (dialog != null) {
-                        dialog.dismiss();
-                    }
-
-                    if (resultCallback != null)
-                        resultCallback.handleFault(fault);
                 }
             });
-
         }
     }
 
-    private BackendlessDataQuery getQuery(String email, String mobile) {
-        String whereClause = whereClauseTemplate.replaceFirst("\\?", email.toLowerCase());
-        whereClause = whereClause.replaceFirst("\\?", mobile);
-        return new BackendlessDataQuery(whereClause);
+    private void handleResult(List<ParseUser> list, ParseException e, String email, String mobile) {
+        if (e == null) {
+            if (list != null) {
+                // found duplicate
+                boolean hasMobile = false;
+                boolean hasEmail = false;
+
+                for (ParseUser parseUser : list) {
+                    if (parseUser.getEmail().equalsIgnoreCase(email))
+                        hasEmail = true;
+                    if (parseUser.getString("mobile").equals(mobile))
+                        hasMobile = true;
+                }
+
+                if (hasEmail && hasMobile)
+                    resultCallback.handleResult(RESULT_DUPLICATE_BOTH);
+                else if (hasEmail)
+                    resultCallback.handleResult(RESULT_DUPLICATE_EMAIL);
+                else if (hasMobile)
+                    resultCallback.handleResult(RESULT_DUPLICATE_MOBILE);
+                else
+                    resultCallback.handleResult(RESULT_PASS);
+            } else {
+                // success
+                resultCallback.handleResult(RESULT_PASS);
+            }
+
+        } else {
+            resultCallback.handleFault(e);
+        }
+    }
+
+    private ParseQuery<ParseUser> getQuery(String email, String mobile) {
+        ParseQuery<ParseUser> queryName = ParseUser.getQuery();
+        queryName.whereEqualTo("username", email.toLowerCase());
+
+        ParseQuery<ParseUser> queryMobile = ParseUser.getQuery();
+        queryMobile.whereEqualTo("mobile", mobile);
+
+        List<ParseQuery<ParseUser>> queryList = new ArrayList<>();
+        queryList.add(queryName);
+        queryList.add(queryMobile);
+
+        return ParseQuery.or(queryList);
     }
 
     private Dialog showProgressDialog() {

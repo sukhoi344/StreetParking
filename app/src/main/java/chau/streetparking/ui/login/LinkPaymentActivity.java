@@ -1,7 +1,9 @@
 package chau.streetparking.ui.login;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Looper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -9,20 +11,36 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.braintreepayments.api.Braintree;
-import com.braintreepayments.api.dropin.BraintreePaymentActivity;
 import com.devmarvel.creditcardentry.library.CreditCard;
 import com.devmarvel.creditcardentry.library.CreditCardForm;
-import com.google.gson.JsonSyntaxException;
+
+import com.google.gson.Gson;
+import com.parse.FunctionCallback;
+import com.parse.Parse;
+import com.parse.ParseCloud;
+import com.parse.ParseException;
+import com.stripe.android.*;
+import com.stripe.android.model.Card;
+import com.stripe.android.model.Token;
+import com.stripe.model.Charge;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import chau.country.picker.CountryPicker;
 import chau.country.picker.CountryPickerListener;
 import chau.streetparking.R;
+import chau.streetparking.backend.BackendTest;
+import chau.streetparking.backend.JsonHelper;
+import chau.streetparking.backend.registration.AccountCreator;
+import chau.streetparking.backend.registration.ResultCallBack;
+import chau.streetparking.backend.registration.StripeCustomerCreator;
 import chau.streetparking.ui.ColoredBarActivity;
+import chau.streetparking.ui.MapsActivity;
 import chau.streetparking.util.Logger;
 
 /**
- * Created by Chau Thai on 7/28/15.g
+ * Created by Chau Thai on 7/28/15
  */
 public class LinkPaymentActivity extends ColoredBarActivity {
     public static final String EXTRA_EMAIL = "extra_email";
@@ -45,6 +63,8 @@ public class LinkPaymentActivity extends ColoredBarActivity {
                     firstName,
                     lastName;
     private boolean avatarSelected;
+
+    private Card card;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,16 +103,6 @@ public class LinkPaymentActivity extends ColoredBarActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 100) {
-            if (resultCode == BraintreePaymentActivity.RESULT_OK) {
-                String paymentMethodNonce = data.getStringExtra(BraintreePaymentActivity.EXTRA_PAYMENT_METHOD_NONCE);
-                Logger.d(TAG, "nonce: " + paymentMethodNonce);
-            } else {
-                JsonSyntaxException jsonSyntaxException = (JsonSyntaxException) data.getSerializableExtra(
-                        BraintreePaymentActivity.EXTRA_ERROR_MESSAGE);
-                Logger.d(TAG, "error: " + jsonSyntaxException.getMessage());
-            }
-        }
     }
 
     public void onPaypalClicked(View v) {
@@ -101,8 +111,32 @@ public class LinkPaymentActivity extends ColoredBarActivity {
 
     private void linkPayment() {
         if (checkInput()) {
+            AccountCreator accountCreator = new AccountCreator(
+                    this, card, email, mobile, password, firstName, lastName, avatarSelected,
+                    new ResultCallBack() {
+                        @Override
+                        public void success(String userId) {
+                            Logger.d(TAG, "saved, userId: " + userId);
+                            goToMainActivity();
+                        }
 
+                        @Override
+                        public void failure(String errorMessage) {
+                            Logger.d(TAG, "Error: " + errorMessage);
+                            showError(errorMessage);
+                        }
+                    }
+            );
+
+            accountCreator.saveAccount();
         }
+    }
+
+    private void goToMainActivity() {
+        Intent intent = new Intent(this, MapsActivity.class);
+        startActivity(intent);
+        setResult(RESULT_OK);
+        finish();
     }
 
     private boolean checkInput() {
@@ -111,6 +145,18 @@ public class LinkPaymentActivity extends ColoredBarActivity {
 
         if (!creditCardForm.isCreditCardValid() || countryCode.isEmpty() || zipCode.isEmpty()) {
             Toast.makeText(this, "Please complete the form", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        CreditCard creditCard = creditCardForm.getCreditCard();
+
+        if (creditCard != null) {
+            card = new Card(creditCard.getCardNumber(), creditCard.getExpMonth(), creditCard.getExpYear(),
+                    creditCard.getSecurityCode());
+        }
+
+        if (creditCard == null || card == null || !card.validateCard()) {
+            Toast.makeText(this, "Invalid credit card", Toast.LENGTH_SHORT).show();
             return false;
         }
 
@@ -156,5 +202,13 @@ public class LinkPaymentActivity extends ColoredBarActivity {
         creditCardForm = (CreditCardForm) findViewById(R.id.credit_card_form);
         textViewCountry = (TextView) findViewById(R.id.country);
         editTextZip = (EditText) findViewById(R.id.zip);
+    }
+
+    private void showError(String errorMessage) {
+        new AlertDialog.Builder(this, AlertDialog.THEME_HOLO_LIGHT)
+                .setMessage(errorMessage)
+                .setPositiveButton("Ok", null)
+                .show();
+
     }
 }

@@ -1,6 +1,8 @@
 package chau.streetparking.ui;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -20,6 +22,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.appyvet.rangebar.RangeBar;
 import com.google.android.gms.common.ConnectionResult;
@@ -42,6 +45,9 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+import com.parse.GetDataCallback;
+import com.parse.ParseException;
+import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,12 +55,16 @@ import java.util.List;
 import chau.streetparking.R;
 import chau.streetparking.datamodels.Request;
 import chau.streetparking.datamodels.SpotMarker;
+import chau.streetparking.datamodels.parse.User;
+import chau.streetparking.ui.login.StartActivity;
 import chau.streetparking.util.ImageUtil;
+import chau.streetparking.util.Logger;
 
 public class MapsActivity extends AppCompatActivity {
     private static final String TAG = "MapsActivity";
     private static final int REQUEST_CODE_SEARCH = 1;
     private static final int REQUEST_CODE_IMAGE = 2;
+    private static final int REQUEST_CODE_PROFILE = 3;
 
     private static final int ID_PROFILE = 0;
     private static final int ID_PAYMENT = 1;
@@ -85,6 +95,12 @@ public class MapsActivity extends AppCompatActivity {
     private TaskGetRequestList taskGetRequestList;
     private List<Uri> photoList = new ArrayList<>();
 
+    // Drawer variables
+    private IProfile profile;
+    private AccountHeader headerResult;
+
+    private User user;
+
     // For testing purpose
     private List<SpotMarker> testList = new ArrayList<>();
 
@@ -106,6 +122,7 @@ public class MapsActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(getString(R.string.app_name));
 
+        setupUser();
         setupDrawer(toolbar);
     }
 
@@ -137,6 +154,31 @@ public class MapsActivity extends AppCompatActivity {
                     new PhotosAdapter(MapsActivity.this, photoList),
                     true
             );
+        }
+
+        if (requestCode == REQUEST_CODE_PROFILE && data != null) {
+            int code = data.getIntExtra(ProfileActivity.EXTRA_PROFILE, ProfileActivity.PROFILE_NO_CHANGE);
+
+            switch (code) {
+                case ProfileActivity.PROFILE_LOG_OUT:
+                    finish();
+                    startActivity(new Intent(this, StartActivity.class));
+                    break;
+
+                case ProfileActivity.PROFILE_UPDATED:
+                    profile.setName(user.getFirstName() + " " + user.getLastName());
+                    profile.setEmail(user.getEmail());
+
+                    if (user.getAvatar() != null) {
+                        profile.setIcon(user.getAvatar().getUrl());
+                    }
+
+                    headerResult.updateProfileByIdentifier(profile);
+                    break;
+
+                default:
+                    break;
+            }
         }
     }
 
@@ -364,20 +406,20 @@ public class MapsActivity extends AppCompatActivity {
     }
 
     private void setupDrawer(Toolbar toolbar) {
+        String name = user.getFirstName() + " " + user.getLastName();
+        String email = user.getEmail();
+
+        // Create profile
+        profile = new ProfileDrawerItem().withName(name).withEmail(email).withIdentifier(0);
+        if (user.getAvatar() != null)
+            profile.withIcon(user.getAvatar().getUrl());
+
         // Create the AccountHeader
-        AccountHeader headerResult = new AccountHeaderBuilder()
+        headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
                 .withHeaderBackground(R.drawable.drawer_header)
-                .addProfiles(
-                        new ProfileDrawerItem().withName("Chau Thai").withEmail("chthai64@gmail.com")
-                )
-                .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
-                    @Override
-                    public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
-                        return false;
-                    }
-                })
-//                .withSelectionListEnabled(false)
+                .addProfiles(profile)
+                .withSelectionListEnabled(false)
                 .build();
 
         drawer = new DrawerBuilder()
@@ -405,7 +447,7 @@ public class MapsActivity extends AppCompatActivity {
                         switch (id) {
                             case ID_PROFILE: {
                                 Intent intent = new Intent(MapsActivity.this, ProfileActivity.class);
-                                startActivity(intent);
+                                startActivityForResult(intent, REQUEST_CODE_PROFILE);
                                 return true;
                             }
                             case ID_PAYMENT: {
@@ -424,6 +466,7 @@ public class MapsActivity extends AppCompatActivity {
                 })
                 .withSelectedItem(-1)
                 .build();
+
     }
 
     private synchronized void buildGoogleApiClient() {
@@ -540,6 +583,11 @@ public class MapsActivity extends AppCompatActivity {
         notificationLayout.setVisibility(View.VISIBLE);
         Animation animation = AnimationUtils.loadAnimation(this, R.anim.slide_in_up);
         notificationLayout.startAnimation(animation);
+    }
+
+    private void setupUser() {
+        user = (User) ParseUser.getCurrentUser();
+
     }
 
     private void setUpClusterer() {

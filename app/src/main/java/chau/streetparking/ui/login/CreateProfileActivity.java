@@ -29,6 +29,8 @@ import chau.streetparking.util.Logger;
  * Created by Chau Thai on 7/27/15.
  */
 public class CreateProfileActivity extends ColoredBarActivity {
+    public static final int REQUEST_EXIT = 2;
+
     public static final String EXTRA_MOBILE = "extra_mobile";
     public static final String EXTRA_EMAIL = "extra_email";
     public static final String EXTRA_PASSWORD = "extra_pass";
@@ -75,8 +77,17 @@ public class CreateProfileActivity extends ColoredBarActivity {
             case R.id.menu_next:
                 if (checkName()) {
                     Intent intent = new Intent(this, LinkPaymentActivity.class);
-                    startActivity(intent);
+
+                    intent.putExtra(LinkPaymentActivity.EXTRA_EMAIL, email);
+                    intent.putExtra(LinkPaymentActivity.EXTRA_MOBILE, mobile);
+                    intent.putExtra(LinkPaymentActivity.EXTRA_PASS, password);
+                    intent.putExtra(LinkPaymentActivity.EXTRA_FIRST, editTextFirst.getText().toString());
+                    intent.putExtra(LinkPaymentActivity.EXTRA_LAST, editTextLast.getText().toString());
+                    intent.putExtra(LinkPaymentActivity.EXTRA_AVATAR_SELECTED, avatarSelected);
+
+                    startActivityForResult(intent, REQUEST_EXIT);
                 }
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -85,23 +96,28 @@ public class CreateProfileActivity extends ColoredBarActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
-        if (resultCode == RESULT_OK && data != null) {
+        if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case AVATAR_REQUEST_CODE:
-                    if (data.getData() != null) {
+                    if (data != null && data.getData() != null) {
                         new TaskCropImage(this, data.getData()).execute();
                     }
-
                     break;
 
                 case Crop.REQUEST_CROP:
-                    Uri avatarUri = Crop.getOutput(data);
+                    if (data != null) {
+                        Uri avatarUri = Crop.getOutput(data);
 
-                    if (avatarUri != null) {
-                        ivAvatar.setImageURI(avatarUri);
-                        avatarSelected = true;
+                        if (avatarUri != null) {
+                            ivAvatar.setImageURI(avatarUri);
+                            avatarSelected = true;
+                        }
                     }
+                    break;
 
+                case REQUEST_EXIT:
+                    setResult(RESULT_OK);
+                    finish();
                     break;
             }
         }
