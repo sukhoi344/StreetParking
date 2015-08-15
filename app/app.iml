@@ -75,9 +75,8 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/recyclerview-v7/22.2.1/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.android.support/support-v4/22.2.1/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.appyvet/materialrangebar/1.0/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.braintreepayments.api/braintree/1.6.5/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.braintreepayments/card-form/2.0.1/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.github.dbachelder/CreditCardEntry/v1.3.0/jars" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.facebook.android/facebook-android-sdk/4.5.0/jars" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.github.dbachelder/CreditCardEntry/1.4.1/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.google.android.gms/play-services-base/7.5.0/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.google.android.gms/play-services-identity/7.5.0/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.google.android.gms/play-services-location/7.5.0/jars" />
@@ -85,9 +84,10 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.google.android.gms/play-services-wallet/7.5.0/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.google.maps.android/android-maps-utils/0.4/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.makeramen/roundedimageview/2.1.1/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.mikepenz/iconics/1.0.2/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.mikepenz/materialdrawer/3.0.6/jars" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.mikepenz/iconics/1.2.0/jars" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.mikepenz/materialdrawer/3.1.2/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.soundcloud.android/android-crop/1.0.0/jars" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.stripe/stripe-android/1.0.0/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.wdullaer/materialdatetimepicker/1.4.2/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/jacoco" />
@@ -106,15 +106,14 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 22 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" exported="" name="gson-2.2.4" level="project" />
     <orderEntry type="library" exported="" name="play-services-wallet-7.5.0" level="project" />
-    <orderEntry type="library" exported="" name="android-2.0.1" level="project" />
-    <orderEntry type="library" exported="" name="gson-2.3.1" level="project" />
+    <orderEntry type="library" exported="" name="materialdrawer-3.1.2" level="project" />
     <orderEntry type="library" exported="" name="recyclerview-v7-22.2.1" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-22.2.1" level="project" />
     <orderEntry type="library" exported="" name="materialrangebar-1.0" level="project" />
-    <orderEntry type="library" exported="" name="materialdrawer-3.0.6" level="project" />
+    <orderEntry type="library" exported="" name="stripe-java-1.15.1" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-22.2.1" level="project" />
-    <orderEntry type="library" exported="" name="braintree-1.6.5" level="project" />
     <orderEntry type="library" exported="" name="play-services-location-7.5.0" level="project" />
     <orderEntry type="library" exported="" name="materialdatetimepicker-1.4.2" level="project" />
     <orderEntry type="library" exported="" name="android-crop-1.0.0" level="project" />
@@ -123,15 +122,15 @@
     <orderEntry type="library" exported="" name="play-services-base-7.5.0" level="project" />
     <orderEntry type="library" exported="" name="Parse-1.9.4" level="project" />
     <orderEntry type="library" exported="" name="bolts-android-1.2.0" level="project" />
-    <orderEntry type="library" exported="" name="CreditCardEntry-v1.3.0" level="project" />
+    <orderEntry type="library" exported="" name="stripe-android-1.0.0" level="project" />
+    <orderEntry type="library" exported="" name="ParseFacebookUtilsV4-1.9.4" level="project" />
     <orderEntry type="library" exported="" name="support-v4-22.2.1" level="project" />
-    <orderEntry type="library" exported="" name="iconics-1.0.2" level="project" />
-    <orderEntry type="library" exported="" name="data-1.6.5" level="project" />
+    <orderEntry type="library" exported="" name="iconics-1.2.0" level="project" />
     <orderEntry type="library" exported="" name="roundedimageview-2.1.1" level="project" />
     <orderEntry type="library" exported="" name="universal-image-loader-1.9.4" level="project" />
-    <orderEntry type="library" exported="" name="braintree-api-1.6.5" level="project" />
+    <orderEntry type="library" exported="" name="CreditCardEntry-1.4.1" level="project" />
+    <orderEntry type="library" exported="" name="facebook-android-sdk-4.5.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-identity-7.5.0" level="project" />
-    <orderEntry type="library" exported="" name="card-form-2.0.1" level="project" />
     <orderEntry type="library" exported="" name="play-services-maps-7.5.0" level="project" />
     <orderEntry type="module" module-name="countrypicker" exported="" />
   </component>
