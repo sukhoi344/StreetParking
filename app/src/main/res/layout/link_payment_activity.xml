@@ -56,41 +56,41 @@
             android:inputType="number"/>
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:orientation="horizontal"-->
+        <!--android:gravity="center_vertical">-->
 
-        <View
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:background="#55000000" />
+        <!--<View-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="1dp"-->
+            <!--android:layout_weight="1"-->
+            <!--android:layout_marginLeft="15dp"-->
+            <!--android:layout_marginRight="15dp"-->
+            <!--android:background="#55000000" />-->
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:text="OR"
-            android:textColor="#55000000"/>
+        <!--<TextView-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:gravity="center_vertical"-->
+            <!--android:text="OR"-->
+            <!--android:textColor="#55000000"/>-->
 
-        <View
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:background="#55000000" />
-    </LinearLayout>
+        <!--<View-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="1dp"-->
+            <!--android:layout_weight="1"-->
+            <!--android:layout_marginLeft="15dp"-->
+            <!--android:layout_marginRight="15dp"-->
+            <!--android:background="#55000000" />-->
+    <!--</LinearLayout>-->
 
-    <ImageButton
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_margin="15dp"
-        android:src="@drawable/ic_paypal_big"
-        android:background="@drawable/parking_location_selector"
-        android:onClick="onPaypalClicked"/>
+    <!--<ImageButton-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="50dp"-->
+        <!--android:layout_margin="15dp"-->
+        <!--android:src="@drawable/ic_paypal_big"-->
+        <!--android:background="@drawable/parking_location_selector"-->
+        <!--android:onClick="onPaypalClicked"/>-->
 </LinearLayout>
