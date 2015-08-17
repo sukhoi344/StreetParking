@@ -6,6 +6,7 @@ import android.content.Context;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
+import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.parse.SignUpCallback;
 import com.stripe.android.model.Card;
@@ -32,6 +33,7 @@ public class AccountCreator {
     private String firstName;
     private String lastName;
     private boolean avatarSelected;
+    private boolean isFacebook;
 
     private ResultCallBack resultCallBack;
     private StripeCustomerCreator stripeCustomerCreator;
@@ -48,6 +50,7 @@ public class AccountCreator {
             String firstName,
             String lastName,
             boolean avatarSelected,
+            boolean isFacebook,
             final ResultCallBack resultCallBack)
     {
         this.context = context;
@@ -58,6 +61,7 @@ public class AccountCreator {
         this.lastName = lastName;
         this.avatarSelected = avatarSelected;
         this.resultCallBack = resultCallBack;
+        this.isFacebook = isFacebook;
 
         stripeCustomerCreator = new StripeCustomerCreator(context, card, email, new ResultCallBack() {
             @Override
@@ -81,9 +85,16 @@ public class AccountCreator {
     }
 
     private void saveAccount(final String customerId) {
-        final User user = new User();
+        final User user;
+
+        if (isFacebook) {
+            user = (User) ParseUser.getCurrentUser();
+        } else {
+            user = new User();
+            user.setPassword(password);
+        }
+
         user.setUsername(email);
-        user.setPassword(password);
         user.setEmail(email);
         user.setMobile(mobile);
         user.setFirstName(firstName);
@@ -128,32 +139,45 @@ public class AccountCreator {
                         user.put("avatar", file);
                     }
 
-                    user.signUpInBackground(new SignUpCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            if (e == null) {
-                                customer.put("user", user);
-                                customer.saveInBackground(new SaveCallback() {
-                                    @Override
-                                    public void done(ParseException e) {
-                                        if (e == null)
-                                            Logger.d(TAG, "customer pointer saved");
-                                        else
-                                            Logger.d(TAG, "customer pointer error: " + e.getLocalizedMessage());
-                                    }
-                                });
-
-                                resultCallBack.success(user.getObjectId());
-                            } else {
-                                resultCallBack.failure(e.getLocalizedMessage());
+                    if (isFacebook) {
+                        user.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                saveCallBack(e, customer, user);
                             }
-
-                            onFinished();
-                        }
-                    });
+                        });
+                    } else {
+                        user.signUpInBackground(new SignUpCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                saveCallBack(e, customer, user);
+                            }
+                        });
+                    }
                 }
             }
         });
+    }
+
+    private void saveCallBack(ParseException e, ParseObject customer, User user) {
+        if (e == null) {
+            customer.put("user", user);
+            customer.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if (e == null)
+                        Logger.d(TAG, "customer pointer saved");
+                    else
+                        Logger.d(TAG, "customer pointer error: " + e.getLocalizedMessage());
+                }
+            });
+
+            resultCallBack.success(user.getObjectId());
+        } else {
+            resultCallBack.failure(e.getLocalizedMessage());
+        }
+
+        onFinished();
     }
 
     private String getFileAvatarName() {

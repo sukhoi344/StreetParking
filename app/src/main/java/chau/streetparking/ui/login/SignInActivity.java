@@ -1,10 +1,8 @@
 package chau.streetparking.ui.login;
 
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -27,6 +25,7 @@ import chau.streetparking.util.Logger;
  * Created by Chau Thai on 6/7/2015.
  */
 public class SignInActivity extends ColoredBarActivity {
+    public static final int REQUEST_EXIT = 1;
     private static final String TAG = SignInActivity.class.getSimpleName();
     private EditText etEmail, etPassword;
     private ProgressDialog dialog;
@@ -36,10 +35,6 @@ public class SignInActivity extends ColoredBarActivity {
         super.onCreate(savedInstanceState);
         etEmail = (EditText) findViewById(R.id.edit_text_email);
         etPassword = (EditText) findViewById(R.id.edit_text_password);
-
-        if (ParseUser.getCurrentUser() != null) {
-            ParseUser.getCurrentUser().logOutInBackground();
-        }
     }
 
     @Override
@@ -52,6 +47,10 @@ public class SignInActivity extends ColoredBarActivity {
                 case MyApplication.REQUEST_CODE_OFFSET:
                     showProgressDialog("Logging in...");
                     ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
+                    break;
+                case REQUEST_EXIT:
+                    setResult(RESULT_OK);
+                    finish();
                     break;
             }
         }
@@ -72,6 +71,14 @@ public class SignInActivity extends ColoredBarActivity {
         goBackToStart();
     }
 
+    @Override
+    protected void onDestroy() {
+        if (ParseUser.getCurrentUser() != null)
+            ParseUser.getCurrentUser().logOutInBackground();
+
+        super.onDestroy();
+    }
+
     /**
      * Called when "CONNECT WITH FACEBOOK" button is selected
      */
@@ -83,14 +90,12 @@ public class SignInActivity extends ColoredBarActivity {
                 if (e == null && parseUser != null) {
                     Logger.d(TAG, "facebook login done!");
 
-                    if (parseUser.isNew()) {
-
+                    if (parseUser.isNew() || parseUser.getEmail() == null) {
+                        Intent intent = new Intent(SignInActivity.this, VerifyAccountActivity.class);
+                        startActivityForResult(intent, REQUEST_EXIT);
                     } else {
-
+                        goToMap();
                     }
-
-                    Intent intent = new Intent(SignInActivity.this, VerifyAccountActivity.class);
-                    startActivity(intent);
                 } else {
                     // Error
                     Logger.d(TAG, "Error message: " + e == null? "null" : e.getLocalizedMessage());
@@ -146,10 +151,7 @@ public class SignInActivity extends ColoredBarActivity {
                     String errorMsg = e == null ? "Wrong email or password" : e.getLocalizedMessage();
                     Toast.makeText(SignInActivity.this, errorMsg, Toast.LENGTH_SHORT).show();
                 } else {
-                    Intent intent = new Intent(SignInActivity.this, MapsActivity.class);
-                    startActivity(intent);
-                    setResult(RESULT_OK);
-                    finish();
+                    goToMap();
                 }
 
                 if (dialog != null) {
@@ -157,6 +159,13 @@ public class SignInActivity extends ColoredBarActivity {
                 }
             }
         });
+    }
+
+    private void goToMap() {
+        Intent intent = new Intent(SignInActivity.this, MapsActivity.class);
+        startActivity(intent);
+        setResult(RESULT_OK);
+        finish();
     }
 
     private void showProgressDialog(String message) {

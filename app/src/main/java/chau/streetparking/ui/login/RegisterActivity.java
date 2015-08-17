@@ -1,20 +1,26 @@
 package chau.streetparking.ui.login;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.parse.LogInCallback;
 import com.parse.ParseException;
+import com.parse.ParseFacebookUtils;
+import com.parse.ParseUser;
 
+import java.util.Arrays;
+import java.util.List;
+
+import chau.streetparking.MyApplication;
 import chau.streetparking.R;
-import chau.streetparking.backend.BackendTest;
 import chau.streetparking.backend.registration.IdentityVerifier;
 import chau.streetparking.ui.ColoredBarActivity;
+import chau.streetparking.ui.MapsActivity;
 import chau.streetparking.util.DeviceUtil;
 import chau.streetparking.util.Logger;
 
@@ -30,6 +36,7 @@ public class RegisterActivity extends ColoredBarActivity {
                         etPassword;
     private TextView    tvError1,
                         tvError2;
+    private ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,9 +46,17 @@ public class RegisterActivity extends ColoredBarActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK && requestCode == REQUEST_EXIT) {
-            setResult(RESULT_OK);
-            finish();
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case REQUEST_EXIT:
+                    setResult(RESULT_OK);
+                    finish();
+                    break;
+                case MyApplication.REQUEST_CODE_OFFSET:
+                    showProgressDialog("Logging in...");
+                    ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
+                    break;
+            }
         }
     }
 
@@ -58,6 +73,33 @@ public class RegisterActivity extends ColoredBarActivity {
     @Override
     public void onBackPressed() {
         goBackToStart();
+    }
+
+    public void onFacebookClicked(View v) {
+        List<String> permissions = Arrays.asList("public_profile", "email");
+        ParseFacebookUtils.logInWithReadPermissionsInBackground(this, permissions, new LogInCallback() {
+            @Override
+            public void done(ParseUser parseUser, ParseException e) {
+                if (e == null && parseUser != null) {
+                    Logger.d(TAG, "facebook login done!");
+
+                    if (parseUser.isNew() || parseUser.getEmail() == null) {
+                        Intent intent = new Intent(RegisterActivity.this, VerifyAccountActivity.class);
+                        startActivityForResult(intent, REQUEST_EXIT);
+                    } else {
+                        goToMap();
+                    }
+                } else {
+                    // Error
+                    Logger.d(TAG, "Error message: " + e == null ? "null" : e.getLocalizedMessage());
+                    if (parseUser == null)
+                        Logger.d(TAG, "parseUser is null");
+                }
+
+                if (dialog != null)
+                    dialog.dismiss();
+            }
+        });
     }
 
     /**
@@ -112,13 +154,9 @@ public class RegisterActivity extends ColoredBarActivity {
         });
 
         identityVerifier.verify(email, mobile);
-
-//        // Temporary bypass the verifier.
-//        goToCreateProfile(email, mobile, password);
     }
 
     private void goBackToStart() {
-//        startActivity(new Intent(this, StartActivity.class));
         finish();
     }
 
@@ -129,6 +167,13 @@ public class RegisterActivity extends ColoredBarActivity {
         intent.putExtra(CreateProfileActivity.EXTRA_MOBILE, mobile);
 
         startActivityForResult(intent, REQUEST_EXIT);
+    }
+
+    private void goToMap() {
+        Intent intent = new Intent(RegisterActivity.this, MapsActivity.class);
+        startActivity(intent);
+        setResult(RESULT_OK);
+        finish();
     }
 
     private void showError(int errorCode) {
@@ -151,6 +196,20 @@ public class RegisterActivity extends ColoredBarActivity {
     private void clearError() {
         tvError1.setText("");
         tvError2.setText("");
+    }
+
+    private void showProgressDialog(String message) {
+        if (dialog != null && dialog.isShowing()) {
+            dialog.dismiss();
+        }
+
+        dialog = new ProgressDialog(this, ProgressDialog.THEME_HOLO_LIGHT);
+        dialog.setIndeterminate(true);
+        dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.setMessage(message);
+
+        dialog.show();
     }
 
     private void getWidgets() {

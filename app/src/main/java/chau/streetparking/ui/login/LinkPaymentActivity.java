@@ -49,6 +49,7 @@ public class LinkPaymentActivity extends ColoredBarActivity {
     public static final String EXTRA_FIRST = "extra_first";
     public static final String EXTRA_LAST = "extra_last";
     public static final String EXTRA_AVATAR_SELECTED = "extra_avatar_selected";
+    public static final String EXTRA_IS_FACEBOOK = "extra_facebook";
 
     private static final String TAG = LinkPaymentActivity.class.getSimpleName();
 
@@ -63,6 +64,7 @@ public class LinkPaymentActivity extends ColoredBarActivity {
                     firstName,
                     lastName;
     private boolean avatarSelected;
+    private boolean isFacebook;
 
     private Card card;
 
@@ -112,7 +114,7 @@ public class LinkPaymentActivity extends ColoredBarActivity {
     private void linkPayment() {
         if (checkInput()) {
             AccountCreator accountCreator = new AccountCreator(
-                    this, card, email, mobile, password, firstName, lastName, avatarSelected,
+                    this, card, email, mobile, password, firstName, lastName, avatarSelected, isFacebook,
                     new ResultCallBack() {
                         @Override
                         public void success(String userId) {
@@ -194,6 +196,7 @@ public class LinkPaymentActivity extends ColoredBarActivity {
             firstName = extras.getStringExtra(EXTRA_FIRST);
             lastName = extras.getStringExtra(EXTRA_LAST);
             avatarSelected = extras.getBooleanExtra(EXTRA_AVATAR_SELECTED, false);
+            isFacebook = extras.getBooleanExtra(EXTRA_IS_FACEBOOK, false);
         }
 
     }
