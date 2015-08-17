@@ -30,6 +30,8 @@ public class SignInActivity extends ColoredBarActivity {
     private EditText etEmail, etPassword;
     private ProgressDialog dialog;
 
+    private boolean shouldLogOut = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,12 +49,19 @@ public class SignInActivity extends ColoredBarActivity {
                 case MyApplication.REQUEST_CODE_OFFSET:
                     showProgressDialog("Logging in...");
                     ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
+                    shouldLogOut = false;
                     break;
                 case REQUEST_EXIT:
                     setResult(RESULT_OK);
+                    shouldLogOut = true;
                     finish();
                     break;
+                default:
+                    shouldLogOut = false;
+                    break;
             }
+        } else {
+            shouldLogOut = false;
         }
     }
 
@@ -73,8 +82,9 @@ public class SignInActivity extends ColoredBarActivity {
 
     @Override
     protected void onDestroy() {
-        if (ParseUser.getCurrentUser() != null)
+        if (ParseUser.getCurrentUser() != null && shouldLogOut) {
             ParseUser.getCurrentUser().logOutInBackground();
+        }
 
         super.onDestroy();
     }
