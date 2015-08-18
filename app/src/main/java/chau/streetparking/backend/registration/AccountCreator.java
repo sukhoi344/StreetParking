@@ -104,7 +104,7 @@ public class AccountCreator {
         if (avatarSelected) {
             byte[] data = FileUtil.getBytesFromPath(context.getFilesDir().getPath() + "/" +
                     FileManager.AVATAR_CROPPED_FILE_NAME);
-            final ParseFile file = new ParseFile(getFileAvatarName(), data);
+            final ParseFile file = new ParseFile(FileManager.getFileAvatarName(mobile), data);
             file.saveInBackground(new SaveCallback() {
                 @Override
                 public void done(ParseException e) {
@@ -178,21 +178,6 @@ public class AccountCreator {
         }
 
         onFinished();
-    }
-
-    private String getFileAvatarName() {
-        try {
-            return toHex(System.currentTimeMillis() + mobile) + ".png";
-        } catch (Exception e) {
-            if (Logger.DEBUG)
-                e.printStackTrace();
-        }
-
-        return System.currentTimeMillis() + ".png";
-    }
-
-    private String toHex(String arg) {
-        return String.format("%x", new BigInteger(1, arg.getBytes(/*YOUR_CHARSET?*/)));
     }
 
     private void onFinished() {
