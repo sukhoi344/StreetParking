@@ -93,6 +93,8 @@ public class SignInActivity extends ColoredBarActivity {
      * Called when "CONNECT WITH FACEBOOK" button is selected
      */
     public void onFacebookClicked(View v) {
+        // TODO: fix the bug "java.lang.RuntimeException: Unable to authenticate when another authentication is in process"
+
         List<String> permissions = Arrays.asList("public_profile", "email");
         ParseFacebookUtils.logInWithReadPermissionsInBackground(this, permissions, new LogInCallback() {
             @Override
