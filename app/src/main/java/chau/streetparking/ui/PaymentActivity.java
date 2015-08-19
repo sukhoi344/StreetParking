@@ -7,21 +7,37 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.wallet.WalletConstants;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseUser;
+import com.stripe.Stripe;
+import com.stripe.model.Card;
+import com.stripe.model.Customer;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import chau.streetparking.R;
+import chau.streetparking.backend.StripeHelper;
 import chau.streetparking.datamodels.CardItem;
 import chau.streetparking.datamodels.CardTypes;
+import chau.streetparking.datamodels.parse.Credit;
+import chau.streetparking.datamodels.parse.User;
+import chau.streetparking.util.Logger;
 
 /**
  * Created by Chau Thai on 6/19/15.
  */
 public class PaymentActivity extends ColoredBarActivity {
+    private static final String TAG = PaymentActivity.class.getSimpleName();
+
+    private View        contentView;
+    private ProgressBar progressBar;
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
 
@@ -40,6 +56,7 @@ public class PaymentActivity extends ColoredBarActivity {
         super.onCreate(savedInstanceState);
         getWidgets();
         setupList();
+        getCards();
     }
 
     @Override
@@ -65,28 +82,63 @@ public class PaymentActivity extends ColoredBarActivity {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setOverScrollMode(View.OVER_SCROLL_NEVER);
         recyclerView.addItemDecoration(new DividerItemDecoration(this, null));
-
-        recyclerView.setAdapter(new PaymentsAdapter(this, createTestSList()));
     }
 
-    private List<CardItem> createTestSList() {
-        List<CardItem> list = new ArrayList<>();
+    private void getCards() {
+        User user = (User) ParseUser.getCurrentUser();
 
-        CardItem item1 = new CardItem(1, WalletConstants.CardNetwork.VISA,
-                CardTypes.PERSONAL, "2442 4441 2234 1124", 5,12,355,"US", "20015");
-        CardItem item2 = new CardItem(2, WalletConstants.CardNetwork.MASTERCARD,
-                CardTypes.BUSINESS, "2314 5535 1232, 5435", 5,12,123,"US", "20015");
-        CardItem item3 = new CardItem(3, WalletConstants.CardNetwork.DISCOVER,
-                CardTypes.PERSONAL, "2323 1312 1242 1341", 5,12,456,"US", "20015");
+        if (user != null) {
+            List<Credit> creditList = user.getCredits();
 
-        list.add(item1);
-        list.add(item2);
-        list.add(item3);
+            if (creditList != null && !creditList.isEmpty()) {
+                final Credit credit = creditList.get(0);
 
-        return list;
+                credit.fetchIfNeededInBackground(new GetCallback<Credit>() {
+                    @Override
+                    public void done(Credit parseObject, ParseException e) {
+                        setProgressBarVisible(false);
+
+                        if (e != null) {
+                            Toast.makeText(PaymentActivity.this, "Error getting cards", Toast.LENGTH_SHORT).show();
+                            Logger.d(TAG, "Error fetching Credit: " + e.getLocalizedMessage());
+                        } else {
+                            String customerId = credit.getCustomerId();
+
+                            StripeHelper.getCardsFromCustomer(PaymentActivity.this, customerId, new StripeHelper.GetCardsCallBack() {
+                                @Override
+                                public void done(List<Card> cards, String errorMessage) {
+                                    try {
+                                        setProgressBarVisible(false);
+
+                                        if (errorMessage != null) {
+                                            Toast.makeText(PaymentActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                                        } else if (cards != null) {
+                                            recyclerView.setAdapter(new PaymentsAdapter(PaymentActivity.this, cards));
+                                        }
+
+                                    } catch (Exception e) {
+                                        if (Logger.DEBUG)
+                                            e.printStackTrace();
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+            } else {
+                setProgressBarVisible(false);
+            }
+        }
+    }
+
+    private void setProgressBarVisible(boolean visible) {
+        progressBar.setVisibility(visible? View.VISIBLE : View.INVISIBLE);
+        contentView.setVisibility(visible? View.INVISIBLE : View.VISIBLE);
     }
 
     private void getWidgets() {
+        contentView = findViewById(R.id.content_layout);
+        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
     }
 }

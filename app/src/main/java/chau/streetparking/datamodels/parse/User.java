@@ -71,8 +71,8 @@ public class User extends ParseUser {
         put(KEY_MOBILE_VERIFIED, mobileVerified);
     }
 
-    // TODO: create Credit object instead of ParseObject
-    public List<ParseObject> getCredits() {
+    // TODO: change List<Credit> to just one Credit object, on need to have an array (also in the backend).
+    public List<Credit> getCredits() {
         return getList(KEY_CREDIT_CARD);
     }
 

@@ -20,6 +20,7 @@ import com.parse.Parse;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
 
+import chau.streetparking.datamodels.parse.Credit;
 import chau.streetparking.datamodels.parse.User;
 
 /**
@@ -95,6 +96,7 @@ public class MyApplication extends Application {
 
     private void initParse() {
         ParseObject.registerSubclass(User.class);
+        ParseObject.registerSubclass(Credit.class);
         Parse.enableLocalDatastore(this);
 
         Parse.initialize(this, getString(R.string.parse_application_id), getString(R.string.parse_client_key));
