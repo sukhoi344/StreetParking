@@ -17,4 +17,9 @@ public class Logger {
         if (DEBUG)
             Log.e(TAG, message);
     }
+
+    public static void printStackTrace(Exception e) {
+        if (DEBUG && e != null)
+            e.printStackTrace();
+    }
 }

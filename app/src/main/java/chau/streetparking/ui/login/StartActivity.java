@@ -73,7 +73,7 @@ public class StartActivity extends AppCompatActivity {
         startActivityForResult(new Intent(this, RegisterActivity.class), REQUEST_EXIT);
 
 //        BackendTest test = new BackendTest(this);
-//        test.testPointerRetrive();
+//        test.retrieveCustomer("cus_6nm1hFgKcPociO");
     }
 
     private boolean checkPlayServices() {

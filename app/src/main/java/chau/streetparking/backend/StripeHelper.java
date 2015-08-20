@@ -1,25 +1,24 @@
 package chau.streetparking.backend;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.res.Resources;
-import android.os.*;
 import android.os.Process;
 
+import com.parse.FunctionCallback;
 import com.parse.ParseCloud;
+import com.stripe.Stripe;
 import com.stripe.model.Card;
-import com.stripe.model.Customer;
-import com.stripe.model.CustomerCardCollection;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import chau.streetparking.R;
 import chau.streetparking.util.Logger;
 
 /**
  * Created by Chau Thai on 8/19/15.
  */
+
+//TODO: Create notification listener for changing API KEY event in the backend
 public class StripeHelper {
     private static final String TAG = StripeHelper.class.getSimpleName();
 
@@ -50,7 +49,7 @@ public class StripeHelper {
 
                 try {
                     // Get the secret Stripe apikey from the server
-                    String apiKey = getStripeAPIKey();
+                    final String apiKey = getStripeAPIKey();
 
                     if (apiKey == null) {
                         if (activity != null && callBack != null) {
@@ -65,58 +64,85 @@ public class StripeHelper {
                         return;
                     }
 
-                    // Get customer from Stripe server
-                    Customer customer = Customer.retrieve(customerId, apiKey);
-                    Logger.d(TAG, "customer: " + customer == null? "null" : Customer.PRETTY_PRINT_GSON.toJson(customer));
+                    // Get customer from Parse server
+                    Map<String, Object> params = new HashMap<>();
+                    params.put("customerId", customerId);
+                    String customerString = ParseCloud.callFunction("getCustomer", params);
 
-                    CustomerCardCollection cardCollection = customer.getCards();
-                    final List<Card> cards = cardCollection.getData();
-
-                    if (callBack != null) {
-                        activity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    callBack.done(cards, null);
-                                } catch (Exception e) {
-                                    if (Logger.DEBUG)
-                                        e.printStackTrace();
-                                }
-                            }
-                        });
-                    }
+                    // Decode the response json and call the callback function
+                    decodeCustomerJSON(customerString, callBack, activity);
                 } catch (Exception e) {
-                    if (Logger.DEBUG)
-                        e.printStackTrace();
-
-                    if (callBack != null && activity != null) {
-                        activity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    callBack.done(null, "Unknown error");
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
-                    }
+                    handleExeption(e, callBack, activity);
                 }
             }
         }).start();
     }
 
     public static String getStripeAPIKey() {
-        try {
-            String functionName = LIVE ? "get_stripe_secret_key_live" : "get_stripe_secret_key_test";
-            String apiKey = ParseCloud.callFunction(functionName, new HashMap<String, Object>());
+        if (Stripe.apiKey == null || Stripe.apiKey.isEmpty()) {
+            try {
+                String functionName = LIVE ? RequestManager.Stripe.GET_SECRET_KEY_LIVE :
+                        RequestManager.Stripe.GET_SECRET_KEY_TEST;
+                String apiKey = ParseCloud.callFunction(functionName, new HashMap<String, Object>());
 
-            return apiKey;
+                Stripe.apiKey = apiKey;
 
-        } catch (Exception e) {
-            e.printStackTrace();
+                return apiKey;
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
-        return null;
+        return Stripe.apiKey;
     }
+
+    public static void getStripeApiKeyAsync(FunctionCallback<String> functionCallback) {
+        if (Stripe.apiKey == null || Stripe.apiKey.isEmpty()) {
+            String functionName = LIVE ? RequestManager.Stripe.GET_SECRET_KEY_LIVE :
+                    RequestManager.Stripe.GET_SECRET_KEY_TEST;
+
+            ParseCloud.callFunctionInBackground(functionName, new HashMap<String, Object>(), functionCallback);
+        } else {
+            functionCallback.done(Stripe.apiKey, null);
+        }
+    }
+
+    private static void decodeCustomerJSON(String customerString, final GetCardsCallBack callBack, Activity activity) {
+        CustomerWithCards customerWithCards = JsonHelper.jsonToCustomerWithCards(customerString);
+        final List<Card> cards = customerWithCards.getCards();
+
+        if (callBack != null) {
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        callBack.done(cards, null);
+                    } catch (Exception e) {
+                        if (Logger.DEBUG)
+                            e.printStackTrace();
+                    }
+                }
+            });
+        }
+    }
+
+    private static void handleExeption(Exception e, final GetCardsCallBack callBack, Activity activity) {
+        if (Logger.DEBUG)
+            e.printStackTrace();
+
+        if (callBack != null && activity != null) {
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        callBack.done(null, "Unknown error");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+    }
+
 }

@@ -14,6 +14,7 @@ import com.google.android.gms.wallet.WalletConstants;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.stripe.Stripe;
 import com.stripe.model.Card;
@@ -93,21 +94,30 @@ public class PaymentActivity extends ColoredBarActivity {
             if (creditList != null && !creditList.isEmpty()) {
                 final Credit credit = creditList.get(0);
 
+                final long creditT1 = System.currentTimeMillis();
                 credit.fetchIfNeededInBackground(new GetCallback<Credit>() {
                     @Override
                     public void done(Credit parseObject, ParseException e) {
-                        setProgressBarVisible(false);
+                        long creditTime = System.currentTimeMillis() - creditT1;
+                        Logger.d(TAG, "credit fetch time: " + creditTime + "ms");
 
                         if (e != null) {
+                            setProgressBarVisible(false);
                             Toast.makeText(PaymentActivity.this, "Error getting cards", Toast.LENGTH_SHORT).show();
                             Logger.d(TAG, "Error fetching Credit: " + e.getLocalizedMessage());
                         } else {
                             String customerId = credit.getCustomerId();
 
+                            final long getCardT1 = System.currentTimeMillis();
                             StripeHelper.getCardsFromCustomer(PaymentActivity.this, customerId, new StripeHelper.GetCardsCallBack() {
                                 @Override
                                 public void done(List<Card> cards, String errorMessage) {
+                                    setProgressBarVisible(false);
+
                                     try {
+                                        long getCardTime = System.currentTimeMillis() - getCardT1;
+                                        Logger.d(TAG, "get cards time: " + getCardTime + "ms");
+
                                         setProgressBarVisible(false);
 
                                         if (errorMessage != null) {

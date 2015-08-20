@@ -19,6 +19,7 @@ import com.stripe.android.model.Card;
 import com.stripe.android.model.Token;
 import com.stripe.model.Charge;
 import com.stripe.model.Customer;
+import com.stripe.model.CustomerCardCollection;
 import com.stripe.net.APIResource;
 
 import java.util.ArrayList;
@@ -142,7 +143,7 @@ public class BackendTest {
 
 
                 } else {
-                    Logger.d(TAG, "Error: " + e==null? "null" : e.getLocalizedMessage());
+                    Logger.d(TAG, "Error: " + e == null ? "null" : e.getLocalizedMessage());
                 }
             }
         });
@@ -190,6 +191,43 @@ public class BackendTest {
         } catch (Exception e) {
             e.printStackTrace();
             Toast.makeText(context, "Error linking payment", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void retrieveCustomer(String customerId) {
+        try {
+            Map<String, Object> params = new HashMap<>();
+            params.put("customerId", customerId);
+
+            ParseCloud.callFunctionInBackground("getCustomer", params, new FunctionCallback<String>() {
+                @Override
+                public void done(String customerString, ParseException e) {
+                    if (e != null) {
+                        Logger.d(TAG, "Error retrieving customer: " + e.getLocalizedMessage());
+                    } else if (customerString == null) {
+                        Logger.d(TAG, "Error retrieving customer: null customer");
+                    } else {
+                        CustomerWithCards customerWithCards = JsonHelper.jsonToCustomerWithCards(customerString);
+
+                        Customer customer = customerWithCards.getCustomer();
+                        List<com.stripe.model.Card> cards = customerWithCards.getCards();
+
+                        Logger.d(TAG, "customer: " + Customer.GSON.toJson(customer));
+
+                        if (cards != null) {
+                            for (com.stripe.model.Card card: cards) {
+                                Logger.d(TAG, "Card: " + com.stripe.model.Card.PRETTY_PRINT_GSON.toJson(card));
+                            }
+                        } else {
+                            Logger.d(TAG, "Null card");
+                        }
+//
+
+                    }
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

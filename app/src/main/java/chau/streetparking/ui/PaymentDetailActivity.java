@@ -11,6 +11,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 
+import com.stripe.model.Card;
+
 import chau.country.picker.CountryPicker;
 import chau.country.picker.CountryPickerListener;
 import chau.streetparking.R;
@@ -25,16 +27,15 @@ public class PaymentDetailActivity extends ColoredBarActivity {
     public static final String EXTRA_CARD = "extra_card";
 
     // Widgets
-    private View cancelSaveLayout;
+    private View        cancelSaveLayout;
     private EditText    editTextNumber,
                         editTextMonth,
                         editTextYear,
-                        editTextCVV,
-                        editTextZip;
-    private TextView    textViewCountry;
-    private Spinner     spinnerCardType;
+                        editTextCVV;
+//    private TextView    textViewCountry;
+//    private Spinner     spinnerCardType;
 
-    private CardItem cardItem;
+    private Card card;
 
     @Override
     protected int getLayout() {
@@ -50,11 +51,11 @@ public class PaymentDetailActivity extends ColoredBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWidgets();
-        setupSpinner();
-        setCountryPicker();
+//        setupSpinner();
+//        setCountryPicker();
         setEditEnabled(false);
 
-        cardItem = getIntent().getParcelableExtra(EXTRA_CARD);
+        getCard();
         setWidgetContent();
     }
 
@@ -89,81 +90,80 @@ public class PaymentDetailActivity extends ColoredBarActivity {
         editTextMonth.setEnabled(enabled);
         editTextYear.setEnabled(enabled);
         editTextCVV.setEnabled(enabled);
-        editTextZip.setEnabled(enabled);
-        textViewCountry.setClickable(enabled);
-        spinnerCardType.setClickable(enabled);
+//        editTextZip.setEnabled(enabled);
+//        textViewCountry.setClickable(enabled);
+//        spinnerCardType.setClickable(enabled);
     }
 
-    private void setCountryPicker() {
-        final CountryPicker countryPicker = CountryPicker.newInstance();
+//    private void setCountryPicker() {
+//        final CountryPicker countryPicker = CountryPicker.newInstance();
+//
+//        textViewCountry.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                countryPicker.show(getSupportFragmentManager(), "COUNTRY_PICKER");
+//            }
+//        });
+//
+//        countryPicker.setListener(new CountryPickerListener() {
+//            @Override
+//            public void onSelectCountry(String name, String code) {
+//                textViewCountry.setText(code);
+//                countryPicker.dismiss();
+//            }
+//        });
+//
+//    }
 
-        textViewCountry.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                countryPicker.show(getSupportFragmentManager(), "COUNTRY_PICKER");
-            }
-        });
-
-        countryPicker.setListener(new CountryPickerListener() {
-            @Override
-            public void onSelectCountry(String name, String code) {
-                textViewCountry.setText(code);
-                countryPicker.dismiss();
-            }
-        });
-
-    }
-
-    private void setupSpinner() {
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.card_type_array, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerCardType.setAdapter(adapter);
-        spinnerCardType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                switch (position) {
-                    case 0:
-
-                        break;
-                    case 1:
-
-                        break;
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
-    }
+//    private void setupSpinner() {
+//        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+//                R.array.card_type_array, android.R.layout.simple_spinner_item);
+//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        spinnerCardType.setAdapter(adapter);
+//        spinnerCardType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//                switch (position) {
+//                    case 0:
+//
+//                        break;
+//                    case 1:
+//
+//                        break;
+//                }
+//            }
+//
+//            @Override
+//            public void onNothingSelected(AdapterView<?> parent) {
+//            }
+//        });
+//    }
 
     private void setWidgetContent() {
-        if (cardItem != null) {
-            editTextNumber.setText(TextUtil.getCodedNumber(cardItem.getNumber()));
+        if (card != null) {
+            editTextNumber.setText(TextUtil.getCodedNumber(card.getLast4()));
 
-            String month = cardItem.getExpMonth() + "";
+            String month = card.getExpMonth() + "";
             if (month.length() == 1)
                 month = "0" + month;
             editTextMonth.setText(month);
 
-            String year = cardItem.getExpYear() + "";
+            String year = card.getExpYear() + "";
             if (year.length() == 1)
                 year = "0" + year;
             editTextYear.setText(year);
 
-            editTextCVV.setText(cardItem.getCvv() + "");
-            textViewCountry.setText(cardItem.getCountry());
-            editTextZip.setText(cardItem.getZipCode());
+            editTextCVV.setText("•••");
+//            textViewCountry.setText(card.getCountry());
+//            editTextZip.setText(card.getAddressZip() == null? "" : card.getAddressZip());
+        }
+    }
 
-            switch (cardItem.getType()) {
-                case CardTypes.PERSONAL:
-                    spinnerCardType.setSelection(0);
-                    break;
-                case CardTypes.BUSINESS:
-                    spinnerCardType.setSelection(1);
-                    break;
-            }
+    private void getCard() {
+        String cardJSON = getIntent().getStringExtra(EXTRA_CARD);
+
+        if (cardJSON != null) {
+            card = Card.GSON.fromJson(cardJSON, Card.class);
         }
     }
 
@@ -173,8 +173,8 @@ public class PaymentDetailActivity extends ColoredBarActivity {
         editTextMonth = (EditText) findViewById(R.id.month);
         editTextYear = (EditText) findViewById(R.id.year);
         editTextCVV = (EditText) findViewById(R.id.cvv);
-        editTextZip = (EditText) findViewById(R.id.zip);
-        textViewCountry = (TextView) findViewById(R.id.country);
-        spinnerCardType = (Spinner) findViewById(R.id.spinner);
+//        editTextZip = (EditText) findViewById(R.id.zip);
+//        textViewCountry = (TextView) findViewById(R.id.country);
+//        spinnerCardType = (Spinner) findViewById(R.id.spinner);
     }
 }

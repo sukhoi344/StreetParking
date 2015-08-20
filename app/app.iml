@@ -132,6 +132,7 @@
     <orderEntry type="library" exported="" name="facebook-android-sdk-4.5.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-identity-7.8.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-maps-7.8.0" level="project" />
+    <orderEntry type="module" module-name="volley" exported="" />
     <orderEntry type="module" module-name="countrypicker" exported="" />
   </component>
 </module>

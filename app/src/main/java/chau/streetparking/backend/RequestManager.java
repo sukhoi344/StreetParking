@@ -10,7 +10,8 @@ public class RequestManager {
     }
 
     public static abstract class Stripe {
-        public static final String GET_SECRET_KEY_TEST = "get_parse_secret_key_test";
-        public static final String GET_SECRET_KEY_LIVE = "get_parse_secret_key_live";
+        public static final String GET_SECRET_KEY_TEST = "get_stripe_secret_key_test";
+        public static final String GET_SECRET_KEY_LIVE = "get_stripe_secret_key_live";
+        public static final String API_BASE_URL = "api.stripe.com/v1";
     }
 }

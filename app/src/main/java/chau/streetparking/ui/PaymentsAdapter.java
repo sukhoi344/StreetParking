@@ -62,7 +62,7 @@ public class PaymentsAdapter extends RecyclerView.Adapter {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(context, PaymentDetailActivity.class);
-                    intent.putExtra(PaymentDetailActivity.EXTRA_CARD, card.getId());
+                    intent.putExtra(PaymentDetailActivity.EXTRA_CARD, Card.GSON.toJson(card));
                     context.startActivity(intent);
                 }
             });

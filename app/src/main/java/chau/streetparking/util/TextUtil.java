@@ -6,11 +6,6 @@ package chau.streetparking.util;
 public class TextUtil {
 
     public static String getCodedNumber(String number) {
-        if (number != null && number.length() >= 14) {
-            String last4 = number.substring(number.length() - 4);
-            return "•••• " + last4;
-        }
-
-        return number;
+        return "•••• " + number;
     }
 }

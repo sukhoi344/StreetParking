@@ -3,6 +3,8 @@ package chau.streetparking.backend;
 import com.stripe.model.Card;
 import com.stripe.model.Charge;
 import com.stripe.model.Customer;
+import com.stripe.model.CustomerCardCollection;
+import com.stripe.model.StripeColllectionAPIResource;
 
 import org.json.JSONObject;
 
@@ -12,6 +14,7 @@ import chau.streetparking.util.Logger;
  * Created by Chau Thai on 8/4/15.
  */
 public class JsonHelper {
+    private static final String TAG = JsonHelper.class.getSimpleName();
 
     /**
      * Convert json string to {@link Charge} object
@@ -53,9 +56,49 @@ public class JsonHelper {
             return customer;
 
         } catch (Exception e) {
-            if (Logger.DEBUG) {
-                e.printStackTrace();
+            Logger.printStackTrace(e);
+        }
+
+        return null;
+    }
+
+
+    public static CustomerWithCards jsonToCustomerWithCards(String jsonString) {
+        try {
+            long t1 = System.currentTimeMillis();
+            Customer customer = jsonToCustomer(jsonString);
+            CustomerCardCollection cardCollection = getCustomerCardCollection(jsonString);
+
+            long delta = System.currentTimeMillis() - t1;
+
+            Logger.d(TAG, "total json time: " + delta + "ms");
+
+            if (cardCollection != null)
+                return new CustomerWithCards(customer, cardCollection.getData());
+
+            return new CustomerWithCards(customer, null);
+        } catch (Exception e) {
+            Logger.printStackTrace(e);
+        }
+
+        return null;
+    }
+
+    private static CustomerCardCollection getCustomerCardCollection(String jsonString) {
+        if (jsonString == null)
+            return null;
+
+        try {
+            JSONObject jsonObject = new JSONObject(jsonString);
+            if (jsonObject.has("sources")) {
+                JSONObject sources = jsonObject.getJSONObject("sources");
+
+                CustomerCardCollection cards = CustomerCardCollection.GSON.fromJson(sources.toString(), CustomerCardCollection.class);
+                return cards;
             }
+
+        } catch (Exception e) {
+            Logger.printStackTrace(e);
         }
 
         return null;
