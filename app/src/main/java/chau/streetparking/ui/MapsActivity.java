@@ -53,6 +53,7 @@ import chau.streetparking.datamodels.parse.User;
 import chau.streetparking.ui.login.StartActivity;
 import chau.streetparking.ui.payment.PaymentActivity;
 import chau.streetparking.util.ImageUtil;
+import chau.streetparking.util.Logger;
 
 public class MapsActivity extends AppCompatActivity {
     private static final String TAG = "MapsActivity";
@@ -124,6 +125,11 @@ public class MapsActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         setUpMapIfNeeded();
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
     }
 
     @Override
@@ -423,15 +429,15 @@ public class MapsActivity extends AppCompatActivity {
                 .withAccountHeader(headerResult)
                 .addDrawerItems(
                         new PrimaryDrawerItem().withName("Profile")
-                                .withIcon(R.drawable.ic_account_circle_black_24dp).withIdentifier(ID_PROFILE),
+                                .withIcon(R.drawable.ic_action_account_circle).withIdentifier(ID_PROFILE),
                         new PrimaryDrawerItem().withName("Payment").withIdentifier(ID_PAYMENT)
-                                .withIcon(R.drawable.ic_credit_card_black_24dp),
+                                .withIcon(R.drawable.ic_action_credit_card),
                         new PrimaryDrawerItem().withName("My Parking Lots")
-                                .withIcon(R.drawable.ic_home).withIdentifier(ID_MY_PARKING_LOTS),
+                                .withIcon(R.drawable.ic_action_home).withIdentifier(ID_MY_PARKING_LOTS),
                         new PrimaryDrawerItem().withName("Help").withIdentifier(ID_HELP)
-                                .withIcon(R.drawable.ic_help_outline_black_24dp),
+                                .withIcon(R.drawable.ic_action_help),
                         new PrimaryDrawerItem().withName("About").withIdentifier(ID_ABOUT)
-                                .withIcon(R.drawable.ic_info_outline_black_24dp)
+                                .withIcon(R.drawable.ic_action_info)
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
@@ -663,7 +669,7 @@ public class MapsActivity extends AppCompatActivity {
                 }
 
             } catch (Exception e) {
-                e.printStackTrace();
+                Logger.printStackTrace(e);
             }
 
             return null;
