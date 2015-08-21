@@ -215,7 +215,7 @@ public class BackendTest {
                         Logger.d(TAG, "customer: " + Customer.GSON.toJson(customer));
 
                         if (cards != null) {
-                            for (com.stripe.model.Card card: cards) {
+                            for (com.stripe.model.Card card : cards) {
                                 Logger.d(TAG, "Card: " + com.stripe.model.Card.PRETTY_PRINT_GSON.toJson(card));
                             }
                         } else {
@@ -228,6 +228,28 @@ public class BackendTest {
             });
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public void addCardToCustomer() {
+        try {
+            Card card = new Card("4242424242424242", 12, 16, "233");
+            Stripe stripe = new Stripe(context.getResources().getString(R.string.stripe_test_publishable_key));
+
+            stripe.createToken(card, new TokenCallback() {
+                @Override
+                public void onError(Exception e) {
+                    Logger.printStackTrace(e);
+                }
+
+                @Override
+                public void onSuccess(Token token) {
+                    Logger.d(TAG, "card added, token: " + Token.PRETTY_PRINT_GSON.toJson(token));
+                }
+            });
+
+        } catch (Exception e) {
+            Logger.printStackTrace(e);
         }
     }
 

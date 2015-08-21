@@ -89,15 +89,15 @@
             android:screenOrientation="portrait">
         </activity>
 
-        <activity android:name=".ui.PaymentActivity"
+        <activity android:name=".ui.payment.PaymentActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" />
 
-        <activity android:name=".ui.PaymentDetailActivity"
+        <activity android:name=".ui.payment.PaymentDetailActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" />
 
-        <activity android:name=".ui.AddPaymentActivity"
+        <activity android:name=".ui.payment.AddPaymentActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" />
 

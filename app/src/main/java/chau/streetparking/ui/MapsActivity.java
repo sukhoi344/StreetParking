@@ -1,8 +1,6 @@
 package chau.streetparking.ui;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -16,13 +14,11 @@ import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.appyvet.rangebar.RangeBar;
 import com.google.android.gms.common.ConnectionResult;
@@ -45,8 +41,6 @@ import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
-import com.parse.GetDataCallback;
-import com.parse.ParseException;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
@@ -57,8 +51,8 @@ import chau.streetparking.datamodels.Request;
 import chau.streetparking.datamodels.SpotMarker;
 import chau.streetparking.datamodels.parse.User;
 import chau.streetparking.ui.login.StartActivity;
+import chau.streetparking.ui.payment.PaymentActivity;
 import chau.streetparking.util.ImageUtil;
-import chau.streetparking.util.Logger;
 
 public class MapsActivity extends AppCompatActivity {
     private static final String TAG = "MapsActivity";

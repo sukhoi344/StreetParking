@@ -1,4 +1,4 @@
-package chau.streetparking.ui;
+package chau.streetparking.ui.payment;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,25 +10,19 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.google.android.gms.wallet.WalletConstants;
 import com.parse.GetCallback;
 import com.parse.ParseException;
-import com.parse.ParseObject;
-import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.stripe.Stripe;
 import com.stripe.model.Card;
-import com.stripe.model.Customer;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import chau.streetparking.R;
 import chau.streetparking.backend.StripeHelper;
-import chau.streetparking.datamodels.CardItem;
-import chau.streetparking.datamodels.CardTypes;
 import chau.streetparking.datamodels.parse.Credit;
 import chau.streetparking.datamodels.parse.User;
+import chau.streetparking.ui.ColoredBarActivity;
+import chau.streetparking.ui.DividerItemDecoration;
 import chau.streetparking.util.Logger;
 
 /**
@@ -36,6 +30,8 @@ import chau.streetparking.util.Logger;
  */
 public class PaymentActivity extends ColoredBarActivity {
     private static final String TAG = PaymentActivity.class.getSimpleName();
+    private static final int REQUEST_CODE_DETAIL = 1;
+    private static final int REQUEST_CODE_ADD = 2;
 
     private View        contentView;
     private ProgressBar progressBar;
@@ -71,10 +67,35 @@ public class PaymentActivity extends ColoredBarActivity {
         switch (item.getItemId()) {
             case R.id.menu_add:
                 Intent intent = new Intent(this, AddPaymentActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, REQUEST_CODE_ADD);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_CODE_DETAIL:
+                if (resultCode == RESULT_OK && data != null) {
+                    boolean updated = data.getBooleanExtra(PaymentDetailActivity.EXTRA_UPDATED, false);
+
+                    if (updated) {
+                        getCards();
+                    }
+                }
+                break;
+
+            case REQUEST_CODE_ADD:
+                if (resultCode == RESULT_OK && data != null) {
+                    boolean added = data.getBooleanExtra(AddPaymentActivity.EXTRA_ADDED, false);
+
+                    if (added) {
+                        getCards();
+                    }
+                }
+                break;
         }
     }
 
@@ -86,6 +107,7 @@ public class PaymentActivity extends ColoredBarActivity {
     }
 
     private void getCards() {
+        setProgressBarVisible(true);
         User user = (User) ParseUser.getCurrentUser();
 
         if (user != null) {
@@ -123,7 +145,7 @@ public class PaymentActivity extends ColoredBarActivity {
                                         if (errorMessage != null) {
                                             Toast.makeText(PaymentActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
                                         } else if (cards != null) {
-                                            recyclerView.setAdapter(new PaymentsAdapter(PaymentActivity.this, cards));
+                                            recyclerView.setAdapter(new PaymentsAdapter(PaymentActivity.this, cards, REQUEST_CODE_DETAIL));
                                         }
 
                                     } catch (Exception e) {

@@ -1,6 +1,6 @@
-package chau.streetparking.ui;
+package chau.streetparking.ui.payment;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,7 +10,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.stripe.model.Card;
-import com.stripe.model.Customer;
 
 import java.util.List;
 
@@ -21,8 +20,9 @@ import chau.streetparking.util.TextUtil;
  * Created by Chau Thai on 8/19/15.
  */
 public class PaymentsAdapter extends RecyclerView.Adapter {
-    private Context context;
+    private Activity activity;
     private List<Card> dataSet;
+    private final int REQUEST_CODE_DETAIL;
 
     private static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView cardIcon;
@@ -37,9 +37,10 @@ public class PaymentsAdapter extends RecyclerView.Adapter {
         }
     }
 
-    public PaymentsAdapter(Context context, List<Card> dataSet) {
-        this.context = context;
+    public PaymentsAdapter(Activity activity, List<Card> dataSet, int requestCodeDetail) {
+        this.activity = activity;
         this.dataSet = dataSet;
+        this.REQUEST_CODE_DETAIL = requestCodeDetail;
     }
 
     @Override
@@ -61,9 +62,9 @@ public class PaymentsAdapter extends RecyclerView.Adapter {
             viewHolder.view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(context, PaymentDetailActivity.class);
+                    Intent intent = new Intent(activity, PaymentDetailActivity.class);
                     intent.putExtra(PaymentDetailActivity.EXTRA_CARD, Card.GSON.toJson(card));
-                    context.startActivity(intent);
+                    activity.startActivityForResult(intent, REQUEST_CODE_DETAIL);
                 }
             });
 

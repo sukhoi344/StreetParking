@@ -4,8 +4,10 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import chau.streetparking.ui.payment.PaymentActivity;
+
 /**
- * To be used in RecyclerView in {@link chau.streetparking.ui.PaymentActivity}
+ * To be used in RecyclerView in {@link PaymentActivity}
  * Created by Chau Thai on 6/20/2015.
  */
 public class CardItem implements Parcelable {
