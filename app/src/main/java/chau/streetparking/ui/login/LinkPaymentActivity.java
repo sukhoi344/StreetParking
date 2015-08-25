@@ -3,7 +3,6 @@ package chau.streetparking.ui.login;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Looper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,29 +13,15 @@ import android.widget.Toast;
 import com.devmarvel.creditcardentry.library.CreditCard;
 import com.devmarvel.creditcardentry.library.CreditCardForm;
 
-import com.google.gson.Gson;
-import com.parse.FunctionCallback;
-import com.parse.Parse;
-import com.parse.ParseCloud;
-import com.parse.ParseException;
-import com.stripe.android.*;
 import com.stripe.android.model.Card;
-import com.stripe.android.model.Token;
-import com.stripe.model.Charge;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import chau.country.picker.CountryPicker;
 import chau.country.picker.CountryPickerListener;
 import chau.streetparking.R;
-import chau.streetparking.backend.BackendTest;
-import chau.streetparking.backend.JsonHelper;
 import chau.streetparking.backend.registration.AccountCreator;
 import chau.streetparking.backend.registration.ResultCallBack;
-import chau.streetparking.backend.registration.StripeCustomerCreator;
 import chau.streetparking.ui.ColoredBarActivity;
-import chau.streetparking.ui.MapsActivity;
+import chau.streetparking.ui.map.MapsActivity;
 import chau.streetparking.util.Logger;
 
 /**

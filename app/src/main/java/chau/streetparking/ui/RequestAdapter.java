@@ -12,6 +12,7 @@ import java.util.List;
 
 import chau.streetparking.R;
 import chau.streetparking.datamodels.Request;
+import chau.streetparking.ui.map.MapLayout;
 
 /**
  * Created by Chau Thai on 6/27/2015.

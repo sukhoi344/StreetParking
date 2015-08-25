@@ -1,4 +1,4 @@
-package chau.streetparking.ui;
+package chau.streetparking.ui.map;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -9,7 +9,6 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,8 +16,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -34,7 +31,6 @@ import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import java.util.Calendar;
-import java.util.List;
 
 import chau.streetparking.R;
 import chau.streetparking.datamodels.Request;
@@ -62,10 +58,12 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     private int actionBarHeight;
 
     // Widgets
-    private ViewGroup   setOfferLocatonLayout;
+    private ViewGroup   setOfferLocationLayout;
     private ViewGroup   crossLayout;
     private ViewGroup   locationLayout;
     private ViewGroup   requestAddLayout;
+
+    // Request layout
     private CurtainView curtainViewRequest;
     private RangeBar    seekBar;
     private TextView    tvFrom, tvTo;
@@ -199,6 +197,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
 
         requestAddLayout.setVisibility(View.INVISIBLE);
         curtainViewRequest.setVisibility(View.VISIBLE);
+        crossLayout.setVisibility(View.VISIBLE);
 
         showLocationLayout();
 
@@ -244,6 +243,8 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
             curtainViewRequest.setVisibility(View.INVISIBLE);
             requestAddLayout.setVisibility(View.VISIBLE);
         }
+
+        crossLayout.setVisibility(View.INVISIBLE);
 
         hideLocationLayout();
     }
@@ -292,7 +293,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         offerLayout1.setVisibility(View.INVISIBLE);
         offerLayout2.setVisibility(View.VISIBLE);
 
-        setOfferLocatonLayout.setVisibility(View.VISIBLE);
+        setOfferLocationLayout.setVisibility(View.VISIBLE);
         crossLayout.setVisibility(View.VISIBLE);
 
         tvRequestName.setText(request.getName());
@@ -455,7 +456,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
 
                 offerLayout2.setVisibility(View.INVISIBLE);
                 offerLayout1.setVisibility(View.VISIBLE);
-                setOfferLocatonLayout.setVisibility(View.INVISIBLE);
+                setOfferLocationLayout.setVisibility(View.INVISIBLE);
                 crossLayout.setVisibility(View.INVISIBLE);
 
                 if (onClickBackOffer2 != null)
@@ -463,12 +464,12 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
             }
         });
 
-        setOfferLocatonLayout.setOnClickListener(new OnClickListener() {
+        setOfferLocationLayout.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 offerLayout3.setVisibility(View.VISIBLE);
                 offerLayout2.setVisibility(View.INVISIBLE);
-                setOfferLocatonLayout.setVisibility(View.INVISIBLE);
+                setOfferLocationLayout.setVisibility(View.INVISIBLE);
                 locationLayout.setEnabled(false);
 
                 if (onClickSetOfferLocation != null)
@@ -481,7 +482,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
             public void onClick(View v) {
                 offerLayout2.setVisibility(View.VISIBLE);
                 offerLayout3.setVisibility(View.INVISIBLE);
-                setOfferLocatonLayout.setVisibility(View.VISIBLE);
+                setOfferLocationLayout.setVisibility(View.VISIBLE);
                 locationLayout.setEnabled(true);
 
                 if (onClickBackOffer3 != null)
@@ -609,7 +610,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
 
     private void getWidgets() {
         mapContainer = findViewById(R.id.map_container);
-        setOfferLocatonLayout = (ViewGroup) findViewById(R.id.set_offer_location_layout);
+        setOfferLocationLayout = (ViewGroup) findViewById(R.id.set_offer_location_layout);
         crossLayout = (ViewGroup) findViewById(R.id.cross_view);
         locationLayout = (ViewGroup) findViewById(R.id.location_layout);
         requestAddLayout = (ViewGroup) findViewById(R.id.request_add_layout);

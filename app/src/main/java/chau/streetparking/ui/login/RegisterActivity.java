@@ -20,7 +20,7 @@ import chau.streetparking.MyApplication;
 import chau.streetparking.R;
 import chau.streetparking.backend.registration.IdentityVerifier;
 import chau.streetparking.ui.ColoredBarActivity;
-import chau.streetparking.ui.MapsActivity;
+import chau.streetparking.ui.map.MapsActivity;
 import chau.streetparking.util.DeviceUtil;
 import chau.streetparking.util.Logger;
 

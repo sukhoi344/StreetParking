@@ -11,8 +11,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.parse.ParseUser;
 
 import chau.streetparking.R;
-import chau.streetparking.backend.BackendTest;
-import chau.streetparking.ui.MapsActivity;
+import chau.streetparking.ui.map.MapsActivity;
 
 /**
  * Created by Chau Thai on 6/7/2015.

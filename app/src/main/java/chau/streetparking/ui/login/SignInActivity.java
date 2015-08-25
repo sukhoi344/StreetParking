@@ -18,7 +18,7 @@ import java.util.List;
 import chau.streetparking.MyApplication;
 import chau.streetparking.R;
 import chau.streetparking.ui.ColoredBarActivity;
-import chau.streetparking.ui.MapsActivity;
+import chau.streetparking.ui.map.MapsActivity;
 import chau.streetparking.util.Logger;
 
 /**

@@ -37,7 +37,8 @@
                 android:layout_weight="1"
                 android:enabled="false"
                 android:onClick="onSendRequestClicked"
-                android:text="SEND REQUEST" />
+                android:textAllCaps="false"
+                android:text="Find" />
 
             <Button
                 android:layout_width="0dp"
@@ -47,7 +48,8 @@
                 android:layout_marginTop="4dp"
                 android:layout_weight="1"
                 android:onClick="onCancelRequestClicked"
-                android:text="CANCEL" />
+                android:textAllCaps="false"
+                android:text="Cancel" />
         </LinearLayout>
 
         <!--  SeekBar layout -->

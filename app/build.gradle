@@ -8,8 +8,8 @@ android {
         applicationId "chau.streetparking"
         minSdkVersion 17
         targetSdkVersion 23
-        versionCode 4
-        versionName "1.0 Build 1507.01"
+        versionCode 5
+        versionName "1.0 Build 1508.01"
     }
     buildTypes {
         release {

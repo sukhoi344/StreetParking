@@ -1,4 +1,4 @@
-package chau.streetparking.ui;
+package chau.streetparking.ui.map;
 
 import android.content.Intent;
 import android.location.Address;
@@ -50,10 +50,17 @@ import chau.streetparking.R;
 import chau.streetparking.datamodels.Request;
 import chau.streetparking.datamodels.SpotMarker;
 import chau.streetparking.datamodels.parse.User;
+import chau.streetparking.ui.DividerItemDecoration;
+import chau.streetparking.ui.MyGarageActivity;
+import chau.streetparking.ui.PhotosAdapter;
+import chau.streetparking.ui.ProfileActivity;
+import chau.streetparking.ui.RequestAdapter;
+import chau.streetparking.ui.SearchLocationActivity;
 import chau.streetparking.ui.login.StartActivity;
 import chau.streetparking.ui.payment.PaymentActivity;
 import chau.streetparking.util.ImageUtil;
 import chau.streetparking.util.Logger;
+import chau.streetparking.util.MapUtil;
 
 public class MapsActivity extends AppCompatActivity {
     private static final String TAG = "MapsActivity";
@@ -81,14 +88,16 @@ public class MapsActivity extends AppCompatActivity {
     private GoogleMap       googleMap; // Might be null if Google Play services APK is not available.
     private Drawer          drawer;
     private MapLayout       mapLayout;
+    private MyMapFragment   mapFragment;
 
     // Global variables
-    private Circle circle;  // Radius circle for parking
+//    private Circle circle;  // Radius circle for parking
     private Circle requestCircle;       // Circle for the incoming request
     private Geocoder geocoder;
     private TaskGetAddress taskGetAddress;
     private TaskGetRequestList taskGetRequestList;
     private List<Uri> photoList = new ArrayList<>();
+    private int seekBarValue = 0;
 
     // Drawer variables
     private IProfile profile;
@@ -211,8 +220,8 @@ public class MapsActivity extends AppCompatActivity {
         // Do a null check to confirm that we have not already instantiated the map.
         if (googleMap == null) {
             // Try to obtain the map from the SupportMapFragment.
-            googleMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
-                    .getMap();
+            mapFragment = (MyMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+            googleMap = mapFragment.getMap();
             // Check if we were successful in obtaining the map.
             if (googleMap != null) {
                 setUpMap();
@@ -258,9 +267,10 @@ public class MapsActivity extends AppCompatActivity {
             @Override
             public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex, int rightPinIndex,
                                               String leftPinValue, String rightPinValue) {
-                if (circle != null) {
-                    circle.setRadius(Double.parseDouble(rightPinValue) * 0.3048); // ft to meter
-                }
+                int radiusInMeter = (int) (Double.parseDouble(rightPinValue) * 0.3048);
+                seekBarValue = radiusInMeter;
+                mapFragment.setRadius(MapUtil.convertMetersToPixels(googleMap,
+                        googleMap.getCameraPosition().target, radiusInMeter));
             }
         });
 
@@ -363,12 +373,8 @@ public class MapsActivity extends AppCompatActivity {
             public void onCameraChange(CameraPosition cameraPosition) {
                 LatLng latLng = cameraPosition.target;
 
-                if (circle != null) {
-                    circle.setCenter(latLng);
-                }
-
-//                mapLayout.closeCurtainRequest();
-//                mapLayout.closeCurtainOffer();
+                int radiusInMeters = MapUtil.convertMetersToPixels(googleMap, latLng, seekBarValue);
+                mapFragment.setRadius(radiusInMeters);
 
                 if (mapLayout.getCurrentLayout() == MapLayout.LAYOUT_SEND_CANCEL) {
                     updateLocationAddress(latLng);
@@ -521,25 +527,20 @@ public class MapsActivity extends AppCompatActivity {
     }
 
     private void enableCircle() {
-        if (googleMap != null) {
-            LatLng currentCamPosition = googleMap.getCameraPosition().target;
-                circle = googleMap.addCircle(new CircleOptions()
-                        .center(currentCamPosition)
-                        .radius(100)
-                        .strokeColor(getResources().getColor(R.color.circle_stroke_color))
-                        .fillColor(getResources().getColor(R.color.circle_fill_color)));
-
-                circle.setStrokeWidth(3.0f);
+        if (mapFragment != null) {
+            mapFragment.setCircleEnable(true);
+            int radiusInMeter = MapUtil.convertMetersToPixels(googleMap, googleMap.getCameraPosition().target,
+                    300 * 0.3048);
+            mapFragment.setRadius(radiusInMeter);
         }
     }
 
     private void disableCircle() {
-        if (googleMap != null && circle != null) {
-            circle.remove();
-            circle = null;
-        }
+        if (mapFragment != null)
+            mapFragment.setCircleEnable(false);
     }
 
+    @Deprecated
     private void addRequestCircle(LatLng latLng, int radius) {
         if (googleMap != null) {
             requestCircle = googleMap.addCircle(new CircleOptions()

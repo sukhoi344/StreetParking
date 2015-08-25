@@ -19,7 +19,8 @@
         android:layout_marginRight="2dp"
         android:layout_marginTop="4dp"
         android:layout_weight="1"
-        android:text="Request" />
+        android:textAllCaps="false"
+        android:text="Find Parking Spot" />
 
     <Button
         android:id="@+id/btn_offer"
@@ -30,5 +31,6 @@
         android:layout_marginRight="4dp"
         android:layout_marginTop="4dp"
         android:layout_weight="1"
-        android:text="Offer" />
+        android:textAllCaps="false"
+        android:text="My Requests" />
 </LinearLayout>
