@@ -13,17 +13,18 @@ import java.util.List;
  */
 @ParseClassName("ParkingLot")
 public class ParkingLot extends ParseObject {
-    private static final String KEY_OWNER = "owner";
-    private static final String KEY_CAPACITY = "capacity";
-    private static final String KEY_IN_USE = "inUse";
-    private static final String KEY_AVAILABLE_START_TIME = "availableStartTime";
-    private static final String KEY_AVAILABLE_END_TIME = "availableEndTime";
-    private static final String KEY_LOCATION = "location";
-    private static final String KEY_PRICE = "price";
-    private static final String KEY_PRICE_TYPE = "priceType";
-    private static final String KEY_PHOTOS = "photos";
-    private static final String KEY_INFO = "info";
-    private static final String KEY_NAME = "name";
+    public static final String KEY_OWNER = "owner";
+    public static final String KEY_CAPACITY = "capacity";
+    public static final String KEY_IN_USE = "inUse";
+    public static final String KEY_AVAILABLE_START_TIME = "availableStartTime";
+    public static final String KEY_AVAILABLE_END_TIME = "availableEndTime";
+    public static final String KEY_LOCATION = "location";
+    public static final String KEY_PRICE = "price";
+    public static final String KEY_PRICE_TYPE = "priceType";
+    public static final String KEY_PHOTOS = "photos";
+    public static final String KEY_INFO = "info";
+    public static final String KEY_NAME = "name";
+    public static final String KEY_ADDRESS = "address";
 
     public User getOwner() {
         return (User) getParseObject(KEY_OWNER);
@@ -79,6 +80,14 @@ public class ParkingLot extends ParseObject {
 
     public void setLocation(ParseGeoPoint parseGeoPoint) {
         put(KEY_LOCATION, parseGeoPoint);
+    }
+
+    public String getAddress() {
+        return getString(KEY_ADDRESS);
+    }
+
+    public void setAddress(String address) {
+        put(KEY_ADDRESS, address);
     }
 
     public double getPrice() {

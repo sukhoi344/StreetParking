@@ -76,6 +76,7 @@
                 custom:tickEnd="1500"
                 custom:tickInterval="150"
                 custom:tickStart="150" />
+
         </LinearLayout>
 
         <!-- Select date and time layout -->

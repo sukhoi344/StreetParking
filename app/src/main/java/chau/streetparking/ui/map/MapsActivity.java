@@ -50,6 +50,7 @@ import chau.streetparking.R;
 import chau.streetparking.datamodels.Request;
 import chau.streetparking.datamodels.SpotMarker;
 import chau.streetparking.datamodels.parse.User;
+import chau.streetparking.ui.AvailableSpotsActivity;
 import chau.streetparking.ui.DividerItemDecoration;
 import chau.streetparking.ui.MyGarageActivity;
 import chau.streetparking.ui.PhotosAdapter;
@@ -67,6 +68,7 @@ public class MapsActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_SEARCH = 1;
     private static final int REQUEST_CODE_IMAGE = 2;
     private static final int REQUEST_CODE_PROFILE = 3;
+    private static final int REQUEST_CODE_FIND_SPOTS = 4;
 
     private static final int ID_PROFILE = 0;
     private static final int ID_PAYMENT = 1;
@@ -97,7 +99,7 @@ public class MapsActivity extends AppCompatActivity {
     private TaskGetAddress taskGetAddress;
     private TaskGetRequestList taskGetRequestList;
     private List<Uri> photoList = new ArrayList<>();
-    private int seekBarValue = 0;
+    private int seekBarRadiusInMeter = 0;
 
     // Drawer variables
     private IProfile profile;
@@ -268,9 +270,16 @@ public class MapsActivity extends AppCompatActivity {
             public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex, int rightPinIndex,
                                               String leftPinValue, String rightPinValue) {
                 int radiusInMeter = (int) (Double.parseDouble(rightPinValue) * 0.3048);
-                seekBarValue = radiusInMeter;
+                seekBarRadiusInMeter = radiusInMeter;
                 mapFragment.setRadius(MapUtil.convertMetersToPixels(googleMap,
                         googleMap.getCameraPosition().target, radiusInMeter));
+            }
+        });
+
+        mapLayout.setBtnFindListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                findParkingSpots();
             }
         });
 
@@ -373,7 +382,7 @@ public class MapsActivity extends AppCompatActivity {
             public void onCameraChange(CameraPosition cameraPosition) {
                 LatLng latLng = cameraPosition.target;
 
-                int radiusInMeters = MapUtil.convertMetersToPixels(googleMap, latLng, seekBarValue);
+                int radiusInMeters = MapUtil.convertMetersToPixels(googleMap, latLng, seekBarRadiusInMeter);
                 mapFragment.setRadius(radiusInMeters);
 
                 if (mapLayout.getCurrentLayout() == MapLayout.LAYOUT_SEND_CANCEL) {
@@ -508,6 +517,19 @@ public class MapsActivity extends AppCompatActivity {
 
     private void showMyLocation(LatLng latLng) {
         moveCamera(latLng, false);
+    }
+
+    private void findParkingSpots() {
+        Intent intent = new Intent(this, AvailableSpotsActivity.class);
+        intent.putExtra(AvailableSpotsActivity.EXTRA_RADIUS, seekBarRadiusInMeter);
+        intent.putExtra(AvailableSpotsActivity.EXTRA_LATLNG, googleMap.getCameraPosition().target);
+
+        if (mapLayout.getRequestStartDate() != null)
+            intent.putExtra(AvailableSpotsActivity.EXTRA_START_DATE, mapLayout.getRequestStartDate().getTime());
+        if (mapLayout.getRequestEndDate() != null)
+            intent.putExtra(AvailableSpotsActivity.EXTRA_END_DATE, mapLayout.getRequestEndDate().getTime());
+
+        startActivityForResult(intent, REQUEST_CODE_FIND_SPOTS);
     }
 
     private void moveCamera(LatLng latLng, boolean animate) {

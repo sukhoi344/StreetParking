@@ -1,6 +1,7 @@
 package chau.streetparking.util;
 
 import android.graphics.Point;
+import android.location.Location;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
@@ -32,5 +33,23 @@ public class MapUtil {
         Point p2 = map.getProjection().toScreenLocation(new LatLng(lat2, lng2));
 
         return Math.abs(p1.x - p2.x);
+    }
+
+    /**
+     *
+     * @param latLng1
+     * @param latLng2
+     * @return distance in meters
+     */
+    public static float getDistance(LatLng latLng1, LatLng latLng2) {
+        Location loc1 = new Location("");
+        loc1.setLatitude(latLng1.latitude);
+        loc1.setLongitude(latLng1.longitude);
+
+        Location loc2 = new Location("");
+        loc2.setLatitude(latLng1.latitude);
+        loc2.setLongitude(latLng2.longitude);
+
+        return loc1.distanceTo(loc2);
     }
 }

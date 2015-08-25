@@ -30,13 +30,18 @@ import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 
 import chau.streetparking.R;
 import chau.streetparking.datamodels.Request;
 import chau.streetparking.ui.curtain.CurtainView;
 import chau.streetparking.ui.curtain.ICurtainViewBase;
 import chau.streetparking.util.ImageUtil;
+import chau.streetparking.util.Logger;
 
 /**
  * Created by Chau Thai on 6/9/2015.
@@ -67,7 +72,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     private CurtainView curtainViewRequest;
     private RangeBar    seekBar;
     private TextView    tvFrom, tvTo;
-    private Button      btnSendRequest;
+    private Button      btnFind;
     private TextView    tvLocation;
 
     // First layout
@@ -113,6 +118,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     private OnClickListener onClickAddPhotos;
 
     private String selectedTime;
+    private Date   requestStartDate, requestEndDate;
     private String currentTag = TAG_FROM;
 
     public interface OnRequestSelectedListener {
@@ -162,22 +168,41 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
             timePickerDialog.show(activity.getFragmentManager(), picker.getTag());
         } catch (Exception ignore) {}
 
-        selectedTime = "" + monthOfYear + "/" + (dayOfMonth + 1) + "/" + year;
+        monthOfYear++;
+        selectedTime = "" + ((monthOfYear < 10)? ("0" + monthOfYear): monthOfYear) + "/"
+                + ((dayOfMonth < 10)? "0" + dayOfMonth : dayOfMonth) + "/" + year;
     }
 
     @Override
     public void onTimeSet(RadialPickerLayout picker, int hourOfDay, int minute) {
-        selectedTime += " " + hourOfDay + ":" + minute;
+        selectedTime += " " + (hourOfDay < 10? "0" + hourOfDay : hourOfDay) + ":"
+                + (minute < 10? "0" + minute : minute);
+
+        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm");
+        dateFormat.setTimeZone(TimeZone.getDefault());
+        Date date = null;
+
+        try {
+            date = dateFormat.parse(selectedTime);
+        } catch (Exception e) {
+            Logger.printStackTrace(e);
+        }
+
+
         if (currentTag == TAG_FROM) {
             tvFrom.setText(selectedTime);
+            requestStartDate = date;
         } else {
             tvTo.setText(selectedTime);
+            requestEndDate = date;
         }
 
         if (!tvTo.getText().toString().equals("Tap to select")
                 && !tvFrom.getText().toString().equals("Tap to select")) {
-            btnSendRequest.setEnabled(true);
+            btnFind.setEnabled(true);
         }
+
+
     }
 
     /**
@@ -332,6 +357,11 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         btnOfferListener = onClickListener;
     }
 
+    public void setBtnFindListener(OnClickListener onClickListener) {
+        if (btnFind != null)
+            btnFind.setOnClickListener(onClickListener);
+    }
+
     public void setCancelOffer1OnClick(OnClickListener onClick) {
         onClickCancelOffer1 = onClick;
     }
@@ -388,6 +418,14 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
 
     public RecyclerView getRecyclerViewPhotos() {
         return recyclerViewPhotos;
+    }
+
+    public Date getRequestStartDate() {
+        return requestStartDate;
+    }
+
+    public Date getRequestEndDate() {
+        return requestEndDate;
     }
 
     private void hideLocationLayout() {
@@ -576,7 +614,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         seekBar.setSeekPinByValue(SEEK_BAR_DEFAULT_VALUE);
         tvFrom.setText("Tap to select");
         tvTo.setText("Tap to select");
-        btnSendRequest.setEnabled(false);
+        btnFind.setEnabled(false);
         tvLocation.setText("");
     }
 
@@ -618,7 +656,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         seekBar = (RangeBar) findViewById(R.id.seek_bar);
         tvFrom = (TextView) findViewById(R.id.from);
         tvTo = (TextView) findViewById(R.id.to);
-        btnSendRequest = (Button) findViewById(R.id.btn_send_request);
+        btnFind = (Button) findViewById(R.id.btn_send_request);
         tvLocation = (TextView) findViewById(R.id.tv_location);
         btnRequest = (Button) findViewById(R.id.btn_request);
         btnOffer = (Button) findViewById(R.id.btn_offer);
