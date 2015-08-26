@@ -19,6 +19,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.appyvet.rangebar.RangeBar;
 import com.google.android.gms.common.ConnectionResult;
@@ -35,10 +36,13 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.maps.android.clustering.ClusterManager;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.accountswitcher.AccountHeader;
-import com.mikepenz.materialdrawer.accountswitcher.AccountHeaderBuilder;
+import com.mikepenz.materialdrawer.AccountHeader;
+import com.mikepenz.materialdrawer.AccountHeaderBuilder;
+import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
+import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.SectionDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.parse.ParseUser;
@@ -70,12 +74,18 @@ public class MapsActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_PROFILE = 3;
     private static final int REQUEST_CODE_FIND_SPOTS = 4;
 
-    private static final int ID_PROFILE = 0;
+//    private static final int ID_PROFILE = 0;
+//    private static final int ID_PAYMENT = 1;
+////    private static final int ID_SETTINGS = 5;
+//    private static final int ID_HELP = 3;
+//    private static final int ID_ABOUT = 4;
+//    private static final int ID_MY_PARKING_LOTS = 2;
+
+    private static final int ID_MY_RESERVATIONS = 0;
     private static final int ID_PAYMENT = 1;
-//    private static final int ID_SETTINGS = 5;
-    private static final int ID_HELP = 3;
-    private static final int ID_ABOUT = 4;
-    private static final int ID_MY_PARKING_LOTS = 2;
+    private static final int ID_GARAGE_SETTING = 2;
+    private static final int ID_PARKING_REQUESTS = 3;
+    private static final int ID_BALANCE = 4;
 
     // Toolbars
     private Toolbar toolbar;
@@ -177,11 +187,11 @@ public class MapsActivity extends AppCompatActivity {
                     break;
 
                 case ProfileActivity.PROFILE_UPDATED:
-                    profile.setName(user.getFirstName() + " " + user.getLastName());
-                    profile.setEmail(user.getEmail());
+                    profile.withName(user.getFirstName() + " " + user.getLastName());
+                    profile.withEmail(user.getEmail());
 
                     if (user.getAvatar() != null) {
-                        profile.setIcon(user.getAvatar().getUrl());
+                        profile.withIcon(user.getAvatar().getUrl());
                     }
 
                     headerResult.updateProfileByIdentifier(profile);
@@ -241,6 +251,7 @@ public class MapsActivity extends AppCompatActivity {
         // Build the client to show current location
         buildGoogleApiClient();
         googleMap.setMyLocationEnabled(true);
+        googleMap.getUiSettings().setTiltGesturesEnabled(false);
 
         mapLayout.setBtnRequestListener(new View.OnClickListener() {
             @Override
@@ -435,6 +446,22 @@ public class MapsActivity extends AppCompatActivity {
                 .withHeaderBackground(R.drawable.drawer_header)
                 .addProfiles(profile)
                 .withSelectionListEnabled(false)
+                .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
+                    @Override
+                    public boolean onProfileChanged(View view, IProfile iProfile, boolean b) {
+                        Intent intent = new Intent(MapsActivity.this, ProfileActivity.class);
+                        startActivityForResult(intent, REQUEST_CODE_PROFILE);
+                        return true;
+                    }
+                })
+                .withOnAccountHeaderSelectionViewClickListener(new AccountHeader.OnAccountHeaderSelectionViewClickListener() {
+                    @Override
+                    public boolean onClick(View view, IProfile iProfile) {
+                        Intent intent = new Intent(MapsActivity.this, ProfileActivity.class);
+                        startActivityForResult(intent, REQUEST_CODE_PROFILE);
+                        return true;
+                    }
+                })
                 .build();
 
         drawer = new DrawerBuilder()
@@ -442,35 +469,61 @@ public class MapsActivity extends AppCompatActivity {
                 .withToolbar(toolbar)
                 .withTranslucentStatusBar(true)
                 .withAccountHeader(headerResult)
+
+//                .addDrawerItems(
+//                        new PrimaryDrawerItem().withName("Profile")
+//                                .withIcon(R.drawable.ic_action_account_circle).withIdentifier(ID_PROFILE)
+//                                .withSelectable(false),
+//                        new PrimaryDrawerItem().withName("Payment").withIdentifier(ID_PAYMENT)
+//                                .withIcon(R.drawable.ic_action_credit_card)
+//                                .withSelectable(false),
+//                        new PrimaryDrawerItem().withName("My Parking Lots")
+//                                .withIcon(R.drawable.ic_action_home).withIdentifier(ID_MY_PARKING_LOTS)
+//                                .withSelectable(false),
+//                        new PrimaryDrawerItem().withName("Help").withIdentifier(ID_HELP)
+//                                .withIcon(R.drawable.ic_action_help)
+//                                .withSelectable(false),
+//                        new PrimaryDrawerItem().withName("About").withIdentifier(ID_ABOUT)
+//                                .withIcon(R.drawable.ic_action_info)
+//                                .withSelectable(false)
+//                )
+
                 .addDrawerItems(
-                        new PrimaryDrawerItem().withName("Profile")
-                                .withIcon(R.drawable.ic_action_account_circle).withIdentifier(ID_PROFILE),
-                        new PrimaryDrawerItem().withName("Payment").withIdentifier(ID_PAYMENT)
-                                .withIcon(R.drawable.ic_action_credit_card),
-                        new PrimaryDrawerItem().withName("My Parking Lots")
-                                .withIcon(R.drawable.ic_action_home).withIdentifier(ID_MY_PARKING_LOTS),
-                        new PrimaryDrawerItem().withName("Help").withIdentifier(ID_HELP)
-                                .withIcon(R.drawable.ic_action_help),
-                        new PrimaryDrawerItem().withName("About").withIdentifier(ID_ABOUT)
+                        new PrimaryDrawerItem().withName("My Reservations")
+                                .withIcon(R.drawable.ic_action_done)
+                                .withIdentifier(ID_MY_RESERVATIONS)
+                                .withSelectable(false),
+                        new PrimaryDrawerItem().withName("Payment")
+                                .withIcon(R.drawable.ic_action_credit_card)
+                                .withIdentifier(ID_PAYMENT)
+                                .withSelectable(false),
+                        new SectionDrawerItem().withName("Your Own Garages"),
+                        new PrimaryDrawerItem().withName("Garages Setting")
+                                .withIcon(R.drawable.ic_action_settings)
+                                .withIdentifier(ID_GARAGE_SETTING)
+                                .withSelectable(false),
+                        new PrimaryDrawerItem().withName("Parking Requests")
                                 .withIcon(R.drawable.ic_action_info)
+                                .withIdentifier(ID_PARKING_REQUESTS)
+                                .withSelectable(false),
+                        new PrimaryDrawerItem().withName("Balance")
+                                .withIcon(R.drawable.ic_action_account_balance)
+                                .withIdentifier(ID_BALANCE)
+                                .withSelectable(false)
+
                 )
+
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
                     @Override
-                    public boolean onItemClick(AdapterView<?> adapterView, View view, int position, long id2,
-                                               IDrawerItem iDrawerItem) {
-                        int id = (int) id2;
+                    public boolean onItemClick(View view, int i, IDrawerItem iDrawerItem) {
+                        int id = iDrawerItem.getIdentifier();
                         switch (id) {
-                            case ID_PROFILE: {
-                                Intent intent = new Intent(MapsActivity.this, ProfileActivity.class);
-                                startActivityForResult(intent, REQUEST_CODE_PROFILE);
-                                return true;
-                            }
                             case ID_PAYMENT: {
                                 Intent intent = new Intent(MapsActivity.this, PaymentActivity.class);
                                 startActivity(intent);
                                 return true;
                             }
-                            case ID_MY_PARKING_LOTS: {
+                            case ID_GARAGE_SETTING: {
                                 Intent intent = new Intent(MapsActivity.this, MyGarageActivity.class);
                                 startActivity(intent);
                                 return true;
@@ -479,7 +532,7 @@ public class MapsActivity extends AppCompatActivity {
                         return false;
                     }
                 })
-                .withSelectedItem(-1)
+                .withSelectedItemByPosition(-1)
                 .build();
 
     }

@@ -51,7 +51,7 @@ dependencies {
     compile 'com.google.android.gms:play-services-location:+'
     compile 'com.google.android.gms:play-services-wallet:+'
     compile project(':volley')
-    compile('com.mikepenz:materialdrawer:3.1.2@aar') {
+    compile('com.mikepenz:materialdrawer:4.0.1@aar') {
         transitive = true
     }
     compile 'com.google.maps.android:android-maps-utils:+'
