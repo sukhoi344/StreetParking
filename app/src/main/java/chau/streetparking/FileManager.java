@@ -23,12 +23,21 @@ public class FileManager {
      * @param mobile phone number of the user
      * @return unique file name with .png extension
      */
-    public static final String getFileAvatarName(String mobile) {
+    public static String getFileAvatarName(String mobile) {
         try {
             return toHex(System.currentTimeMillis() + mobile) + ".png";
         } catch (Exception e) {
-            if (Logger.DEBUG)
-                e.printStackTrace();
+            Logger.printStackTrace(e);
+        }
+
+        return System.currentTimeMillis() + ".png";
+    }
+
+    public static String getPhotoFileName(String userId) {
+        try {
+            return toHex(userId + System.currentTimeMillis()) + ".png";
+        } catch (Exception e) {
+            Logger.printStackTrace(e);
         }
 
         return System.currentTimeMillis() + ".png";

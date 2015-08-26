@@ -389,6 +389,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     public void showProgressBarRequest() {
         progressBar.setVisibility(View.VISIBLE);
         recyclerViewRequest.setVisibility(View.INVISIBLE);
+        findViewById(R.id.text_view_no_result).setVisibility(View.INVISIBLE);
     }
 
     public void hideProgressBarRequest() {

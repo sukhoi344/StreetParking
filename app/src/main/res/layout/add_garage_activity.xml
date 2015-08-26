@@ -17,16 +17,20 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="5dp"
         android:orientation="horizontal">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="15dp"
-            android:text="Name: " />
+            android:text="Garage Name: " />
 
         <EditText
+            android:id="@+id/edit_text_name"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:inputType="textPersonName" />
@@ -35,32 +39,41 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
         android:text="Address:" />
 
     <TextView
+        android:id="@+id/text_view_address"
         style="@android:style/Widget.Holo.Light.Spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="5dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:clickable="true"
-        android:onClick="onAddressClicked"/>
+        android:onClick="onAddressClicked"
+        android:hint="Tap to select address"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
         android:orientation="horizontal">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="15dp"
+            android:layout_marginRight="17dp"
             android:text="Capacity: "/>
 
         <EditText
+            android:id="@+id/edit_text_capacity"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:inputType="number"/>
@@ -69,17 +82,19 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
         android:orientation="horizontal">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Price"/>
+            android:text="Price (USD): "/>
 
         <EditText
+            android:id="@+id/edit_text_price"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_marginRight="20dp"
@@ -100,8 +115,36 @@
     </LinearLayout>
 
     <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:text="Add Photo"
+        android:onClick="onAddPhotoClicked"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="@drawable/border_solid_grey"/>
+
+    <EditText
+        android:id="@+id/edit_text_info"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp"
+        android:inputType="textMultiLine"
+        android:hint="Additional information"/>
+
+    <!--<View-->)-->
+
+    <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:text="SAVE"/>
+        android:text="SAVE"
+        android:onClick="onSaveClicked"/>
 </LinearLayout>

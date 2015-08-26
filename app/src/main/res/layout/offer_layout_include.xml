@@ -51,6 +51,14 @@
                     android:layout_height="wrap_content"
                     android:visibility="visible"
                     android:layout_gravity="center"/>
+
+                <TextView
+                    android:id="@+id/text_view_no_result"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="You haven't made any request yet."
+                    android:visibility="invisible"/>
             </FrameLayout>
 
             <Button

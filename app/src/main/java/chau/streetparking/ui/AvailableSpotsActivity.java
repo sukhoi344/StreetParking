@@ -1,12 +1,15 @@
 package chau.streetparking.ui;
 
 import android.content.Intent;
-import android.os.Bundle;
+import android.os.*;
+import android.os.Process;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.parse.FindCallback;
@@ -16,6 +19,7 @@ import com.parse.ParseQuery;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import chau.streetparking.R;
 import chau.streetparking.datamodels.parse.ParkingLot;
@@ -35,7 +39,9 @@ public class AvailableSpotsActivity extends ColoredBarActivity {
     private ProgressBar     progressBar;
     private RecyclerView    recyclerView;
     private TextView        textViewNoResult;
+    private Button          btnSendRequest;
     private RecyclerView.LayoutManager layoutManager;
+    private ParkingLotsAdapter adapter;
 
     private int radius;
     private LatLng latLng;
@@ -57,8 +63,8 @@ public class AvailableSpotsActivity extends ColoredBarActivity {
         super.onCreate(savedInstanceState);
         getWidgets();
         getExtras();
-        getParkingLots();
         setupList();
+        getParkingLots();
     }
 
     public void onBackClicked(View v) {
@@ -73,23 +79,32 @@ public class AvailableSpotsActivity extends ColoredBarActivity {
     }
 
     public void onSendRequestClicked(View v) {
-
+        Toast.makeText(AvailableSpotsActivity.this, "Not yet implemented", Toast.LENGTH_SHORT).show();
     }
 
     private void getParkingLots() {
         ParseQuery<ParkingLot> query = getQuery();
         query.findInBackground(new FindCallback<ParkingLot>() {
             @Override
-            public void done(List<ParkingLot> list, ParseException e) {
+            public void done(final List<ParkingLot> list, ParseException e) {
                 progressBar.setVisibility(View.INVISIBLE);
 
                 if (e != null) {
                     textViewNoResult.setVisibility(View.VISIBLE);
                 } else {
-                    if (list == null || list.isEmpty())
+                    if (list == null || list.isEmpty()) {
                         textViewNoResult.setVisibility(View.VISIBLE);
-                    else {
-                        recyclerView.setAdapter(new ParkingLotsAdapter(AvailableSpotsActivity.this, list, latLng));
+                    } else {
+                        adapter = new ParkingLotsAdapter(AvailableSpotsActivity.this, list, latLng,
+                                new ParkingLotsAdapter.CheckBoxListener() {
+                                    @Override
+                                    public void onCheckBoxChanged(Set<ParkingLot> selectedSet) {
+                                        if (selectedSet != null) {
+                                            btnSendRequest.setEnabled(!selectedSet.isEmpty());
+                                        }
+                                    }
+                                });
+                        recyclerView.setAdapter(adapter);
                     }
                 }
             }
@@ -123,5 +138,6 @@ public class AvailableSpotsActivity extends ColoredBarActivity {
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         textViewNoResult = (TextView) findViewById(R.id.text_view_no_result);
+        btnSendRequest = (Button) findViewById(R.id.btn_send_request);
     }
 }

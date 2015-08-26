@@ -16,8 +16,6 @@ public class ParkingLot extends ParseObject {
     public static final String KEY_OWNER = "owner";
     public static final String KEY_CAPACITY = "capacity";
     public static final String KEY_IN_USE = "inUse";
-    public static final String KEY_AVAILABLE_START_TIME = "availableStartTime";
-    public static final String KEY_AVAILABLE_END_TIME = "availableEndTime";
     public static final String KEY_LOCATION = "location";
     public static final String KEY_PRICE = "price";
     public static final String KEY_PRICE_TYPE = "priceType";
@@ -25,6 +23,12 @@ public class ParkingLot extends ParseObject {
     public static final String KEY_INFO = "info";
     public static final String KEY_NAME = "name";
     public static final String KEY_ADDRESS = "address";
+
+    public static abstract class PriceType {
+        public static final String HOURLY = "hourly";
+        public static final String DAILY = "daily";
+        public static final String MONTHLY = "monthly";
+    }
 
     public User getOwner() {
         return (User) getParseObject(KEY_OWNER);
@@ -58,22 +62,6 @@ public class ParkingLot extends ParseObject {
         put(KEY_IN_USE, inUse);
     }
 
-    public Date getAvailableStartTime() {
-        return getDate(KEY_AVAILABLE_START_TIME);
-    }
-
-    public void setAvailableStartTime(Date date) {
-        put(KEY_AVAILABLE_START_TIME, date);
-    }
-
-    public Date getAvailableEndTime() {
-        return getDate(KEY_AVAILABLE_END_TIME);
-    }
-
-    public void setAvailableEndTime(Date date) {
-        put(KEY_AVAILABLE_END_TIME, date);
-    }
-
     public ParseGeoPoint getLocation() {
         return getParseGeoPoint(KEY_LOCATION);
     }
@@ -102,7 +90,7 @@ public class ParkingLot extends ParseObject {
         return getString(KEY_PRICE_TYPE);
     }
 
-    public void setKeyPriceType(String priceType) {
+    public void setPriceType(String priceType) {
         put(KEY_PRICE_TYPE, priceType);
     }
 

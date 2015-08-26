@@ -1,4 +1,4 @@
-package chau.streetparking.ui;
+package chau.streetparking.ui.garage;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -11,12 +11,13 @@ import java.util.List;
 
 import chau.streetparking.R;
 import chau.streetparking.datamodels.Garage;
+import chau.streetparking.datamodels.parse.ParkingLot;
 
 /**
  * Created by Chau Thai on 6/21/2015.
  */
 public class GarageAdapter extends RecyclerView.Adapter {
-    private List<Garage> dataSet;
+    private List<ParkingLot> dataSet;
     private Context context;
 
     private static class ViewHolder extends RecyclerView.ViewHolder {
@@ -30,7 +31,7 @@ public class GarageAdapter extends RecyclerView.Adapter {
         }
     }
 
-    public GarageAdapter(Context context, List<Garage> dataSet) {
+    public GarageAdapter(Context context, List<ParkingLot> dataSet) {
         this.context = context;
         this.dataSet = dataSet;
     }
@@ -45,10 +46,10 @@ public class GarageAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (dataSet != null && position < dataSet.size()) {
-            final Garage garage = dataSet.get(position);
+            final ParkingLot parkingLot = dataSet.get(position);
             ViewHolder viewHolder = (ViewHolder) holder;
 
-            viewHolder.title.setText(garage.getName());
+            viewHolder.title.setText(parkingLot.getName());
 
             // TODO: set onclick for garage list item
         }

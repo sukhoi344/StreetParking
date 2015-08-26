@@ -80,14 +80,6 @@ public class SearchLocationActivity extends AppCompatActivity {
         recyclerView.setOverScrollMode(View.OVER_SCROLL_NEVER);
     }
 
-    private List<String> createTestList() {
-        List<String> list = new ArrayList<>();
-        list.add("Canada");
-        list.add("4849 Connecticut ave");
-        list.add("Vietnam");
-        return list;
-    }
-
     private void getWidgets() {
         editText = (EditText) findViewById(R.id.edit_text);
         iconSearch = findViewById(R.id.icon_search);

@@ -16,10 +16,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.appyvet.rangebar.RangeBar;
 import com.google.android.gms.common.ConnectionResult;
@@ -38,10 +36,8 @@ import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
-import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
-import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
 import com.mikepenz.materialdrawer.model.SectionDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
@@ -56,7 +52,7 @@ import chau.streetparking.datamodels.SpotMarker;
 import chau.streetparking.datamodels.parse.User;
 import chau.streetparking.ui.AvailableSpotsActivity;
 import chau.streetparking.ui.DividerItemDecoration;
-import chau.streetparking.ui.MyGarageActivity;
+import chau.streetparking.ui.garage.MyGarageActivity;
 import chau.streetparking.ui.PhotosAdapter;
 import chau.streetparking.ui.ProfileActivity;
 import chau.streetparking.ui.RequestAdapter;
@@ -776,26 +772,28 @@ public class MapsActivity extends AppCompatActivity {
         @Override
         protected List<Request> doInBackground(Void... params) {
             isRunning = true;
-            List<LatLng> latLngs = getTestList();
-            List<Request> list = new ArrayList<>();
+//            List<LatLng> latLngs = getTestList();
+//            List<Request> list = new ArrayList<>();
+//
+//            try {
+//                for (LatLng latLng : latLngs) {
+//                    List<Address> addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+//                    Address address = addresses.get(0);
+//
+//                    Request request = new Request(
+//                            1, address, "John", 100, "07/12 11:00am", "07/12 4:00pm"
+//                    );
+//
+//                    list.add(request);
+//                }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                return null;
+//            }
+//
+//            return list;
 
-            try {
-                for (LatLng latLng : latLngs) {
-                    List<Address> addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
-                    Address address = addresses.get(0);
-
-                    Request request = new Request(
-                            1, address, "John", 100, "07/12 11:00am", "07/12 4:00pm"
-                    );
-
-                    list.add(request);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-
-            return list;
+            return null;
         }
 
         @Override
@@ -805,6 +803,9 @@ public class MapsActivity extends AppCompatActivity {
                     mapLayout.hideProgressBarRequest();
                     mapLayout.getRecyclerViewRequest().swapAdapter(
                             new RequestAdapter(MapsActivity.this,mapLayout, requests), true);
+                } else {
+                    findViewById(R.id.text_view_no_result).setVisibility(View.VISIBLE);
+                    mapLayout.hideProgressBarRequest();
                 }
 
             } catch (Exception e) {

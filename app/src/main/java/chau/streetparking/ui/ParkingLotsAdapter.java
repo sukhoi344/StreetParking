@@ -2,16 +2,20 @@ package chau.streetparking.ui;
 
 import android.app.Activity;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import chau.streetparking.R;
 import chau.streetparking.datamodels.parse.ParkingLot;
@@ -25,6 +29,13 @@ public class ParkingLotsAdapter extends RecyclerView.Adapter {
     private List<ParkingLot> dataSet;
     private LatLng location;
     private Map<String, Integer> distanceCache = new HashMap<>();
+
+    private CheckBoxListener checkBoxListener;
+    private Set<ParkingLot> selectedSet = new HashSet<>();
+
+    public interface CheckBoxListener {
+        void onCheckBoxChanged(Set<ParkingLot> selectedSet);
+    }
 
     private static class ViewHolder extends RecyclerView.ViewHolder {
         TextView address;
@@ -41,15 +52,24 @@ public class ParkingLotsAdapter extends RecyclerView.Adapter {
         }
     }
 
-    public ParkingLotsAdapter(Activity activity, List<ParkingLot> dataSet, LatLng location) {
+    public ParkingLotsAdapter(
+            Activity activity,
+            List<ParkingLot> dataSet,
+            LatLng location,
+            CheckBoxListener checkBoxListener)
+    {
         this.activity = activity;
         this.dataSet = dataSet;
         this.location = location;
+        this.checkBoxListener = checkBoxListener;
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return null;
+        View v = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.parking_lot_row, parent, false);
+        ViewHolder holder = new ViewHolder(v);
+        return holder;
     }
 
     @Override
@@ -71,6 +91,20 @@ public class ParkingLotsAdapter extends RecyclerView.Adapter {
             }
 
             viewHolder.distance.setText(distanceInFt + " ft");
+            viewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        selectedSet.add(parkingLot);
+                    } else {
+                        selectedSet.remove(parkingLot);
+                    }
+
+                    if (checkBoxListener != null)
+                        checkBoxListener.onCheckBoxChanged(selectedSet);
+                }
+            });
+
         }
     }
 
@@ -79,5 +113,9 @@ public class ParkingLotsAdapter extends RecyclerView.Adapter {
         if (dataSet == null)
             return 0;
         return dataSet.size();
+    }
+
+    public Set<ParkingLot> getSelectedSet() {
+        return selectedSet;
     }
 }
