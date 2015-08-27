@@ -30,6 +30,7 @@ import chau.streetparking.util.Logger;
  */
 public class AvailableSpotsActivity extends ColoredBarActivity {
     private static final String TAG = AvailableSpotsActivity.class.getSimpleName();
+    private static final int REQUEST_CODE_PARKING_LOT = 1;
 
     public static final String EXTRA_RADIUS = "extra_radius";
     public static final String EXTRA_LATLNG = "extra_location";
@@ -67,6 +68,23 @@ public class AvailableSpotsActivity extends ColoredBarActivity {
         getParkingLots();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode != RESULT_OK)
+            return;
+
+        switch (requestCode) {
+            case REQUEST_CODE_PARKING_LOT:
+                if (data != null && adapter != null) {
+                    String id = data.getStringExtra(ParkingLotRequestDetail.EXTRA_PARKING_LOT_ID);
+                    if (id != null) {
+                        adapter.selectParkingLot(id);
+                    }
+                }
+                break;
+        }
+    }
+
     public void onBackClicked(View v) {
         setResult(RESULT_CANCELED);
         finish();
@@ -95,20 +113,42 @@ public class AvailableSpotsActivity extends ColoredBarActivity {
                     if (list == null || list.isEmpty()) {
                         textViewNoResult.setVisibility(View.VISIBLE);
                     } else {
-                        adapter = new ParkingLotsAdapter(AvailableSpotsActivity.this, list, latLng,
-                                new ParkingLotsAdapter.CheckBoxListener() {
-                                    @Override
-                                    public void onCheckBoxChanged(Set<ParkingLot> selectedSet) {
-                                        if (selectedSet != null) {
-                                            btnSendRequest.setEnabled(!selectedSet.isEmpty());
-                                        }
-                                    }
-                                });
-                        recyclerView.setAdapter(adapter);
+                        setupAdapter(list);
                     }
                 }
             }
         });
+    }
+
+    private void setupAdapter(List<ParkingLot> list) {
+        adapter = new ParkingLotsAdapter(AvailableSpotsActivity.this, list, latLng,
+                new ParkingLotsAdapter.CheckBoxListener() {
+                    @Override
+                    public void onCheckBoxChanged(Set<ParkingLot> selectedSet) {
+                        if (selectedSet != null) {
+                            btnSendRequest.setEnabled(!selectedSet.isEmpty());
+                        }
+                    }
+                });
+
+        adapter.setOnItemClickedListener(new ParkingLotsAdapter.OnItemClickedListener() {
+            @Override
+            public void onItemClicked(ParkingLot parkingLot) {
+                if (parkingLot != null) {
+                    try {
+                        parkingLot.pin();
+                    } catch (Exception e) {
+                        Logger.printStackTrace(e);
+                    }
+
+                    Intent intent = new Intent(AvailableSpotsActivity.this, ParkingLotRequestDetail.class);
+                    intent.putExtra(ParkingLotRequestDetail.EXTRA_PARKING_LOT_ID, parkingLot.getObjectId());
+                    startActivityForResult(intent, REQUEST_CODE_PARKING_LOT);
+                }
+            }
+        });
+
+        recyclerView.setAdapter(adapter);
     }
 
     private ParseQuery<ParkingLot> getQuery() {

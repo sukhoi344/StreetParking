@@ -13,6 +13,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,10 +32,15 @@ public class ParkingLotsAdapter extends RecyclerView.Adapter {
     private Map<String, Integer> distanceCache = new HashMap<>();
 
     private CheckBoxListener checkBoxListener;
+    private OnItemClickedListener onItemClickedListener;
     private Set<ParkingLot> selectedSet = new HashSet<>();
 
     public interface CheckBoxListener {
         void onCheckBoxChanged(Set<ParkingLot> selectedSet);
+    }
+
+    public interface OnItemClickedListener {
+        void onItemClicked(ParkingLot parkingLot);
     }
 
     private static class ViewHolder extends RecyclerView.ViewHolder {
@@ -105,6 +111,19 @@ public class ParkingLotsAdapter extends RecyclerView.Adapter {
                 }
             });
 
+            viewHolder.view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (onItemClickedListener != null) {
+                        onItemClickedListener.onItemClicked(parkingLot);
+                    }
+                }
+            });
+
+            if (selectedSet.contains(parkingLot)) {
+                viewHolder.checkBox.setChecked(true);
+            }
+
         }
     }
 
@@ -117,5 +136,38 @@ public class ParkingLotsAdapter extends RecyclerView.Adapter {
 
     public Set<ParkingLot> getSelectedSet() {
         return selectedSet;
+    }
+
+    public void setOnItemClickedListener(OnItemClickedListener onItemClickedListener) {
+        this.onItemClickedListener = onItemClickedListener;
+    }
+
+    public void selectParkingLot(String id) {
+        Iterator<ParkingLot> iter = selectedSet.iterator();
+        boolean hasId = false;
+
+
+        while (iter.hasNext() && !hasId) {
+            ParkingLot parkingLot = iter.next();
+
+            if (parkingLot.getObjectId().equals(id)) {
+                hasId = true;
+            }
+        }
+
+        if (!hasId) {
+            ParkingLot parkingLot = null;
+            for (ParkingLot p : dataSet) {
+                if (p.getObjectId().equals(id)) {
+                    parkingLot = p;
+                    break;
+                }
+            }
+
+            if (parkingLot != null) {
+                selectedSet.add(parkingLot);
+                notifyDataSetChanged();
+            }
+        }
     }
 }
