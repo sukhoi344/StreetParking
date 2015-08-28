@@ -146,7 +146,6 @@ public class ParkingLotsAdapter extends RecyclerView.Adapter {
         Iterator<ParkingLot> iter = selectedSet.iterator();
         boolean hasId = false;
 
-
         while (iter.hasNext() && !hasId) {
             ParkingLot parkingLot = iter.next();
 
