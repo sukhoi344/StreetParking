@@ -74,6 +74,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     private TextView    tvFrom, tvTo;
     private Button      btnFind;
     private TextView    tvLocation;
+    private TextView    tvRadius;
 
     // First layout
     private Button          btnRequest, btnOffer;
@@ -212,6 +213,10 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         if (seekBar != null && listener != null) {
             seekBar.setOnRangeBarChangeListener(listener);
         }
+    }
+
+    public void setTextRadius(String text) {
+        tvRadius.setText(text);
     }
 
     /**
@@ -655,6 +660,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         requestAddLayout = (ViewGroup) findViewById(R.id.request_add_layout);
         curtainViewRequest = (CurtainView) findViewById(R.id.curtain_view);
         seekBar = (RangeBar) findViewById(R.id.seek_bar);
+        tvRadius = (TextView) findViewById(R.id.tv_radius);
         tvFrom = (TextView) findViewById(R.id.from);
         tvTo = (TextView) findViewById(R.id.to);
         btnFind = (Button) findViewById(R.id.btn_send_request);

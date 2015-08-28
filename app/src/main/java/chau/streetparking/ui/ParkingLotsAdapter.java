@@ -92,7 +92,7 @@ public class ParkingLotsAdapter extends RecyclerView.Adapter {
             } else {
                 LatLng latLng = new LatLng(parkingLot.getLocation().getLatitude(), parkingLot.getLocation().getLongitude());
                 int distanceInMeters = (int) MapUtil.getDistance(latLng, location);
-                distanceInFt = (int) (distanceInMeters * 0.3048);
+                distanceInFt = (int) (distanceInMeters / 0.3048);
                 distanceCache.put(parkingLot.getObjectId(), distanceInFt);
             }
 

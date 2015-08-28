@@ -67,15 +67,32 @@
                 android:text="Radius (ft):"
                 android:textColor="@android:color/black" />
 
-            <com.appyvet.rangebar.RangeBar xmlns:custom="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/seek_bar"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="72dp"
-                android:layout_marginLeft="4dp"
-                custom:rangeBar="false"
-                custom:tickEnd="1500"
-                custom:tickInterval="150"
-                custom:tickStart="150" />
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/tv_radius"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right|top"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginTop="20dp"
+                    android:text="300 ft"/>
+
+                <com.appyvet.rangebar.RangeBar xmlns:custom="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/seek_bar"
+                    android:layout_width="match_parent"
+                    android:layout_height="72dp"
+                    android:layout_marginLeft="4dp"
+                    custom:rangeBar="false"
+                    custom:tickEnd="1500"
+                    custom:tickInterval="150"
+                    custom:tickStart="150" />
+
+            </FrameLayout>
+
+
 
         </LinearLayout>
 

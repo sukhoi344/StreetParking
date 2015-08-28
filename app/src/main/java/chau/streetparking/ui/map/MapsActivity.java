@@ -280,6 +280,8 @@ public class MapsActivity extends AppCompatActivity {
                 seekBarRadiusInMeter = radiusInMeter;
                 mapFragment.setRadius(MapUtil.convertMetersToPixels(googleMap,
                         googleMap.getCameraPosition().target, radiusInMeter));
+
+                mapLayout.setTextRadius(rightPinValue + " ft");
             }
         });
 

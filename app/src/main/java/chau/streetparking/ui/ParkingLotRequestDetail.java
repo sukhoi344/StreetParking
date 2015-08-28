@@ -2,7 +2,9 @@ package chau.streetparking.ui;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.Image;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -16,6 +18,7 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
@@ -49,6 +52,7 @@ public class ParkingLotRequestDetail extends ColoredBarActivity implements OnMap
     private RecyclerView recyclerView;
 
     // Variables
+    private PhotoParseFileAdapter adapter;
     private ParkingLot parkingLot;
     private GoogleMap map;
     private volatile boolean mapLoaded = false;
@@ -90,6 +94,10 @@ public class ParkingLotRequestDetail extends ColoredBarActivity implements OnMap
 
         if (parkingLot != null)
             parkingLot.unpinInBackground();
+
+        if (adapter != null)
+            adapter.onDestroy();
+        ImageLoader.getInstance().cancelDisplayTask(ivAvatar);
 
         super.onDestroy();
     }
@@ -149,7 +157,7 @@ public class ParkingLotRequestDetail extends ColoredBarActivity implements OnMap
                 showMapPosition();
             }
 
-            showPhotos();
+            showPhotoList();
         }
     }
 
@@ -183,7 +191,9 @@ public class ParkingLotRequestDetail extends ColoredBarActivity implements OnMap
                         tvName.setText(user.getFirstName() + " " + user.getLastName());
 
                         if (owner.getAvatar() != null) {
-                            ImageLoader.getInstance().loadImage(owner.getAvatar().getUrl(), new ImageLoadingListener() {
+                            ImageLoader.getInstance().loadImage(owner.getAvatar().getUrl(),
+                                    new DisplayImageOptions.Builder().cacheInMemory(true).build(),
+                                    new ImageLoadingListener() {
                                 @Override
                                 public void onLoadingStarted(String s, View view) {}
 
@@ -206,11 +216,27 @@ public class ParkingLotRequestDetail extends ColoredBarActivity implements OnMap
         }
     }
 
-    private void showPhotos() {
+    private void showPhotoList() {
         if (parkingLot == null || parkingLot.getPhotos() == null)
             return;
 
-        recyclerView.setAdapter(new PhotoParseFileAdapter(this, parkingLot.getPhotos()));
+        adapter = new PhotoParseFileAdapter(this, parkingLot.getPhotos());
+        adapter.setOnPhotoSelectedListener(new PhotoParseFileAdapter.OnPhotoSelectedListener() {
+            @Override
+            public void onPhotoSelected(String url) {
+                showPhoto(url);
+            }
+        });
+        
+        recyclerView.setAdapter(adapter);
+    }
+    
+    private void showPhoto(String url) {
+        DialogPhotoFragment dialog = DialogPhotoFragment.newInstance(url);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+
+        dialog.show(fragmentManager, DialogPhotoFragment.class.getSimpleName());
+
     }
 
     private void getExtras() {

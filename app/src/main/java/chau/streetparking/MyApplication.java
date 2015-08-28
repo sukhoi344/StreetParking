@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import com.facebook.FacebookSdk;
 import com.mikepenz.materialdrawer.util.DrawerImageLoader;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.FailReason;
@@ -49,7 +50,7 @@ public class MyApplication extends Application {
         // method.
         ImageLoaderConfiguration.Builder config = new ImageLoaderConfiguration.Builder(this);
         config.threadPriority(Thread.NORM_PRIORITY - 2);
-        config.denyCacheImageMultipleSizesInMemory();
+//        config.denyCacheImageMultipleSizesInMemory();
         config.diskCacheFileNameGenerator(new Md5FileNameGenerator());
         config.diskCacheSize(50 * 1024 * 1024); // 50 MiB
         config.tasksProcessingOrder(QueueProcessingType.LIFO);
@@ -62,7 +63,9 @@ public class MyApplication extends Application {
         DrawerImageLoader.init(new DrawerImageLoader.IDrawerImageLoader() {
             @Override
             public void set(final ImageView imageView, Uri uri, final Drawable drawable) {
-                ImageLoader.getInstance().loadImage(uri.toString(), new ImageLoadingListener() {
+                ImageLoader.getInstance().loadImage(uri.toString(),
+                        new DisplayImageOptions.Builder().cacheInMemory(true).build(),
+                        new ImageLoadingListener() {
                     @Override
                     public void onLoadingStarted(String s, View view) {
                         imageView.setImageDrawable(drawable);
