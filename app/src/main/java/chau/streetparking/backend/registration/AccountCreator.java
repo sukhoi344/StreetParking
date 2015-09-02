@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import chau.streetparking.FileManager;
+import chau.streetparking.datamodels.parse.Credit;
 import chau.streetparking.datamodels.parse.User;
 import chau.streetparking.util.FileUtil;
 import chau.streetparking.util.Logger;
@@ -122,7 +123,7 @@ public class AccountCreator {
     }
 
     private void saveAccount(String customerId, final User user, final ParseFile file, final boolean uploaded) {
-        final ParseObject customer = new ParseObject("Credit");
+        final Credit customer = new Credit();
         customer.put("customerId", customerId);
         customer.saveInBackground(new SaveCallback() {
             @Override

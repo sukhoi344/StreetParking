@@ -70,13 +70,6 @@ public class MapsActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_PROFILE = 3;
     private static final int REQUEST_CODE_FIND_SPOTS = 4;
 
-//    private static final int ID_PROFILE = 0;
-//    private static final int ID_PAYMENT = 1;
-////    private static final int ID_SETTINGS = 5;
-//    private static final int ID_HELP = 3;
-//    private static final int ID_ABOUT = 4;
-//    private static final int ID_MY_PARKING_LOTS = 2;
-
     private static final int ID_MY_RESERVATIONS = 0;
     private static final int ID_PAYMENT = 1;
     private static final int ID_GARAGE_SETTING = 2;
@@ -276,12 +269,19 @@ public class MapsActivity extends AppCompatActivity {
             @Override
             public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex, int rightPinIndex,
                                               String leftPinValue, String rightPinValue) {
-                int radiusInMeter = (int) (Double.parseDouble(rightPinValue) * 0.3048);
+                double radiusInFt = Double.parseDouble(rightPinValue);
+
+                int radiusInMeter = (int) (radiusInFt * 0.3048);
                 seekBarRadiusInMeter = radiusInMeter;
                 mapFragment.setRadius(MapUtil.convertMetersToPixels(googleMap,
                         googleMap.getCameraPosition().target, radiusInMeter));
 
                 mapLayout.setTextRadius(rightPinValue + " ft");
+
+                if (radiusInFt == rangeBar.getTickEnd()) {
+                    rangeBar.setTickEnd(rangeBar.getTickEnd() * 2.0f);
+                }
+
             }
         });
 
@@ -467,24 +467,6 @@ public class MapsActivity extends AppCompatActivity {
                 .withToolbar(toolbar)
                 .withTranslucentStatusBar(true)
                 .withAccountHeader(headerResult)
-
-//                .addDrawerItems(
-//                        new PrimaryDrawerItem().withName("Profile")
-//                                .withIcon(R.drawable.ic_action_account_circle).withIdentifier(ID_PROFILE)
-//                                .withSelectable(false),
-//                        new PrimaryDrawerItem().withName("Payment").withIdentifier(ID_PAYMENT)
-//                                .withIcon(R.drawable.ic_action_credit_card)
-//                                .withSelectable(false),
-//                        new PrimaryDrawerItem().withName("My Parking Lots")
-//                                .withIcon(R.drawable.ic_action_home).withIdentifier(ID_MY_PARKING_LOTS)
-//                                .withSelectable(false),
-//                        new PrimaryDrawerItem().withName("Help").withIdentifier(ID_HELP)
-//                                .withIcon(R.drawable.ic_action_help)
-//                                .withSelectable(false),
-//                        new PrimaryDrawerItem().withName("About").withIdentifier(ID_ABOUT)
-//                                .withIcon(R.drawable.ic_action_info)
-//                                .withSelectable(false)
-//                )
 
                 .addDrawerItems(
                         new PrimaryDrawerItem().withName("My Reservations")
