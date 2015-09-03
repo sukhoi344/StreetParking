@@ -40,6 +40,7 @@ import chau.streetparking.R;
 import chau.streetparking.datamodels.Request;
 import chau.streetparking.ui.curtain.CurtainView;
 import chau.streetparking.ui.curtain.ICurtainViewBase;
+import chau.streetparking.ui.picker.DurationPickerDialog;
 import chau.streetparking.util.ImageUtil;
 import chau.streetparking.util.Logger;
 
@@ -481,7 +482,21 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         seekBar.setSeekPinByValue(SEEK_BAR_DEFAULT_VALUE);
 
         tvFrom.setOnClickListener(new TimeTextViewListener(TAG_FROM));
-        tvTo.setOnClickListener(new TimeTextViewListener(TAG_TO));
+
+//        tvTo.setOnClickListener(new TimeTextViewListener(TAG_TO));
+        tvTo.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    DurationPickerDialog dialog = DurationPickerDialog.newInstance(1,
+                            DurationPickerDialog.DurationType.HOUR);
+                    Activity activity = (Activity) getContext();
+                    dialog.show(activity.getFragmentManager(), "duration");
+                } catch (Exception e) {
+                    Logger.printStackTrace(e);
+                }
+            }
+        });
 
         btnCancelOffer1.setOnClickListener(new OnClickListener() {
             @Override
