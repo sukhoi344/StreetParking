@@ -8,8 +8,8 @@ android {
         applicationId "chau.streetparking"
         minSdkVersion 17
         targetSdkVersion 23
-        versionCode 6
-        versionName "1.0 Build 1508.02"
+        versionCode 7
+        versionName "1.0 Build 1508.03"
     }
     buildTypes {
         release {
@@ -66,5 +66,6 @@ dependencies {
     compile 'com.parse.bolts:bolts-android:1.+'
     compile 'com.stripe:stripe-android:+'
     compile 'com.facebook.android:facebook-android-sdk:4.5.0'
+    compile 'com.foursquare:foursquare-android-oauth:1.0.3'
     compile files('libs/ParseFacebookUtilsV4-1.9.4.jar')
 }
