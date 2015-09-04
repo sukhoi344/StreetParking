@@ -48,7 +48,8 @@ import chau.streetparking.util.Logger;
  * Created by Chau Thai on 6/9/2015.
  */
 public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSetListener,
-                                                    DatePickerDialog.OnDateSetListener {
+                                                    DatePickerDialog.OnDateSetListener,
+                                                    DurationPickerDialog.OnDurationSetListener {
     public static final int LAYOUT_REQUEST_ADD = 1;
     public static final int LAYOUT_SEND_CANCEL = 2;
 
@@ -190,7 +191,6 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
             Logger.printStackTrace(e);
         }
 
-
         if (currentTag == TAG_FROM) {
             tvFrom.setText(selectedTime);
             requestStartDate = date;
@@ -203,8 +203,11 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
                 && !tvFrom.getText().toString().equals("Tap to select")) {
             btnFind.setEnabled(true);
         }
+    }
 
-
+    @Override
+    public void onDurationSet(int duration, int durationType, String text) {
+        tvTo.setText(text);
     }
 
     /**
@@ -488,8 +491,9 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
             @Override
             public void onClick(View v) {
                 try {
-                    DurationPickerDialog dialog = DurationPickerDialog.newInstance(1,
+                    DurationPickerDialog dialog = DurationPickerDialog.newInstance(2,
                             DurationPickerDialog.DurationType.HOUR);
+                    dialog.setDurationSetListener(MapLayout.this);
                     Activity activity = (Activity) getContext();
                     dialog.show(activity.getFragmentManager(), "duration");
                 } catch (Exception e) {

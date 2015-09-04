@@ -17,6 +17,7 @@ import chau.streetparking.R;
 public class DurationValueAdapter extends RecyclerView.Adapter<DurationViewHolder> {
     private List<Integer> dataSet = new ArrayList<>();
     private Context context;
+    private OnSelectedListener onSelectedListener;
 
     private int selectedIndex = 0;
 
@@ -28,10 +29,22 @@ public class DurationValueAdapter extends RecyclerView.Adapter<DurationViewHolde
         }
     }
 
+    public void setValue(int value) {
+        if (value <= dataSet.size()) {
+            selectedIndex = value - 1;
+        }
+
+        notifyDataSetChanged();
+    }
+
+    public void setOnSelectedListener(OnSelectedListener onSelectedListener) {
+        this.onSelectedListener = onSelectedListener;
+    }
+
     @Override
     public DurationViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.duration_picker_row, parent, false);
+                .inflate(R.layout.duration_picker_value_row, parent, false);
         return new DurationViewHolder(v);
     }
 
@@ -53,6 +66,10 @@ public class DurationValueAdapter extends RecyclerView.Adapter<DurationViewHolde
                 public void onClick(View v) {
                     selectedIndex = position;
                     notifyDataSetChanged();
+
+                    if (onSelectedListener != null) {
+                        onSelectedListener.onSelected(selectedIndex + 1);
+                    }
                 }
             });
         }
@@ -69,5 +86,9 @@ public class DurationValueAdapter extends RecyclerView.Adapter<DurationViewHolde
     @Override
     public int getItemCount() {
         return dataSet.size();
+    }
+
+    public interface OnSelectedListener {
+        void onSelected(int value);
     }
 }

@@ -17,6 +17,7 @@ import chau.streetparking.R;
 public class DurationTypeAdapter extends RecyclerView.Adapter<DurationViewHolder> {
     private List<String> dataSet = new ArrayList<>();
     private Context context;
+    private OnSelectedListener onSelectedListener;
 
     private int selectedIndex = 0;
 
@@ -29,10 +30,33 @@ public class DurationTypeAdapter extends RecyclerView.Adapter<DurationViewHolder
         dataSet.add("MONTH");
     }
 
+    public void setDurationType(int type) {
+        switch (type) {
+            case DurationPickerDialog.DurationType.MINUTE:
+                selectedIndex = 0;
+                break;
+            case DurationPickerDialog.DurationType.HOUR:
+                selectedIndex = 1;
+                break;
+            case DurationPickerDialog.DurationType.DAY:
+                selectedIndex = 2;
+                break;
+            case DurationPickerDialog.DurationType.MONTH:
+                selectedIndex = 3;
+                break;
+        }
+
+        notifyDataSetChanged();
+    }
+
+    public void setOnSelectedListener(OnSelectedListener onSelectedListener) {
+        this.onSelectedListener = onSelectedListener;
+    }
+
     @Override
     public DurationViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.duration_picker_row, parent, false);
+                .inflate(R.layout.duration_picker_type_row, parent, false);
         return new DurationViewHolder(v);
     }
 
@@ -54,13 +78,36 @@ public class DurationTypeAdapter extends RecyclerView.Adapter<DurationViewHolder
                 public void onClick(View v) {
                     selectedIndex = position;
                     notifyDataSetChanged();
+
+                    if (onSelectedListener != null) {
+                        onSelectedListener.onSelected(positionToType(position));
+                    }
                 }
             });
         }
     }
 
+    private int positionToType(int position) {
+        switch (position) {
+            case 0:
+                return DurationPickerDialog.DurationType.MINUTE;
+            case 1:
+                return DurationPickerDialog.DurationType.HOUR;
+            case 2:
+                return DurationPickerDialog.DurationType.DAY;
+            case 3:
+                return DurationPickerDialog.DurationType.MONTH;
+        }
+
+        return DurationPickerDialog.DurationType.HOUR;
+    }
+
     @Override
     public int getItemCount() {
         return dataSet.size();
+    }
+
+    public interface OnSelectedListener {
+        void onSelected(int type);
     }
 }

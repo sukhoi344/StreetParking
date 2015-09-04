@@ -18,4 +18,5 @@ public class DurationViewHolder extends RecyclerView.ViewHolder {
         textView =  (TextView) v.findViewById(R.id.text);
         view = v;
     }
+
 }

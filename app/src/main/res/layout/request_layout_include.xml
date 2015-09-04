@@ -116,7 +116,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:clickable="true"
-                    android:text="Start Date:"
+                    android:text="Start Time:"
                     android:textColor="@android:color/black" />
 
                 <TextView
@@ -141,7 +141,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:clickable="true"
-                    android:text="End Date:"
+                    android:text="Duration:"
                     android:textColor="@android:color/black" />
 
                 <TextView

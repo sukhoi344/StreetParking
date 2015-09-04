@@ -4,46 +4,105 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="23dp"
+        android:background="@color/primary_dark">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="DURATION"
+            android:layout_gravity="center"
+            android:textColor="@android:color/white"/>
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@color/primary">
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="@android:color/white"
+            android:textSize="25sp"
+            android:text="2 HOUR"/>
+    </FrameLayout>
+
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="horizontal">
+        android:layout_weight="1">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recycler_view_duration_value"
-            android:scrollbars="none"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp" />
+            android:orientation="horizontal"
+            android:background="@android:color/white">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recycler_view_duration_type"
-            android:scrollbars="none"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp" />
-    </LinearLayout>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_view_duration_value"
+                android:background="@android:color/white"
+                android:scrollbars="none"
+                android:layout_width="70dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="8dp"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_view_duration_type"
+                android:background="@android:color/white"
+                android:scrollbars="none"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:background="@drawable/duration_picker_gradient_top"
+            android:layout_gravity="top"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:background="@drawable/duration_picker_gradient_bottom"
+            android:layout_gravity="bottom"/>
+    </FrameLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:background="@android:color/white"
         android:gravity="right">
 
         <Button
             android:id="@+id/btn_cancel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="CANCEL"/>
+            android:layout_width="80dp"
+            android:layout_height="40dp"
+            android:layout_margin="5dp"
+            android:background="@drawable/duration_picker_btn_selector"
+            android:text="CANCEL"
+            android:textColor="@color/primary"
+            android:textStyle="bold"
+            android:textSize="14sp"/>
 
         <Button
             android:id="@+id/btn_ok"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="OK"/>
+            android:layout_width="50dp"
+            android:layout_height="40dp"
+            android:layout_margin="5dp"
+            android:background="@drawable/duration_picker_btn_selector"
+            android:text="OK"
+            android:textColor="@color/primary"
+            android:textStyle="bold"
+            android:textSize="14sp"/>
     </LinearLayout>
 
 </LinearLayout>

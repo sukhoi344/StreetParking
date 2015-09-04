@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import chau.streetparking.R;
 import chau.streetparking.util.ImageUtil;
@@ -32,6 +33,7 @@ public class DurationPickerDialog extends DialogFragment {
     private static final String KEY_DURATION = "duration";
     private static final String KEY_TYPE = "type";
 
+    private TextView        tvTitle;
     private RecyclerView    recyclerViewValue;
     private RecyclerView    recyclerViewType;
     private Button          btnOk;
@@ -49,7 +51,7 @@ public class DurationPickerDialog extends DialogFragment {
 
         Bundle args = new Bundle();
         args.putInt(KEY_DURATION, duration);
-        args.putInt(KEY_DURATION, durationType);
+        args.putInt(KEY_TYPE, durationType);
 
         dialog.setArguments(args);
 
@@ -85,6 +87,11 @@ public class DurationPickerDialog extends DialogFragment {
         super.onActivityCreated(savedInstanceState);
         setupList();
         setupButtons();
+        changeTitle();
+    }
+
+    public void setDurationSetListener(OnDurationSetListener onDurationSetListener) {
+        this.durationSetListener = onDurationSetListener;
     }
 
     private void setupSize() {
@@ -99,6 +106,15 @@ public class DurationPickerDialog extends DialogFragment {
             @Override
             public void onClick(View v) {
                 dismiss();
+            }
+        });
+        btnOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (durationSetListener != null) {
+                    durationSetListener.onDurationSet(duration, durationType, getText());
+                    dismiss();
+                }
             }
         });
     }
@@ -128,12 +144,63 @@ public class DurationPickerDialog extends DialogFragment {
                 }
             }
         });
+        durationValueAdapter.setValue(duration);
 
         final DurationTypeAdapter durationTypeAdapter = new DurationTypeAdapter(getActivity());
         recyclerViewType.setAdapter(durationTypeAdapter);
+        durationTypeAdapter.setDurationType(durationType);
+
+        durationValueAdapter.setOnSelectedListener(new DurationValueAdapter.OnSelectedListener() {
+            @Override
+            public void onSelected(int value) {
+                duration = value;
+                changeTitle();
+            }
+        });
+
+        durationTypeAdapter.setOnSelectedListener(new DurationTypeAdapter.OnSelectedListener() {
+            @Override
+            public void onSelected(int type) {
+                durationType = type;
+                changeTitle();
+            }
+        });
+    }
+
+    private String getText() {
+        String type;
+
+        switch (durationType) {
+            case DurationType.MINUTE:
+                type = "MINUTE";
+                break;
+            case DurationType.HOUR:
+                type = "HOUR";
+                break;
+            case DurationType.DAY:
+                type = "DAY";
+                break;
+            case DurationType.MONTH:
+                type = "MONTH";
+                break;
+            default:
+                type = "HOUR";
+                break;
+        }
+
+        if (duration > 1) {
+            type += "S";
+        }
+
+        return (duration + " " + type);
+    }
+
+    private void changeTitle() {
+        tvTitle.setText(getText());
     }
 
     private void getWidgets(View view) {
+        tvTitle = (TextView) view.findViewById(R.id.tv_title);
         recyclerViewValue = (RecyclerView) view.findViewById(R.id.recycler_view_duration_value);
         recyclerViewType = (RecyclerView) view.findViewById(R.id.recycler_view_duration_type);
         btnOk = (Button) view.findViewById(R.id.btn_ok);
@@ -141,6 +208,6 @@ public class DurationPickerDialog extends DialogFragment {
     }
 
     public interface OnDurationSetListener {
-        void onDurationSet(int duration, int durationType);
+        void onDurationSet(int duration, int durationType, String text);
     }
 }
