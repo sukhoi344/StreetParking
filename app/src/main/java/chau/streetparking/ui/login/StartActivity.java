@@ -14,6 +14,7 @@ import com.parse.ParseException;
 import com.parse.ParseUser;
 
 import chau.streetparking.R;
+import chau.streetparking.backend.FourquareSearcher;
 import chau.streetparking.backend.FoursquareManager;
 import chau.streetparking.ui.map.MapsActivity;
 import chau.streetparking.util.Logger;
@@ -75,6 +76,8 @@ public class StartActivity extends AppCompatActivity {
      */
     public void onRegisterClicked(View v) {
 //        startActivityForResult(new Intent(this, RegisterActivity.class), REQUEST_EXIT);
+
+        FourquareSearcher.test(this, 40.7, -74);
     }
 
     private boolean checkPlayServices() {

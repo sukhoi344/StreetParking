@@ -6,6 +6,9 @@
     <string name="backendless_secret_key">B33EDE5D-A903-D5DF-FF66-BFD080A0B900</string>
     <string name="backendless_version">v1</string>
 
+    <!-- FourSquare strings -->
+    <string name="foursquare_client_id">FWYKDVINQS4RX4YZACUBRKMCC25KC0K1RBWH0QLQRBMDCZIF</string>
+
     <string name="title_activity_maps">Map</string>
 
     <string-array name="card_type_array">

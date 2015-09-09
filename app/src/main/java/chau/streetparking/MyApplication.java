@@ -21,6 +21,7 @@ import com.parse.Parse;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
 
+import chau.streetparking.backend.FoursquareManager;
 import chau.streetparking.datamodels.parse.Credit;
 import chau.streetparking.datamodels.parse.ParkingLot;
 import chau.streetparking.datamodels.parse.Request;
@@ -41,6 +42,7 @@ public class MyApplication extends Application {
         initDrawer();
         initParse();
         initFacebook();
+        FoursquareManager.initKeyIfPossible(this);
     }
 
     private void initImageLoader() {
@@ -116,6 +118,4 @@ public class MyApplication extends Application {
     private void initFacebook() {
         FacebookSdk.sdkInitialize(getApplicationContext());
     }
-
-
 }
