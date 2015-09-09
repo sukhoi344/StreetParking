@@ -3,15 +3,20 @@ package chau.streetparking.ui.login;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import com.foursquare.android.nativeoauth.FoursquareOAuth;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.parse.ParseException;
 import com.parse.ParseUser;
 
 import chau.streetparking.R;
+import chau.streetparking.backend.FoursquareManager;
 import chau.streetparking.ui.map.MapsActivity;
+import chau.streetparking.util.Logger;
 
 /**
  * Created by Chau Thai on 6/7/2015.
@@ -30,13 +35,13 @@ public class StartActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        if (checkPlayServices()) {
-            if (ParseUser.getCurrentUser() != null) {
-                Intent intent = new Intent(this, MapsActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        }
+//        if (checkPlayServices()) {
+//            if (ParseUser.getCurrentUser() != null) {
+//                Intent intent = new Intent(this, MapsActivity.class);
+//                startActivity(intent);
+//                finish();
+//            }
+//        }
     }
 
     @Override
@@ -69,10 +74,7 @@ public class StartActivity extends AppCompatActivity {
      * Called when "REGISTER" button is clicked
      */
     public void onRegisterClicked(View v) {
-        startActivityForResult(new Intent(this, RegisterActivity.class), REQUEST_EXIT);
-
-//        BackendTest test = new BackendTest(this);
-//        test.addCardToCustomer();
+//        startActivityForResult(new Intent(this, RegisterActivity.class), REQUEST_EXIT);
     }
 
     private boolean checkPlayServices() {

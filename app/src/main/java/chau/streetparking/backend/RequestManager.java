@@ -14,4 +14,8 @@ public class RequestManager {
         public static final String GET_SECRET_KEY_LIVE = "get_stripe_secret_key_live";
         public static final String API_BASE_URL = "api.stripe.com/v1";
     }
+
+    public static abstract class Foursquare {
+        public static final String GET_CLIENT_SECRET_KEY = "getFourSquareKey";
+    }
 }
