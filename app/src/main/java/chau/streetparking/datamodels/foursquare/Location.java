@@ -1,5 +1,6 @@
 package chau.streetparking.datamodels.foursquare;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -19,7 +20,7 @@ public class Location {
     private String city;
     private String state;
     private String country;
-    private String[] formattedAdress;
+    private String[] formattedAddress;
 
     public Location(
             String address,
@@ -32,7 +33,7 @@ public class Location {
             String city,
             String state,
             String country,
-            String[] formattedAdress) {
+            String[] formattedAddress) {
         this.address = address;
         this.crossStreet = crossStreet;
         this.latitude = latitude;
@@ -43,7 +44,7 @@ public class Location {
         this.city = city;
         this.state = state;
         this.country = country;
-        this.formattedAdress = formattedAdress;
+        this.formattedAddress = formattedAddress;
     }
 
     public String getAddress() {
@@ -126,12 +127,12 @@ public class Location {
         this.country = country;
     }
 
-    public String[] getFormattedAdress() {
-        return formattedAdress;
+    public String[] getFormattedAddress() {
+        return formattedAddress;
     }
 
-    public void setFormattedAdress(String[] formattedAdress) {
-        this.formattedAdress = formattedAdress;
+    public void setFormattedAddress(String[] formattedAddress) {
+        this.formattedAddress = formattedAddress;
     }
 
     @Override
@@ -147,16 +148,66 @@ public class Location {
                 ", city='" + city + '\'' +
                 ", state='" + state + '\'' +
                 ", country='" + country + '\'' +
-                ", formattedAdress=" + Arrays.toString(formattedAdress) +
+                ", formattedAddress=" + Arrays.toString(formattedAddress) +
                 '}';
     }
 
     public static Location fromJSON(JSONObject jsonObject) throws JSONException {
-        String id = jsonObject.getString("id");
-        String name = jsonObject.getString("name");
-        String pluralName = jsonObject.getString("pluralName");
-        String shortName = jsonObject.getString("shortName");
+        String address = null;
+        String crossStreet = null;
+        double latitude = 0;
+        double longitude = 0;
+        int distance = 0;
+        String postalCode = null;
+        String cc = null;
+        String city = null;
+        String state = null;
+        String country = null;
+        String[] formattedAddress = null;
 
-        return null;
+        if (jsonObject.has("address"))
+            address = jsonObject.getString("address");
+        if (jsonObject.has("crossStreet"))
+            crossStreet = jsonObject.getString("crossStreet");
+        if (jsonObject.has("lat"))
+            latitude = jsonObject.getDouble("lat");
+        if (jsonObject.has("lng"))
+            longitude = jsonObject.getDouble("lng");
+        if (jsonObject.has("distance"))
+            distance = jsonObject.getInt("distance");
+        if (jsonObject.has("postalCode"))
+            postalCode = jsonObject.getString("postalCode");
+        if (jsonObject.has("cc"))
+            cc = jsonObject.getString("cc");
+        if (jsonObject.has("city"))
+            city = jsonObject.getString("city");
+        if (jsonObject.has("state"))
+            state = jsonObject.getString("state");
+        if (jsonObject.has("country"))
+            country = jsonObject.getString("country");
+        formattedAddress = null;
+
+        if (jsonObject.has("formattedAddress")) {
+            JSONArray jsonArray = jsonObject.getJSONArray("formattedAddress");
+            formattedAddress = new String[jsonArray.length()];
+
+            for (int i = 0; i < formattedAddress.length; i++) {
+                formattedAddress[i] = jsonArray.getString(i);
+            }
+        }
+
+        return new Location(
+                address,
+                crossStreet,
+                latitude,
+                longitude,
+                distance,
+                postalCode,
+                cc,
+                city,
+                state,
+                country,
+                formattedAddress
+        );
     }
 }

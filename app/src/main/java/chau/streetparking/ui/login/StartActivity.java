@@ -3,20 +3,17 @@ package chau.streetparking.ui.login;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.foursquare.android.nativeoauth.FoursquareOAuth;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.parse.ParseException;
-import com.parse.ParseUser;
+
+import java.util.List;
 
 import chau.streetparking.R;
-import chau.streetparking.backend.FourquareSearcher;
-import chau.streetparking.backend.FoursquareManager;
-import chau.streetparking.ui.map.MapsActivity;
+import chau.streetparking.backend.VenueFinder;
+import chau.streetparking.datamodels.foursquare.Venue;
 import chau.streetparking.util.Logger;
 
 /**
@@ -77,7 +74,23 @@ public class StartActivity extends AppCompatActivity {
     public void onRegisterClicked(View v) {
 //        startActivityForResult(new Intent(this, RegisterActivity.class), REQUEST_EXIT);
 
-        FourquareSearcher.test(this, 40.7, -74);
+        VenueFinder finder = new VenueFinder(this);
+
+        finder.find(40.7, -74, new VenueFinder.OnSearchDoneListener() {
+            @Override
+            public void onSearchDone(int code, String requestId, List<Venue> venues) {
+                Logger.d("yolo", "success, venues.size() = " + venues.size());
+                for (int i = 0; i < venues.size(); i++) {
+                    Logger.d("yolo", "venue" + i + ": ");
+                    Logger.d("yolo", venues.get(i).toString());
+                }
+            }
+
+            @Override
+            public void onSearchError(int code, String errorType, String errorDetail) {
+                Logger.d("yolo", "SearchError. Code: " + code + ", type: " + errorType + ", errorDetail: " + errorDetail);
+            }
+        });
     }
 
     private boolean checkPlayServices() {

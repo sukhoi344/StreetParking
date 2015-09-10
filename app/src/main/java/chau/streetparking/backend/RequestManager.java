@@ -37,9 +37,14 @@ public class RequestManager {
         public static abstract class Search {
             public static final String URL = API_BASE_URL + "venues/search";
             public static final String PARAM_LATLNG = "ll";
+            public static final String PARAM_INTENT = "intent";
             public static final String PARAM_LIMIT = "limit";
-        }
+            public static final String PARAM_RADIUS = "radius";
 
-        public static final String SEARCH_VALUE_URL = API_BASE_URL + "venues/search";
+            public static final String INTENT_CHECKIN = "checkin";
+            public static final String INTENT_BROWSE = "browse";
+            public static final String INTENT_GLOBAL = "global";
+            public static final String INTENT_MATCH = "match";
+        }
     }
 }
