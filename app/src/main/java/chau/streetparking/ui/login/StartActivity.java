@@ -8,13 +8,11 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.parse.ParseUser;
 
-import java.util.List;
 
 import chau.streetparking.R;
-import chau.streetparking.backend.VenueFinder;
-import chau.streetparking.datamodels.foursquare.Venue;
-import chau.streetparking.util.Logger;
+import chau.streetparking.ui.map.MapsActivity;
 
 /**
  * Created by Chau Thai on 6/7/2015.
@@ -33,13 +31,13 @@ public class StartActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-//        if (checkPlayServices()) {
-//            if (ParseUser.getCurrentUser() != null) {
-//                Intent intent = new Intent(this, MapsActivity.class);
-//                startActivity(intent);
-//                finish();
-//            }
-//        }
+        if (checkPlayServices()) {
+            if (ParseUser.getCurrentUser() != null) {
+                Intent intent = new Intent(this, MapsActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        }
     }
 
     @Override
@@ -72,25 +70,7 @@ public class StartActivity extends AppCompatActivity {
      * Called when "REGISTER" button is clicked
      */
     public void onRegisterClicked(View v) {
-//        startActivityForResult(new Intent(this, RegisterActivity.class), REQUEST_EXIT);
-
-        VenueFinder finder = new VenueFinder(this);
-
-        finder.find(40.7, -74, new VenueFinder.OnSearchDoneListener() {
-            @Override
-            public void onSearchDone(int code, String requestId, List<Venue> venues) {
-                Logger.d("yolo", "success, venues.size() = " + venues.size());
-                for (int i = 0; i < venues.size(); i++) {
-                    Logger.d("yolo", "venue" + i + ": ");
-                    Logger.d("yolo", venues.get(i).toString());
-                }
-            }
-
-            @Override
-            public void onSearchError(int code, String errorType, String errorDetail) {
-                Logger.d("yolo", "SearchError. Code: " + code + ", type: " + errorType + ", errorDetail: " + errorDetail);
-            }
-        });
+        startActivityForResult(new Intent(this, RegisterActivity.class), REQUEST_EXIT);
     }
 
     private boolean checkPlayServices() {

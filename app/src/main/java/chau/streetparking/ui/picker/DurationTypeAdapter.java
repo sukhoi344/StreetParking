@@ -27,7 +27,6 @@ public class DurationTypeAdapter extends RecyclerView.Adapter<DurationViewHolder
         dataSet.add("MINUTE");
         dataSet.add("HOUR");
         dataSet.add("DAY");
-        dataSet.add("MONTH");
     }
 
     public void setDurationType(int type) {
@@ -41,9 +40,9 @@ public class DurationTypeAdapter extends RecyclerView.Adapter<DurationViewHolder
             case DurationPickerDialog.DurationType.DAY:
                 selectedIndex = 2;
                 break;
-            case DurationPickerDialog.DurationType.MONTH:
-                selectedIndex = 3;
-                break;
+//            case DurationPickerDialog.DurationType.MONTH:
+//                selectedIndex = 3;
+//                break;
         }
 
         notifyDataSetChanged();
@@ -95,8 +94,8 @@ public class DurationTypeAdapter extends RecyclerView.Adapter<DurationViewHolder
                 return DurationPickerDialog.DurationType.HOUR;
             case 2:
                 return DurationPickerDialog.DurationType.DAY;
-            case 3:
-                return DurationPickerDialog.DurationType.MONTH;
+//            case 3:
+//                return DurationPickerDialog.DurationType.MONTH;
         }
 
         return DurationPickerDialog.DurationType.HOUR;

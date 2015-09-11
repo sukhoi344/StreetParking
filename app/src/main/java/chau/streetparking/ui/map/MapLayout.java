@@ -208,6 +208,11 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     @Override
     public void onDurationSet(int duration, int durationType, String text) {
         tvTo.setText(text);
+
+        if (!tvTo.getText().toString().equals("Tap to select")
+                && !tvFrom.getText().toString().equals("Tap to select")) {
+            btnFind.setEnabled(true);
+        }
     }
 
     /**
