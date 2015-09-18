@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/request_add_layout"
+    android:id="@+id/first_layout"
     android:layout_width="match_parent"
     android:layout_height="@dimen/curtain_view_fixed"
     android:layout_gravity="bottom"
@@ -11,7 +11,7 @@
     android:layout_alignParentBottom="true">
 
     <Button
-        android:id="@+id/btn_request"
+        android:id="@+id/btn_find_parking_spots"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"
@@ -23,7 +23,7 @@
         android:text="Find Parking Spot" />
 
     <Button
-        android:id="@+id/btn_offer"
+        android:id="@+id/btn_my_requests"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"

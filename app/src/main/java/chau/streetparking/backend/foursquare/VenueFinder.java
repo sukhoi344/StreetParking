@@ -1,4 +1,4 @@
-package chau.streetparking.backend;
+package chau.streetparking.backend.foursquare;
 
 import android.content.Context;
 
@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import chau.streetparking.VolleySingleton;
+import chau.streetparking.backend.RequestManager;
 import chau.streetparking.datamodels.foursquare.Venue;
 import chau.streetparking.util.Logger;
 

@@ -41,19 +41,19 @@ import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SectionDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import chau.streetparking.R;
-import chau.streetparking.datamodels.Request;
 import chau.streetparking.datamodels.SpotMarker;
+import chau.streetparking.datamodels.parse.Request;
 import chau.streetparking.datamodels.parse.User;
 import chau.streetparking.ui.AvailableSpotsActivity;
 import chau.streetparking.ui.DividerItemDecoration;
 import chau.streetparking.ui.garage.MyGarageActivity;
-import chau.streetparking.ui.PhotosAdapter;
 import chau.streetparking.ui.ProfileActivity;
 import chau.streetparking.ui.RequestAdapter;
 import chau.streetparking.ui.SearchLocationActivity;
@@ -66,7 +66,6 @@ import chau.streetparking.util.MapUtil;
 public class MapsActivity extends AppCompatActivity {
     private static final String TAG = "MapsActivity";
     private static final int REQUEST_CODE_SEARCH = 1;
-    private static final int REQUEST_CODE_IMAGE = 2;
     private static final int REQUEST_CODE_PROFILE = 3;
     private static final int REQUEST_CODE_FIND_SPOTS = 4;
 
@@ -92,12 +91,9 @@ public class MapsActivity extends AppCompatActivity {
     private MyMapFragment   mapFragment;
 
     // Global variables
-//    private Circle circle;  // Radius circle for parking
-    private Circle requestCircle;       // Circle for the incoming request
     private Geocoder geocoder;
     private TaskGetAddress taskGetAddress;
     private TaskGetRequestList taskGetRequestList;
-    private List<Uri> photoList = new ArrayList<>();
     private int seekBarRadiusInMeter = 0;
 
     // Drawer variables
@@ -105,9 +101,6 @@ public class MapsActivity extends AppCompatActivity {
     private AccountHeader headerResult;
 
     private User user;
-
-    // For testing purpose
-    private List<SpotMarker> testList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,8 +111,6 @@ public class MapsActivity extends AppCompatActivity {
         geocoder = new Geocoder(this);
 
         setupRequestList(mapLayout.getRecyclerViewRequest());
-        setupPhotoRecyclerView();
-        setupTestList();
         setUpMapIfNeeded();
 
         // Setup toolbar
@@ -154,16 +145,6 @@ public class MapsActivity extends AppCompatActivity {
                 moveCamera(latLng, false);
                 updateLocationAddress(latLng);
             }
-        }
-
-        if (requestCode == REQUEST_CODE_IMAGE) {
-            final Uri uri = data.getData();
-            photoList.add(uri);
-
-            mapLayout.getRecyclerViewPhotos().swapAdapter(
-                    new PhotosAdapter(MapsActivity.this, photoList),
-                    true
-            );
         }
 
         if (requestCode == REQUEST_CODE_PROFILE && data != null) {
@@ -242,7 +223,7 @@ public class MapsActivity extends AppCompatActivity {
         googleMap.setMyLocationEnabled(true);
         googleMap.getUiSettings().setTiltGesturesEnabled(false);
 
-        mapLayout.setBtnRequestListener(new View.OnClickListener() {
+        mapLayout.setBtnFindParkingListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 updateCurrentAddress();
@@ -251,7 +232,7 @@ public class MapsActivity extends AppCompatActivity {
             }
         });
 
-        mapLayout.setBtnOfferListener(new View.OnClickListener() {
+        mapLayout.setBtnMyRequestListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (taskGetRequestList != null && taskGetRequestList.isRunning) {
@@ -307,43 +288,6 @@ public class MapsActivity extends AppCompatActivity {
             }
         });
 
-        mapLayout.setBackOffer2OnClick(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (requestCircle != null) {
-                    requestCircle.remove();
-                    requestCircle = null;
-                }
-            }
-        });
-
-        mapLayout.setNextOffer2OnClick(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-            }
-        });
-
-        mapLayout.setOnRequestSelectedListener(new MapLayout.OnRequestSelectedListener() {
-            @Override
-            public void onRequestSelected(Request request) {
-                if (request != null) {
-                    if (requestCircle != null) {
-                        requestCircle.remove();
-                        requestCircle = null;
-                    }
-
-                    Address address = request.getAddress();
-                    if (address.hasLatitude() && address.hasLongitude()) {
-                        LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                        addRequestCircle(latLng, request.getRadius());
-
-                        LatLng latLngCam = new LatLng(latLng.latitude, latLng.longitude);
-                        moveCamera(latLngCam, true);
-                    }
-                }
-            }
-        });
-
         mapLayout.setOnLayoutMoved(new MapLayout.OnLayoutMoved() {
             @Override
             public void onLayoutMoved(double ratio) {
@@ -352,37 +296,6 @@ public class MapsActivity extends AppCompatActivity {
                 LinearLayout.MarginLayoutParams params = (LinearLayout.MarginLayoutParams) toolbar.getLayoutParams();
                 params.setMargins(params.leftMargin, topMargin, params.rightMargin, params.bottomMargin);
                 toolbar.setLayoutParams(params);
-            }
-        });
-
-        mapLayout.setSetOfferLocationListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                googleMap.getUiSettings().setScrollGesturesEnabled(false);
-            }
-        });
-
-        mapLayout.setBackOffer3Listener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                googleMap.getUiSettings().setScrollGesturesEnabled(true);
-                photoList.clear();
-                final RecyclerView.Adapter adapter = mapLayout.getRecyclerViewPhotos().getAdapter();
-                if (adapter != null) {
-                    adapter.notifyDataSetChanged();
-                }
-            }
-        });
-
-        mapLayout.setAddPhotosListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("image/*");
-//                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE);
-
-                Intent chooser = Intent.createChooser(intent, "Choose a Picture");
-                startActivityForResult(chooser, REQUEST_CODE_IMAGE);
             }
         });
 
@@ -406,8 +319,6 @@ public class MapsActivity extends AppCompatActivity {
                 Log.d(TAG, latLng.toString());
             }
         });
-
-        setUpClusterer();
     }
 
     private void updateLocationAddress(LatLng latLng) {
@@ -559,8 +470,6 @@ public class MapsActivity extends AppCompatActivity {
 
         if (mapLayout.getRequestStartDate() != null)
             intent.putExtra(AvailableSpotsActivity.EXTRA_START_DATE, mapLayout.getRequestStartDate().getTime());
-        if (mapLayout.getRequestEndDate() != null)
-            intent.putExtra(AvailableSpotsActivity.EXTRA_END_DATE, mapLayout.getRequestEndDate().getTime());
 
         startActivityForResult(intent, REQUEST_CODE_FIND_SPOTS);
     }
@@ -595,38 +504,10 @@ public class MapsActivity extends AppCompatActivity {
             mapFragment.setCircleEnable(false);
     }
 
-    @Deprecated
-    private void addRequestCircle(LatLng latLng, int radius) {
-        if (googleMap != null) {
-            requestCircle = googleMap.addCircle(new CircleOptions()
-                .center(latLng)
-                .radius(radius)
-                .strokeColor(getResources().getColor(R.color.circle_stroke_color))
-                .fillColor(getResources().getColor(R.color.circle_fill_color)));
-            requestCircle.setStrokeWidth(3.0f);
-        }
-    }
-
-    private void removeRequestCircle() {
-        if (googleMap != null && requestCircle != null) {
-            requestCircle.remove();
-            requestCircle = null;
-        }
-    }
-
     private void setupRequestList(RecyclerView recyclerView) {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setOverScrollMode(View.OVER_SCROLL_NEVER);
         recyclerView.addItemDecoration(new DividerItemDecoration(this, null));
-    }
-
-    private void setupPhotoRecyclerView() {
-        if (mapLayout != null) {
-            final RecyclerView recyclerView = mapLayout.getRecyclerViewPhotos();
-            recyclerView.setLayoutManager(new LinearLayoutManager(this,
-                    LinearLayoutManager.HORIZONTAL, false));
-            recyclerView.setOverScrollMode(View.OVER_SCROLL_NEVER);
-        }
     }
 
     private void hideNotificationLayout() {
@@ -644,54 +525,6 @@ public class MapsActivity extends AppCompatActivity {
     private void setupUser() {
         user = (User) ParseUser.getCurrentUser();
 
-    }
-
-    private void setUpClusterer() {
-        // Declare a variable for the cluster manager.
-        ClusterManager<SpotMarker> mClusterManager;
-
-        // Initialize the manager with the context and the map.
-        // (Activity extends context, so we can pass 'this' in the constructor.)
-        mClusterManager = new ClusterManager<>(this, googleMap);
-
-        // Point the map's listeners at the listeners implemented by the cluster
-        // manager.
-//        googleMap.setOnCameraChangeListener(mClusterManager);
-        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                marker.setTitle("15 mins ago");
-                marker.showInfoWindow();
-                return true;
-            }
-        });
-
-        // Add cluster items (markers) to the cluster manager.
-        for (SpotMarker marker : testList) {
-            mClusterManager.addItem(marker);
-        }
-    }
-
-    private void setupTestList() {
-        testList.add(new SpotMarker(38.95853541559733, -77.07178372889757));
-        testList.add(new SpotMarker(38.95899035503473, -77.07150846719742));
-        testList.add(new SpotMarker(38.957454499065214, -77.07124292850494));
-        testList.add(new SpotMarker(38.9609141038949, -77.06989780068398));
-        testList.add(new SpotMarker(38.96098162577503, -77.06947736442089));
-        testList.add(new SpotMarker(38.960973544008965, -77.06974390894175));
-        testList.add(new SpotMarker(38.96109242408757, -77.0695873349905));
-        testList.add(new SpotMarker(38.96222516395402, -77.07205329090357));
-        testList.add(new SpotMarker(38.96110180934844, -77.0732294395566));
-    }
-
-    private List<LatLng> getTestList() {
-        List<LatLng> list = new ArrayList<>();
-        list.add(new LatLng(38.95847675557191,-77.07176126539707));
-
-        list.add(new LatLng(38.96222516395402, -77.07205329090357));
-        list.add(new LatLng(38.96110180934844, -77.0732294395566));
-
-        return list;
     }
 
     private int dpToPx(int dp) {
@@ -756,27 +589,6 @@ public class MapsActivity extends AppCompatActivity {
         @Override
         protected List<Request> doInBackground(Void... params) {
             isRunning = true;
-//            List<LatLng> latLngs = getTestList();
-//            List<Request> list = new ArrayList<>();
-//
-//            try {
-//                for (LatLng latLng : latLngs) {
-//                    List<Address> addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
-//                    Address address = addresses.get(0);
-//
-//                    Request request = new Request(
-//                            1, address, "John", 100, "07/12 11:00am", "07/12 4:00pm"
-//                    );
-//
-//                    list.add(request);
-//                }
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                return null;
-//            }
-//
-//            return list;
-
             return null;
         }
 

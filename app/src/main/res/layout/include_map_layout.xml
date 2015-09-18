@@ -18,24 +18,6 @@
             android:layout_gravity="top"
             tools:context=".MapsActivity" />
 
-        <!--  Set offer location layout -->
-        <FrameLayout
-            android:id="@+id/set_offer_location_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:layout_marginBottom="50dp"
-            android:layout_gravity="center"
-            android:visibility="invisible"
-            android:clickable="true"
-            android:background="@drawable/parking_location_selector">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="SET OFFER LOCATION"/>
-        </FrameLayout>
-
         <!-- Cross layout -->
         <FrameLayout
             android:id="@+id/cross_view"
@@ -62,12 +44,12 @@
     <include layout="@layout/location_layout_include" />
 
     <!--  first layout -->
-    <include layout="@layout/curtain_view_main_layout_include" />
+    <include layout="@layout/curtain_view_first_layout_include" />
 
     <!-- Send Request and Cancel CurtainView -->
     <include layout="@layout/request_layout_include" />
 
     <!-- Add Offer CurtainView-->
-    <include layout="@layout/offer_layout_include" />
+    <include layout="@layout/my_requests_layout_include" />
 
 </RelativeLayout>

@@ -21,7 +21,7 @@ import com.parse.Parse;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
 
-import chau.streetparking.backend.FoursquareManager;
+import chau.streetparking.backend.foursquare.FoursquareManager;
 import chau.streetparking.datamodels.parse.Credit;
 import chau.streetparking.datamodels.parse.ParkingLot;
 import chau.streetparking.datamodels.parse.Request;

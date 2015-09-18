@@ -11,7 +11,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import chau.streetparking.R;
-import chau.streetparking.datamodels.Request;
+import chau.streetparking.datamodels.parse.Request;
 import chau.streetparking.ui.map.MapLayout;
 
 /**
@@ -56,18 +56,14 @@ public class RequestAdapter extends RecyclerView.Adapter {
         if (dataSet != null && position < dataSet.size()) {
             final ViewHolder viewHolder = (ViewHolder) holder;
             final Request request = dataSet.get(position);
-            final Address address = request.getAddress();
 
-            if (address.getMaxAddressLineIndex() > 0) {
-                viewHolder.address.setText(address.getAddressLine(0));
-            }
-
-            viewHolder.start.setText(request.getFrom());
-            viewHolder.end.setText(request.getTo());
+            viewHolder.address.setText(request.getLocation().toString());
+            viewHolder.start.setText(request.getStartTime().toString());
+            viewHolder.end.setText(request.getDuration());
             viewHolder.view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mapLayout.showSelectedRequest(request);
+//                    mapLayout.showSelectedRequest(request);
                 }
             });
         }

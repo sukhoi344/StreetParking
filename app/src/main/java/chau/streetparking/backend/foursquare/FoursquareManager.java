@@ -1,4 +1,4 @@
-package chau.streetparking.backend;
+package chau.streetparking.backend.foursquare;
 
 import android.app.Application;
 import android.content.Context;
@@ -13,6 +13,7 @@ import com.parse.ParseException;
 import java.util.HashMap;
 
 import chau.streetparking.R;
+import chau.streetparking.backend.RequestManager;
 
 /**
  * Created by Chau Thai on 9/9/15.

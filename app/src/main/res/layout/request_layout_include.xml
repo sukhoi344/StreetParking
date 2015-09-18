@@ -89,11 +89,7 @@
                     custom:tickEnd="1500"
                     custom:tickInterval="150"
                     custom:tickStart="150" />
-
             </FrameLayout>
-
-
-
         </LinearLayout>
 
         <!-- Select date and time layout -->
@@ -145,14 +141,13 @@
                     android:textColor="@android:color/black" />
 
                 <TextView
-                    android:id="@+id/to"
+                    android:id="@+id/duration"
                     style="@android:style/Widget.Holo.Light.Spinner"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingLeft="10dp"
                     android:text="Tap to select"
                     android:textColor="#44000000" />
-
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
