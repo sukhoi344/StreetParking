@@ -45,21 +45,21 @@ repositories {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:appcompat-v7:+'
-    compile 'com.android.support:recyclerview-v7:+'
-    compile 'com.google.android.gms:play-services-maps:+'
-    compile 'com.google.android.gms:play-services-location:+'
-    compile 'com.google.android.gms:play-services-wallet:+'
+    compile 'com.android.support:appcompat-v7:23.0.1'
+    compile 'com.android.support:recyclerview-v7:23.0.1'
+    compile 'com.google.android.gms:play-services-maps:7.8.0'
+    compile 'com.google.android.gms:play-services-location:7.8.0'
+    compile 'com.google.android.gms:play-services-wallet:7.8.0'
     compile('com.mikepenz:materialdrawer:4.0.1@aar') {
         transitive = true
     }
-    compile 'com.mcxiaoke.volley:library:+'
-    compile 'com.google.maps.android:android-maps-utils:+'
-    compile 'com.appyvet:materialrangebar:+'
-    compile 'com.wdullaer:materialdatetimepicker:+'
-    compile 'com.readystatesoftware.systembartint:systembartint:+'
+    compile 'com.mcxiaoke.volley:library:1.0.19'
+    compile 'com.google.maps.android:android-maps-utils:0.4'
+    compile 'com.appyvet:materialrangebar:1.0'
+    compile 'com.wdullaer:materialdatetimepicker:1.5.2'
+    compile 'com.readystatesoftware.systembartint:systembartint:1.0.4'
     compile 'com.github.dbachelder:CreditCardEntry:1.4.1'
-    compile 'com.makeramen:roundedimageview:+'
+    compile 'com.makeramen:roundedimageview:2.1.1'
     compile 'com.soundcloud.android:android-crop:1.0.0@aar'
     compile project(':countrypicker')
     compile files('libs/universal-image-loader-1.9.4.jar')

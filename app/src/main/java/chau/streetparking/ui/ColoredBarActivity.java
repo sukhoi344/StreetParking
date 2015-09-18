@@ -8,7 +8,6 @@ import android.view.View;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 
 import chau.streetparking.R;
-import chau.streetparking.util.Logger;
 
 /**
  * Activity with colored status bar and action bar.
