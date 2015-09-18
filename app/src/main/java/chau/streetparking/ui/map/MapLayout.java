@@ -44,7 +44,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
                                                     DatePickerDialog.OnDateSetListener,
                                                     DurationPickerDialog.OnDurationSetListener {
     public static final int LAYOUT_FIRST_MAIN = 1;
-    public static final int LAYOUT_SEND_CANCEL = 2;
+    public static final int LAYOUT_FIND_PARKING_SPOTS = 2;
 
     private static final String TAG_FROM = "from";
     private static final int SEEK_BAR_DEFAULT_VALUE = 300;
@@ -62,11 +62,11 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     private ViewGroup   firstLayout;
 
     // First layout (only has 2 buttons: "Find Parking Spot" and "My Requests"
-    private Button      btnFindParkingSpots, btnMyRequests;
+    private Button          btnFindParkingSpots,    btnMyRequests;
     private OnClickListener btnFindParkingListener, btnMyRequestListener;
 
-    // Request parking spot layout
-    private CurtainView curtainViewRequest;
+    // Find parking spot layout
+    private CurtainView curtainViewFindParking;
     private RangeBar    seekBar;
     private TextView    tvFrom, tvDuration;
     private Button      btnFind;
@@ -192,18 +192,18 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         reset();
 
         firstLayout.setVisibility(View.INVISIBLE);
-        curtainViewRequest.setVisibility(View.VISIBLE);
+        curtainViewFindParking.setVisibility(View.VISIBLE);
         crossLayout.setVisibility(View.VISIBLE);
 
         showLocationLayout();
 
-        if (curtainViewRequest.getCurtainStatus() == ICurtainViewBase.CurtainStatus.CLOSED) {
-            curtainViewRequest.toggleStatus();
+        if (curtainViewFindParking.getCurtainStatus() == ICurtainViewBase.CurtainStatus.CLOSED) {
+            curtainViewFindParking.toggleStatus();
         }
     }
 
     /**
-     * Change UI when the user selects "OFFER" button
+     * Change UI when the user selects "My Requests" button
      */
     private void showMyRequests() {
         reset();
@@ -218,25 +218,25 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     }
 
     /**
-     * Change UI when the user selects "CANCEL" button while in Request mode
+     * Change UI when the user selects "Cancel" in the FindParkingSpot layout
      */
-    public void cancelRequest() {
-        if (curtainViewRequest.getCurtainStatus() == ICurtainViewBase.CurtainStatus.OPENED) {
-            curtainViewRequest.toggleStatus();
-            curtainViewRequest.setAutoScrollingListener(new ICurtainViewBase.AutoScrollingListener() {
+    public void cancelFindParkingSpot() {
+        if (curtainViewFindParking.getCurtainStatus() == ICurtainViewBase.CurtainStatus.OPENED) {
+            curtainViewFindParking.toggleStatus();
+            curtainViewFindParking.setAutoScrollingListener(new ICurtainViewBase.AutoScrollingListener() {
                 @Override
                 public void onScrolling(int currValue, int currVelocity, int startValue, int finalValue) {
                 }
 
                 @Override
                 public void onScrollFinished() {
-                    curtainViewRequest.setVisibility(View.INVISIBLE);
+                    curtainViewFindParking.setVisibility(View.INVISIBLE);
                     firstLayout.setVisibility(View.VISIBLE);
-                    curtainViewRequest.setAutoScrollingListener(null);
+                    curtainViewFindParking.setAutoScrollingListener(null);
                 }
             });
         } else {
-            curtainViewRequest.setVisibility(View.INVISIBLE);
+            curtainViewFindParking.setVisibility(View.INVISIBLE);
             firstLayout.setVisibility(View.VISIBLE);
         }
 
@@ -246,9 +246,9 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     }
 
     /**
-     * Change UI when the user selects "CANCEL" button while in Offer mode
+     * Change UI when the user selects "Cancel" button while in MyRequests layout
      */
-    public void cancelOffer() {
+    public void cancelMyRequests() {
         if (curtainViewMyRequests.getCurtainStatus() == ICurtainViewBase.CurtainStatus.OPENED) {
             curtainViewMyRequests.toggleStatus();
             curtainViewMyRequests.setAutoScrollingListener(new ICurtainViewBase.AutoScrollingListener() {
@@ -271,11 +271,11 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     }
 
     /**
-     * Close the curtain request layout, which contains the settings for parking request
+     * Close the curtain find parking layout
      */
-    public void closeCurtainRequest() {
-        if (curtainViewRequest.getCurtainStatus() != ICurtainViewBase.CurtainStatus.CLOSED) {
-            curtainViewRequest.toggleStatus();
+    public void closeCurtainFindParking() {
+        if (curtainViewFindParking.getCurtainStatus() != ICurtainViewBase.CurtainStatus.CLOSED) {
+            curtainViewFindParking.toggleStatus();
         }
     }
 
@@ -288,7 +288,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     }
 
     public int getCurrentLayout() {
-        return firstLayout.getVisibility() == View.VISIBLE? LAYOUT_FIRST_MAIN : LAYOUT_SEND_CANCEL;
+        return firstLayout.getVisibility() == View.VISIBLE? LAYOUT_FIRST_MAIN : LAYOUT_FIND_PARKING_SPOTS;
     }
 
     public void setLocationLayoutOnClick(OnClickListener onClickListener) {
@@ -410,7 +410,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         btnCancelMyRequest.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                cancelOffer();
+                cancelMyRequests();
                 if (onClickCancelMyRequest != null)
                     onClickCancelMyRequest.onClick(v);
             }
@@ -420,8 +420,6 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     }
 
     private OnLayoutChangeListener getCurtainViewOfferListener() {
-        final Wrapper wrapper = new Wrapper();
-        wrapper.l = SystemClock.elapsedRealtime();
         final int curtainViewHeight = getResources().getDimensionPixelOffset(R.dimen.curtain_view_offer_height);
         final int curtainViewFixedHeight = getResources()
                 .getDimensionPixelOffset(R.dimen.curtain_view_fixed);
@@ -449,11 +447,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         };
     }
 
-    private class Wrapper {
-        long l;
-    }
-
-    private void openCurtainViewOffer() {
+    private void openCurtainMyRequests() {
         if (curtainViewMyRequests.getCurtainStatus() != ICurtainViewBase.CurtainStatus.OPENED) {
             curtainViewMyRequests.toggleStatus();
         }
@@ -502,12 +496,12 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         locationLayout = (ViewGroup) findViewById(R.id.location_layout);
         firstLayout = (ViewGroup) findViewById(R.id.first_layout);
 
-        curtainViewRequest = (CurtainView) findViewById(R.id.curtain_view);
+        curtainViewFindParking = (CurtainView) findViewById(R.id.curtain_view);
         seekBar = (RangeBar) findViewById(R.id.seek_bar);
         tvRadius = (TextView) findViewById(R.id.tv_radius);
         tvFrom = (TextView) findViewById(R.id.from);
         tvDuration = (TextView) findViewById(R.id.duration);
-        btnFind = (Button) findViewById(R.id.btn_send_request);
+        btnFind = (Button) findViewById(R.id.btn_find);
         tvLocation = (TextView) findViewById(R.id.tv_location);
 
         btnFindParkingSpots = (Button) findViewById(R.id.btn_find_parking_spots);

@@ -2,7 +2,6 @@ package chau.streetparking.ui;
 
 import android.content.Intent;
 import android.os.*;
-import android.os.Process;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -178,6 +177,6 @@ public class AvailableSpotsActivity extends ColoredBarActivity {
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         textViewNoResult = (TextView) findViewById(R.id.text_view_no_result);
-        btnSendRequest = (Button) findViewById(R.id.btn_send_request);
+        btnSendRequest = (Button) findViewById(R.id.btn_find);
     }
 }

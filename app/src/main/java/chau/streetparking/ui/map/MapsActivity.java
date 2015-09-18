@@ -165,12 +165,12 @@ public class MapsActivity extends AppCompatActivity {
         }
     }
 
-    public void onSendRequestClicked(View v) {
+    public void onFindClicked(View v) {
     }
 
-    public void onCancelRequestClicked(View v) {
+    public void onCancelFindSpotsClicked(View v) {
         mapLayout.setMyLocationBtnMargin(dpToPx(10));
-        mapLayout.cancelRequest();
+        mapLayout.cancelFindParkingSpot();
         disableCircle();
         showNotificationLayout();
     }
@@ -299,7 +299,7 @@ public class MapsActivity extends AppCompatActivity {
                 int radiusInMeters = MapUtil.convertMetersToPixels(googleMap, latLng, seekBarRadiusInMeter);
                 mapFragment.setRadius(radiusInMeters);
 
-                if (mapLayout.getCurrentLayout() == MapLayout.LAYOUT_SEND_CANCEL) {
+                if (mapLayout.getCurrentLayout() == MapLayout.LAYOUT_FIND_PARKING_SPOTS) {
                     updateLocationAddress(latLng);
                 }
             }
