@@ -57,6 +57,7 @@ import chau.streetparking.util.MapUtil;
 
 public class MapsActivity extends AppCompatActivity {
     private static final String TAG = "MapsActivity";
+
     private static final int REQUEST_CODE_SEARCH = 1;
     private static final int REQUEST_CODE_PROFILE = 3;
     private static final int REQUEST_CODE_FIND_SPOTS = 4;
@@ -204,8 +205,7 @@ public class MapsActivity extends AppCompatActivity {
     }
 
     /**
-     * This is where we can add markers or lines, add listeners or move the camera. In this case, we
-     * just add a marker near Africa.
+     * This is where we can add markers or lines, add listeners or move the camera.
      * <p/>
      * This should only be called once and when we are sure that {@link #googleMap} is not null.
      */
@@ -215,6 +215,24 @@ public class MapsActivity extends AppCompatActivity {
         googleMap.setMyLocationEnabled(true);
         googleMap.getUiSettings().setTiltGesturesEnabled(false);
 
+        googleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+            @Override
+            public void onCameraChange(CameraPosition cameraPosition) {
+                LatLng latLng = cameraPosition.target;
+
+                int radiusInMeters = MapUtil.convertMetersToPixels(googleMap, latLng, seekBarRadiusInMeter);
+                mapFragment.setRadius(radiusInMeters);
+
+                if (mapLayout.getCurrentLayout() == MapLayout.LAYOUT_FIND_PARKING_SPOTS) {
+                    updateLocationAddress(latLng);
+                }
+            }
+        });
+
+        setupMapLayout();
+    }
+
+    private void setupMapLayout() {
         mapLayout.setBtnFindParkingListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -288,27 +306,6 @@ public class MapsActivity extends AppCompatActivity {
                 LinearLayout.MarginLayoutParams params = (LinearLayout.MarginLayoutParams) toolbar.getLayoutParams();
                 params.setMargins(params.leftMargin, topMargin, params.rightMargin, params.bottomMargin);
                 toolbar.setLayoutParams(params);
-            }
-        });
-
-        googleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
-            @Override
-            public void onCameraChange(CameraPosition cameraPosition) {
-                LatLng latLng = cameraPosition.target;
-
-                int radiusInMeters = MapUtil.convertMetersToPixels(googleMap, latLng, seekBarRadiusInMeter);
-                mapFragment.setRadius(radiusInMeters);
-
-                if (mapLayout.getCurrentLayout() == MapLayout.LAYOUT_FIND_PARKING_SPOTS) {
-                    updateLocationAddress(latLng);
-                }
-            }
-        });
-
-        googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng latLng) {
-                Log.d(TAG, latLng.toString());
             }
         });
     }
@@ -389,7 +386,7 @@ public class MapsActivity extends AppCompatActivity {
                                 .withIcon(R.drawable.ic_action_info)
                                 .withIdentifier(ID_PARKING_REQUESTS)
                                 .withSelectable(false),
-                        new PrimaryDrawerItem().withName("Balance")
+                        new PrimaryDrawerItem().withName("Income")
                                 .withIcon(R.drawable.ic_action_account_balance)
                                 .withIdentifier(ID_BALANCE)
                                 .withSelectable(false)

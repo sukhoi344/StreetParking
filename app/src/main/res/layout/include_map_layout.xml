@@ -46,10 +46,10 @@
     <!--  first layout -->
     <include layout="@layout/curtain_view_first_layout_include" />
 
-    <!-- Send Request and Cancel CurtainView -->
+    <!-- Find Parking Spot CurtainView -->
     <include layout="@layout/request_layout_include" />
 
-    <!-- Add Offer CurtainView-->
+    <!-- MyRequest CurtainView-->
     <include layout="@layout/my_requests_layout_include" />
 
 </RelativeLayout>
