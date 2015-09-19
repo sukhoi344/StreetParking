@@ -1,11 +1,15 @@
 package chau.streetparking.ui.map;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -25,8 +29,14 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.ui.IconGenerator;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.AccountHeader;
@@ -41,19 +51,21 @@ import com.parse.ParseUser;
 import java.util.List;
 
 import chau.streetparking.R;
+import chau.streetparking.TestManager;
+import chau.streetparking.backend.foursquare.VenueFinder;
+import chau.streetparking.datamodels.foursquare.Venue;
 import chau.streetparking.datamodels.parse.Request;
 import chau.streetparking.datamodels.parse.User;
-import chau.streetparking.ui.AvailableSpotsActivity;
 import chau.streetparking.ui.DividerItemDecoration;
 import chau.streetparking.ui.garage.MyGarageActivity;
 import chau.streetparking.ui.ProfileActivity;
-import chau.streetparking.ui.RequestAdapter;
 import chau.streetparking.ui.SearchLocationActivity;
 import chau.streetparking.ui.login.StartActivity;
 import chau.streetparking.ui.payment.PaymentActivity;
 import chau.streetparking.util.ImageUtil;
 import chau.streetparking.util.Logger;
 import chau.streetparking.util.MapUtil;
+import chau.streetparking.util.Wrapper;
 
 public class MapsActivity extends AppCompatActivity {
     private static final String TAG = "MapsActivity";
@@ -84,6 +96,7 @@ public class MapsActivity extends AppCompatActivity {
     private MyMapFragment   mapFragment;
 
     // Global variables
+    private VenueMapLoader venueMapLoader;
     private Geocoder geocoder;
     private TaskGetAddress taskGetAddress;
     private TaskGetRequestList taskGetRequestList;
@@ -215,17 +228,59 @@ public class MapsActivity extends AppCompatActivity {
         googleMap.setMyLocationEnabled(true);
         googleMap.getUiSettings().setTiltGesturesEnabled(false);
 
+        // Initial the venue map loader
+        venueMapLoader = new VenueMapLoader(this, googleMap);
+
         googleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition cameraPosition) {
                 LatLng latLng = cameraPosition.target;
 
+                // Correct the circle radius to match the map size
                 int radiusInMeters = MapUtil.convertMetersToPixels(googleMap, latLng, seekBarRadiusInMeter);
                 mapFragment.setRadius(radiusInMeters);
 
+                // Update the location address bar
                 if (mapLayout.getCurrentLayout() == MapLayout.LAYOUT_FIND_PARKING_SPOTS) {
                     updateLocationAddress(latLng);
                 }
+
+                // Display venues on the visible map region
+                LatLngBounds latLngBounds = googleMap.getProjection().getVisibleRegion().latLngBounds;
+                venueMapLoader.load(latLngBounds);
+
+            }
+        });
+
+        googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                final long start = SystemClock.currentThreadTimeMillis();
+                Logger.d(TAG, "searching...");
+
+                LatLngBounds latLngBounds = googleMap.getProjection().getVisibleRegion().latLngBounds;
+
+                VenueFinder venueFinder = new VenueFinder(MapsActivity.this);
+                venueFinder.find(latLngBounds, new VenueFinder.OnSearchDoneListener() {
+                    @Override
+                    public void onSearchDone(int code, String requestId, List<Venue> venues) {
+                        if (venues == null)
+                            Logger.d(TAG, "null venues");
+                        else {
+                            for (Venue venue : venues) {
+                                Logger.d(TAG, venue.toString());
+                            }
+                        }
+
+                        long total = SystemClock.currentThreadTimeMillis() - start;
+                        Logger.d(TAG, "total: " + total + "ms");
+                    }
+
+                    @Override
+                    public void onSearchError(int code, String errorType, String errorDetail) {
+                        Logger.d(TAG, errorDetail);
+                    }
+                });
             }
         });
 
@@ -276,12 +331,12 @@ public class MapsActivity extends AppCompatActivity {
             }
         });
 
-        mapLayout.setBtnFindListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                findParkingSpots();
-            }
-        });
+//        mapLayout.setBtnFindListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                findParkingSpots();
+//            }
+//        });
 
         mapLayout.setLocationLayoutOnClick(new View.OnClickListener() {
             @Override
@@ -452,16 +507,16 @@ public class MapsActivity extends AppCompatActivity {
         moveCamera(latLng, false);
     }
 
-    private void findParkingSpots() {
-        Intent intent = new Intent(this, AvailableSpotsActivity.class);
-        intent.putExtra(AvailableSpotsActivity.EXTRA_RADIUS, seekBarRadiusInMeter);
-        intent.putExtra(AvailableSpotsActivity.EXTRA_LATLNG, googleMap.getCameraPosition().target);
-
-        if (mapLayout.getRequestStartDate() != null)
-            intent.putExtra(AvailableSpotsActivity.EXTRA_START_DATE, mapLayout.getRequestStartDate().getTime());
-
-        startActivityForResult(intent, REQUEST_CODE_FIND_SPOTS);
-    }
+//    private void findParkingSpots() {
+//        Intent intent = new Intent(this, AvailableSpotsActivity.class);
+//        intent.putExtra(AvailableSpotsActivity.EXTRA_RADIUS, seekBarRadiusInMeter);
+//        intent.putExtra(AvailableSpotsActivity.EXTRA_LATLNG, googleMap.getCameraPosition().target);
+//
+//        if (mapLayout.getRequestStartDate() != null)
+//            intent.putExtra(AvailableSpotsActivity.EXTRA_START_DATE, mapLayout.getRequestStartDate().getTime());
+//
+//        startActivityForResult(intent, REQUEST_CODE_FIND_SPOTS);
+//    }
 
     private void moveCamera(LatLng latLng, boolean animate) {
         if (latLng != null && googleMap != null) {

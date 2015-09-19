@@ -47,7 +47,7 @@
     <include layout="@layout/curtain_view_first_layout_include" />
 
     <!-- Find Parking Spot CurtainView -->
-    <include layout="@layout/request_layout_include" />
+    <include layout="@layout/find_parking_spot_layout_include" />
 
     <!-- MyRequest CurtainView-->
     <include layout="@layout/my_requests_layout_include" />

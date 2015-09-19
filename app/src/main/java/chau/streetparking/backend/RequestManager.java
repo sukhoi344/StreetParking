@@ -40,6 +40,8 @@ public class RequestManager {
             public static final String PARAM_INTENT = "intent";
             public static final String PARAM_LIMIT = "limit";
             public static final String PARAM_RADIUS = "radius";
+            public static final String PARAM_SW = "sw";
+            public static final String PARAM_NE = "ne";
 
             public static final String INTENT_CHECKIN = "checkin";
             public static final String INTENT_BROWSE = "browse";

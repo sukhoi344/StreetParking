@@ -1,4 +1,4 @@
-package chau.streetparking.ui;
+package chau.streetparking.ui.map;
 
 import android.app.Activity;
 import android.location.Address;

@@ -21,35 +21,34 @@
         android:background="#ffffff"
         android:orientation="vertical">
 
-        <!-- Sent Request & Cancel Layout-->
+        <!-- Sent Find & Cancel Buttons-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/btn_find"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="4dp"
-                android:layout_marginRight="2dp"
-                android:layout_marginTop="4dp"
-                android:layout_weight="1"
-                android:enabled="false"
-                android:onClick="onFindClicked"
-                android:textAllCaps="false"
-                android:text="Find" />
+            <!--<Button-->
+                <!--android:id="@+id/btn_find"-->
+                <!--android:layout_width="0dp"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_marginLeft="4dp"-->
+                <!--android:layout_marginRight="2dp"-->
+                <!--android:layout_marginTop="4dp"-->
+                <!--android:layout_weight="1"-->
+                <!--android:enabled="false"-->
+                <!--android:onClick="onFindClicked"-->
+                <!--android:textAllCaps="false"-->
+                <!--android:text="Find" />-->
 
             <Button
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="2dp"
                 android:layout_marginRight="4dp"
                 android:layout_marginTop="4dp"
-                android:layout_weight="1"
                 android:onClick="onCancelFindSpotsClicked"
                 android:textAllCaps="false"
-                android:text="Cancel" />
+                android:text="Back" />
         </LinearLayout>
 
         <!--  SeekBar layout -->

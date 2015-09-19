@@ -7,6 +7,12 @@ import org.json.JSONObject;
  * Created by Chau Thai on 9/9/15.
  */
 public class Category {
+    private static final String ICON_32 = "32";
+    private static final String ICON_44 = "44";
+    private static final String ICON_64 = "64";
+    private static final String ICON_88 = "88";
+    private static final String ICON_GREY_BACKGROUND = "bg_";
+
     private String id;
     private String name;
     private String pluralName;
@@ -86,6 +92,31 @@ public class Category {
 
     public void setPrimary(boolean primary) {
         this.primary = primary;
+    }
+
+    public String getIconUrl32(boolean grayBackground) {
+        return getIconUrl(ICON_32, grayBackground);
+    }
+
+    public String getIconUrl44(boolean grayBackground) {
+        return getIconUrl(ICON_44, grayBackground);
+    }
+
+    public String getIconUrl64(boolean grayBackground) {
+        return getIconUrl(ICON_64, grayBackground);
+    }
+
+    public String getIconUrl88(boolean grayBackground) {
+        return getIconUrl(ICON_88, grayBackground);
+    }
+
+    private String getIconUrl(String size, boolean grayBackground) {
+        if (iconPrefix == null || iconPrefix.isEmpty())
+            return null;
+        if (iconSuffix == null || iconSuffix.isEmpty())
+            return null;
+
+        return iconPrefix + ((grayBackground)? ICON_GREY_BACKGROUND : "") + size + iconSuffix;
     }
 
     @Override

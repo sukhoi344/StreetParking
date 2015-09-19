@@ -62,14 +62,16 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     private ViewGroup   firstLayout;
 
     // First layout (only has 2 buttons: "Find Parking Spot" and "My Requests"
-    private Button          btnFindParkingSpots,    btnMyRequests;
-    private OnClickListener btnFindParkingListener, btnMyRequestListener;
+    private Button          btnFindParkingSpots;
+    private Button          btnMyRequests;
+    private OnClickListener btnFindParkingListener;
+    private OnClickListener btnMyRequestListener;
 
     // Find parking spot layout
     private CurtainView curtainViewFindParking;
     private RangeBar    seekBar;
     private TextView    tvFrom, tvDuration;
-    private Button      btnFind;
+//    private Button      btnFind;
     private TextView    tvLocation;
     private TextView    tvRadius;
 
@@ -156,20 +158,20 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
             requestStartDate = date;
         }
 
-        if (!tvDuration.getText().toString().equals("Tap to select")
-                && !tvFrom.getText().toString().equals("Tap to select")) {
-            btnFind.setEnabled(true);
-        }
+//        if (!tvDuration.getText().toString().equals("Tap to select")
+//                && !tvFrom.getText().toString().equals("Tap to select")) {
+//            btnFind.setEnabled(true);
+//        }
     }
 
     @Override
     public void onDurationSet(int duration, int durationType, String text) {
         tvDuration.setText(text);
 
-        if (!tvDuration.getText().toString().equals("Tap to select")
-                && !tvFrom.getText().toString().equals("Tap to select")) {
-            btnFind.setEnabled(true);
-        }
+//        if (!tvDuration.getText().toString().equals("Tap to select")
+//                && !tvFrom.getText().toString().equals("Tap to select")) {
+//            btnFind.setEnabled(true);
+//        }
     }
 
     /**
@@ -305,10 +307,10 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         btnMyRequestListener = onClickListener;
     }
 
-    public void setBtnFindListener(OnClickListener onClickListener) {
-        if (btnFind != null)
-            btnFind.setOnClickListener(onClickListener);
-    }
+//    public void setBtnFindListener(OnClickListener onClickListener) {
+//        if (btnFind != null)
+//            btnFind.setOnClickListener(onClickListener);
+//    }
 
     public void setCancelOffer1OnClick(OnClickListener onClick) {
         onClickCancelMyRequest = onClick;
@@ -458,7 +460,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         seekBar.setSeekPinByValue(SEEK_BAR_DEFAULT_VALUE);
         tvFrom.setText("Tap to select");
         tvDuration.setText("Tap to select");
-        btnFind.setEnabled(false);
+//        btnFind.setEnabled(false);
         tvLocation.setText("");
     }
 
@@ -501,7 +503,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         tvRadius = (TextView) findViewById(R.id.tv_radius);
         tvFrom = (TextView) findViewById(R.id.from);
         tvDuration = (TextView) findViewById(R.id.duration);
-        btnFind = (Button) findViewById(R.id.btn_find);
+//        btnFind = (Button) findViewById(R.id.btn_find);
         tvLocation = (TextView) findViewById(R.id.tv_location);
 
         btnFindParkingSpots = (Button) findViewById(R.id.btn_find_parking_spots);

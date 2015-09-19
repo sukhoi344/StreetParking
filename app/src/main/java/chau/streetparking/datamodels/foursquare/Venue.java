@@ -6,6 +6,8 @@ import org.json.JSONObject;
 
 import java.util.Arrays;
 
+import chau.streetparking.util.Logger;
+
 /**
  * Created by Chau Thai on 9/9/15.
  */
@@ -118,5 +120,27 @@ public class Venue {
 
     public static Venue fromJSON(String jsonString) throws JSONException {
         return fromJSON(new JSONObject(jsonString));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        try {
+            if (o instanceof Venue) {
+                Venue venue2 = (Venue) o;
+
+                if (id == null || venue2.id == null)
+                    return false;
+                return id.equals(venue2.id);
+            }
+        } catch (Exception ignore) {}
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        if (id == null)
+            return super.hashCode();
+        return id.hashCode();
     }
 }
