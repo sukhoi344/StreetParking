@@ -52,6 +52,8 @@ import java.util.List;
 
 import chau.streetparking.R;
 import chau.streetparking.TestManager;
+import chau.streetparking.backend.ParkingSpotFinder;
+import chau.streetparking.backend.ParkingSpotMapLoader;
 import chau.streetparking.backend.foursquare.VenueFinder;
 import chau.streetparking.datamodels.foursquare.Venue;
 import chau.streetparking.datamodels.parse.Request;
@@ -96,7 +98,9 @@ public class MapsActivity extends AppCompatActivity {
     private MyMapFragment   mapFragment;
 
     // Global variables
-    private VenueMapLoader venueMapLoader;
+    private VenueMapLoader       venueMapLoader;
+    private ParkingSpotMapLoader parkingSpotMapLoader;
+
     private Geocoder geocoder;
     private TaskGetAddress taskGetAddress;
     private TaskGetRequestList taskGetRequestList;
@@ -228,8 +232,9 @@ public class MapsActivity extends AppCompatActivity {
         googleMap.setMyLocationEnabled(true);
         googleMap.getUiSettings().setTiltGesturesEnabled(false);
 
-        // Initial the venue map loader
+        // Initial the loaders
         venueMapLoader = new VenueMapLoader(this, googleMap);
+        parkingSpotMapLoader = new ParkingSpotMapLoader(this, googleMap);
 
         googleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             @Override
@@ -245,42 +250,19 @@ public class MapsActivity extends AppCompatActivity {
                     updateLocationAddress(latLng);
                 }
 
-                // Display venues on the visible map region
+                // Display venues and parking spots on the visible map region
                 LatLngBounds latLngBounds = googleMap.getProjection().getVisibleRegion().latLngBounds;
                 venueMapLoader.load(latLngBounds);
-
+                parkingSpotMapLoader.load(latLngBounds);
             }
         });
 
-        googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+        // Zoom the marker when selected
+        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
-            public void onMapClick(LatLng latLng) {
-                final long start = SystemClock.currentThreadTimeMillis();
-                Logger.d(TAG, "searching...");
-
-                LatLngBounds latLngBounds = googleMap.getProjection().getVisibleRegion().latLngBounds;
-
-                VenueFinder venueFinder = new VenueFinder(MapsActivity.this);
-                venueFinder.find(latLngBounds, new VenueFinder.OnSearchDoneListener() {
-                    @Override
-                    public void onSearchDone(int code, String requestId, List<Venue> venues) {
-                        if (venues == null)
-                            Logger.d(TAG, "null venues");
-                        else {
-                            for (Venue venue : venues) {
-                                Logger.d(TAG, venue.toString());
-                            }
-                        }
-
-                        long total = SystemClock.currentThreadTimeMillis() - start;
-                        Logger.d(TAG, "total: " + total + "ms");
-                    }
-
-                    @Override
-                    public void onSearchError(int code, String errorType, String errorDetail) {
-                        Logger.d(TAG, errorDetail);
-                    }
-                });
+            public boolean onMarkerClick(Marker marker) {
+                moveCamera(marker);
+                return true;
             }
         });
 
@@ -531,6 +513,13 @@ public class MapsActivity extends AppCompatActivity {
                 googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
             else
                 googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        }
+    }
+
+    private void moveCamera(Marker marker) {
+        if (marker != null) {
+            moveCamera(marker.getPosition(), true);
+            marker.showInfoWindow();
         }
     }
 

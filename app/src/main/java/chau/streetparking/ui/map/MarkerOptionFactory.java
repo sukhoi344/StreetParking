@@ -2,22 +2,19 @@ package chau.streetparking.ui.map;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.ui.IconGenerator;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.parse.ParseGeoPoint;
 
 import chau.streetparking.R;
-import chau.streetparking.TestManager;
 import chau.streetparking.datamodels.foursquare.Location;
 import chau.streetparking.datamodels.foursquare.Venue;
+import chau.streetparking.datamodels.parse.ParkingLot;
 import chau.streetparking.util.Logger;
 
 /**
@@ -25,7 +22,7 @@ import chau.streetparking.util.Logger;
  */
 public class MarkerOptionFactory {
 
-    public static MarkerOptions createMarkerOption(Context context, Venue venue, Bitmap venueIcon) {
+    public static MarkerOptions create(Context context, Venue venue, Bitmap venueIcon) {
         try {
             if (venue != null && venueIcon != null) {
                 Location location = venue.getLocation();
@@ -52,5 +49,32 @@ public class MarkerOptionFactory {
 
         return null;
     }
+
+    public static MarkerOptions create(Context context, ParkingLot parkingLot) {
+        try {
+            if (parkingLot != null) {
+                ParseGeoPoint location = parkingLot.getLocation();
+                LatLng position = new LatLng(location.getLatitude(), location.getLongitude());
+
+                String price = "$" + parkingLot.getPrice();
+
+                IconGenerator iconGenerator = new IconGenerator(context);
+                iconGenerator.setStyle(IconGenerator.STYLE_GREEN);
+                final Bitmap bitmap = iconGenerator.makeIcon(price);
+
+                MarkerOptions options = new MarkerOptions()
+                        .position(position)
+                        .icon(BitmapDescriptorFactory.fromBitmap(bitmap))
+                        .title(parkingLot.getName());
+
+                return options;
+            }
+        } catch (Exception e) {
+            Logger.printStackTrace(e);
+        }
+
+        return null;
+    }
+
 
 }
