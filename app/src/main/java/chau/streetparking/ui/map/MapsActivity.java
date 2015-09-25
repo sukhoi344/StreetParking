@@ -518,8 +518,8 @@ public class MapsActivity extends AppCompatActivity {
 
     private void moveCamera(Marker marker) {
         if (marker != null) {
-            moveCamera(marker.getPosition(), true);
             marker.showInfoWindow();
+            moveCamera(marker.getPosition(), true);
         }
     }
 
