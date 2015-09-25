@@ -1,15 +1,11 @@
 package chau.streetparking.ui.map;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -29,14 +25,10 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.maps.android.ui.IconGenerator;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.AccountHeader;
@@ -51,11 +43,6 @@ import com.parse.ParseUser;
 import java.util.List;
 
 import chau.streetparking.R;
-import chau.streetparking.TestManager;
-import chau.streetparking.backend.ParkingSpotFinder;
-import chau.streetparking.backend.ParkingSpotMapLoader;
-import chau.streetparking.backend.foursquare.VenueFinder;
-import chau.streetparking.datamodels.foursquare.Venue;
 import chau.streetparking.datamodels.parse.Request;
 import chau.streetparking.datamodels.parse.User;
 import chau.streetparking.ui.DividerItemDecoration;
@@ -67,7 +54,6 @@ import chau.streetparking.ui.payment.PaymentActivity;
 import chau.streetparking.util.ImageUtil;
 import chau.streetparking.util.Logger;
 import chau.streetparking.util.MapUtil;
-import chau.streetparking.util.Wrapper;
 
 public class MapsActivity extends AppCompatActivity {
     private static final String TAG = "MapsActivity";

@@ -1,4 +1,4 @@
-package chau.streetparking.backend;
+package chau.streetparking.ui.map;
 
 import android.content.Context;
 
@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 
 import chau.streetparking.R;
+import chau.streetparking.backend.ParkingSpotFinder;
 import chau.streetparking.datamodels.parse.ParkingLot;
 import chau.streetparking.ui.map.MarkerOptionFactory;
 import chau.streetparking.util.Logger;
