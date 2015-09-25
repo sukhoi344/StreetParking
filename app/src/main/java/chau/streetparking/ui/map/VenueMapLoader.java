@@ -23,6 +23,7 @@ import java.util.Set;
 
 import chau.streetparking.R;
 import chau.streetparking.backend.foursquare.VenueFinder;
+import chau.streetparking.datamodels.foursquare.Category;
 import chau.streetparking.datamodels.foursquare.Venue;
 import chau.streetparking.util.Logger;
 import chau.streetparking.util.MapUtil;
@@ -95,40 +96,45 @@ public class VenueMapLoader {
     }
 
     private void loadVenue(final Venue venue, final LatLngBounds latLngBounds) {
-        if (venue != null) {
-            String url = venue.getCategories()[0].getIconUrl88(true);
+        if (venue == null)
+            return;
 
-            DisplayImageOptions imageOptions = new DisplayImageOptions.Builder()
-                    .cacheInMemory(true)
-                    .build();
+        Category[] categories = venue.getCategories();
+        if (categories == null || categories.length == 0)
+            return;
 
-            ImageLoader.getInstance().loadImage(url, imageOptions,
-                    new ImageLoadingListener() {
-                        @Override
-                        public void onLoadingStarted(String s, View view) {}
+        String url = venue.getCategories()[0].getIconUrl88(true);
 
-                        @Override
-                        public void onLoadingFailed(String s, View view, FailReason failReason) {}
+        DisplayImageOptions imageOptions = new DisplayImageOptions.Builder()
+                .cacheInMemory(true)
+                .build();
 
-                        @Override
-                        public void onLoadingComplete(String s, View view, Bitmap bitmap) {
-                            MarkerOptions markerOptions = MarkerOptionFactory.create(
-                                    context, venue, bitmap
-                            );
+        ImageLoader.getInstance().loadImage(url, imageOptions,
+                new ImageLoadingListener() {
+                    @Override
+                    public void onLoadingStarted(String s, View view) {}
 
-                            Marker marker = map.addMarker(markerOptions);
-                            markerSet.add(marker);
-                            marketToIcon.put(marker, markerOptions.getIcon());
+                    @Override
+                    public void onLoadingFailed(String s, View view, FailReason failReason) {}
 
-                            if (MapUtil.getDistance(latLngBounds.northeast, latLngBounds.southwest) > distanceToHide) {
-                                marker.setIcon(smallDot);
-                            }
+                    @Override
+                    public void onLoadingComplete(String s, View view, Bitmap bitmap) {
+                        MarkerOptions markerOptions = MarkerOptionFactory.create(
+                                context, venue, bitmap
+                        );
+
+                        Marker marker = map.addMarker(markerOptions);
+                        markerSet.add(marker);
+                        marketToIcon.put(marker, markerOptions.getIcon());
+
+                        if (MapUtil.getDistance(latLngBounds.northeast, latLngBounds.southwest) > distanceToHide) {
+                            marker.setIcon(smallDot);
                         }
+                    }
 
-                        @Override
-                        public void onLoadingCancelled(String s, View view) {}
-                    });
-        }
+                    @Override
+                    public void onLoadingCancelled(String s, View view) {}
+                });
 
     }
 

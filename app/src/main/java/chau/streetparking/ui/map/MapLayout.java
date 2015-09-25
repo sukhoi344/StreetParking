@@ -3,7 +3,6 @@ package chau.streetparking.ui.map;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
-import android.os.SystemClock;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
@@ -34,7 +33,7 @@ import chau.streetparking.R;
 import chau.streetparking.ui.curtain.CurtainView;
 import chau.streetparking.ui.curtain.ICurtainViewBase;
 import chau.streetparking.ui.picker.DurationPickerDialog;
-import chau.streetparking.util.ImageUtil;
+import chau.streetparking.util.DateUtil;
 import chau.streetparking.util.Logger;
 
 /**
@@ -47,7 +46,9 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     public static final int LAYOUT_FIND_PARKING_SPOTS = 2;
 
     private static final String TAG_FROM = "from";
-    private static final int SEEK_BAR_DEFAULT_VALUE = 300;
+    public static final int SEEK_BAR_DEFAULT_VALUE_IN_FEET = 300;
+
+    private static final int DEFAULT_DURATION_IN_HOUR = 1;
 
     // The map
     private View map;
@@ -68,7 +69,8 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     private OnClickListener btnMyRequestListener;
 
     // Find parking spot layout
-    private CurtainView curtainViewFindParking;
+//    private CurtainView curtainViewFindParking;
+    private View        findParkingSpotLayout;
     private RangeBar    seekBar;
     private TextView    tvFrom, tvDuration;
 //    private Button      btnFind;
@@ -194,14 +196,14 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         reset();
 
         firstLayout.setVisibility(View.INVISIBLE);
-        curtainViewFindParking.setVisibility(View.VISIBLE);
+//        curtainViewFindParking.setVisibility(View.VISIBLE);
         crossLayout.setVisibility(View.VISIBLE);
 
         showLocationLayout();
 
-        if (curtainViewFindParking.getCurtainStatus() == ICurtainViewBase.CurtainStatus.CLOSED) {
-            curtainViewFindParking.toggleStatus();
-        }
+//        if (curtainViewFindParking.getCurtainStatus() == ICurtainViewBase.CurtainStatus.CLOSED) {
+//            curtainViewFindParking.toggleStatus();
+//        }
     }
 
     /**
@@ -223,28 +225,28 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
      * Change UI when the user selects "Cancel" in the FindParkingSpot layout
      */
     public void cancelFindParkingSpot() {
-        if (curtainViewFindParking.getCurtainStatus() == ICurtainViewBase.CurtainStatus.OPENED) {
-            curtainViewFindParking.toggleStatus();
-            curtainViewFindParking.setAutoScrollingListener(new ICurtainViewBase.AutoScrollingListener() {
-                @Override
-                public void onScrolling(int currValue, int currVelocity, int startValue, int finalValue) {
-                }
-
-                @Override
-                public void onScrollFinished() {
-                    curtainViewFindParking.setVisibility(View.INVISIBLE);
-                    firstLayout.setVisibility(View.VISIBLE);
-                    curtainViewFindParking.setAutoScrollingListener(null);
-                }
-            });
-        } else {
-            curtainViewFindParking.setVisibility(View.INVISIBLE);
-            firstLayout.setVisibility(View.VISIBLE);
-        }
-
-        crossLayout.setVisibility(View.INVISIBLE);
-
-        hideLocationLayout();
+//        if (curtainViewFindParking.getCurtainStatus() == ICurtainViewBase.CurtainStatus.OPENED) {
+//            curtainViewFindParking.toggleStatus();
+//            curtainViewFindParking.setAutoScrollingListener(new ICurtainViewBase.AutoScrollingListener() {
+//                @Override
+//                public void onScrolling(int currValue, int currVelocity, int startValue, int finalValue) {
+//                }
+//
+//                @Override
+//                public void onScrollFinished() {
+//                    curtainViewFindParking.setVisibility(View.INVISIBLE);
+//                    firstLayout.setVisibility(View.VISIBLE);
+//                    curtainViewFindParking.setAutoScrollingListener(null);
+//                }
+//            });
+//        } else {
+//            curtainViewFindParking.setVisibility(View.INVISIBLE);
+//            firstLayout.setVisibility(View.VISIBLE);
+//        }
+//
+//        crossLayout.setVisibility(View.INVISIBLE);
+//
+//        hideLocationLayout();
     }
 
     /**
@@ -276,9 +278,9 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
      * Close the curtain find parking layout
      */
     public void closeCurtainFindParking() {
-        if (curtainViewFindParking.getCurtainStatus() != ICurtainViewBase.CurtainStatus.CLOSED) {
-            curtainViewFindParking.toggleStatus();
-        }
+//        if (curtainViewFindParking.getCurtainStatus() != ICurtainViewBase.CurtainStatus.CLOSED) {
+//            curtainViewFindParking.toggleStatus();
+//        }
     }
 
     /**
@@ -312,7 +314,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
 //            btnFind.setOnClickListener(onClickListener);
 //    }
 
-    public void setCancelOffer1OnClick(OnClickListener onClick) {
+    public void setCancelMyRequestOnClick(OnClickListener onClick) {
         onClickCancelMyRequest = onClick;
     }
 
@@ -347,6 +349,10 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         return requestStartDate;
     }
 
+    public String getDuration() {
+        return tvDuration.getText().toString();
+    }
+
     private void hideLocationLayout() {
         locationLayout.setVisibility(View.INVISIBLE);
         Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.slide_out_up);
@@ -359,19 +365,28 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         locationLayout.startAnimation(animation);
     }
 
+    private void setCurrentTimeForPickers() {
+        tvDuration.setText(DEFAULT_DURATION_IN_HOUR + " HOUR");
+
+        Date date = new Date();
+        tvFrom.setText(DateUtil.getStringFromDate(date, DateUtil.DATE_STRING_FORMAT_1));
+    }
+
     private void init(Context context) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.include_map_layout, this, true);
         getWidgets();
 
         // Set height and margin of the map container
-        actionBarHeight = ImageUtil.getActionBarHeight(getContext());
-        mapHeight = ImageUtil.getAppScreenHeight(getContext()) - actionBarHeight;  // this is tricky (hack)
+//        mapHeight = ImageUtil.getActionBarHeight(getContext()) - findSpotLayoutHeight;
+//        actionBarHeight = ImageUtil.getActionBarHeight(getContext());
+//        mapHeight = ImageUtil.getAppScreenHeight(getContext()) - actionBarHeight;  // this is tricky (hack)
 
-        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) mapContainer.getLayoutParams();
-        params.height = mapHeight - context.getResources().getDimensionPixelSize(R.dimen.curtain_view_fixed);
-        params.setMargins(0, actionBarHeight, 0, 0);
-        mapContainer.setLayoutParams(params);
+//        ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) mapContainer.getLayoutParams();
+//        params.height = mapHeight - context.getResources().getDimensionPixelSize(R.dimen.curtain_view_fixed);
+//        params.setMargins(0, actionBarHeight, 0, 0);
+//        params.height = findSpotLayoutHeight;
+//        mapContainer.setLayoutParams(params);
 
         btnMyRequests.setOnClickListener(new OnClickListener() {
             @Override
@@ -391,7 +406,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
             }
         });
 
-        seekBar.setSeekPinByValue(SEEK_BAR_DEFAULT_VALUE);
+        seekBar.setSeekPinByValue(SEEK_BAR_DEFAULT_VALUE_IN_FEET);
 
         tvFrom.setOnClickListener(new TimeTextViewListener(TAG_FROM));
         tvDuration.setOnClickListener(new OnClickListener() {
@@ -419,12 +434,16 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         });
 
         onLayoutChangeListener = getCurtainViewOfferListener();
+
+        // Show the current time and default parking duration on
+        // "Stat Time" and "Duration"
+        setCurrentTimeForPickers();
     }
 
     private OnLayoutChangeListener getCurtainViewOfferListener() {
         final int curtainViewHeight = getResources().getDimensionPixelOffset(R.dimen.curtain_view_offer_height);
         final int curtainViewFixedHeight = getResources()
-                .getDimensionPixelOffset(R.dimen.curtain_view_fixed);
+                .getDimensionPixelOffset(R.dimen.find_parking_spot_layout_height);
         final int withoutFixedHeight = curtainViewHeight - curtainViewFixedHeight;
 
         return new OnLayoutChangeListener() {
@@ -457,7 +476,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
 
     private void reset() {
         selectedTime = "";
-        seekBar.setSeekPinByValue(SEEK_BAR_DEFAULT_VALUE);
+        seekBar.setSeekPinByValue(SEEK_BAR_DEFAULT_VALUE_IN_FEET);
         tvFrom.setText("Tap to select");
         tvDuration.setText("Tap to select");
 //        btnFind.setEnabled(false);
@@ -498,7 +517,8 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         locationLayout = (ViewGroup) findViewById(R.id.location_layout);
         firstLayout = (ViewGroup) findViewById(R.id.first_layout);
 
-        curtainViewFindParking = (CurtainView) findViewById(R.id.curtain_view);
+//        curtainViewFindParking = (CurtainView) findViewById(R.id.curtain_view);
+        findParkingSpotLayout = findViewById(R.id.find_parking_spot_layout);
         seekBar = (RangeBar) findViewById(R.id.seek_bar);
         tvRadius = (TextView) findViewById(R.id.tv_radius);
         tvFrom = (TextView) findViewById(R.id.from);

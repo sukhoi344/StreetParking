@@ -15,6 +15,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import chau.streetparking.R;
 
 /**
+ * MapFragment which has circle on top of the map (in the center)
  * Created by Chau Thai on 8/25/15.
  */
 public class MyMapFragment extends SupportMapFragment {
@@ -76,8 +77,6 @@ public class MyMapFragment extends SupportMapFragment {
 
         return circleView.getRadius();
     }
-
-
     private class CircleView extends View {
         private Paint paintFill;
         private Paint paintStroke;

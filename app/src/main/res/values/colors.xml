@@ -15,7 +15,7 @@
 
     <!-- Circle color -->
     <color name="circle_stroke_color">#ffff0000</color>
-    <color name="circle_fill_color">#11vrrereff0000</color>
+    <color name="circle_fill_color">#11ff0000</color>
 
     <color name="hint_color">#33000000</color>
 

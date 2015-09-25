@@ -6,6 +6,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,6 +18,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.appyvet.rangebar.RangeBar;
 import com.google.android.gms.common.ConnectionResult;
@@ -69,12 +71,12 @@ public class MapsActivity extends AppCompatActivity {
     private static final int ID_BALANCE = 4;
 
     // Toolbars
-    private Toolbar toolbar;
-    private int     actionBarHeight;
+//    private Toolbar toolbar;
+//    private int     actionBarHeight;
 
     // Notification setting
-    private View        notificationLayout;
-    private CheckBox    notificationCheckBox;
+//    private View        notificationLayout;
+//    private CheckBox    notificationCheckBox;
 
     // Maps
     private GoogleApiClient mGoogleApiClient;
@@ -110,12 +112,12 @@ public class MapsActivity extends AppCompatActivity {
         setUpMapIfNeeded();
 
         // Setup toolbar
-        actionBarHeight = ImageUtil.getActionBarHeight(this);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(getString(R.string.app_name));
+//        actionBarHeight = ImageUtil.getActionBarHeight(this);
+//        setSupportActionBar(toolbar);
+//        getSupportActionBar().setTitle(getString(R.string.app_name));
 
         setupUser();
-        setupDrawer(toolbar);
+        setupDrawer(null);
     }
 
     @Override
@@ -179,6 +181,12 @@ public class MapsActivity extends AppCompatActivity {
         showNotificationLayout();
     }
 
+    public void onNavigationClicked(View v) {
+        if (drawer != null && !drawer.isDrawerOpen()) {
+            drawer.openDrawer();
+        }
+    }
+
     /**
      * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
      * installed) and the map has not already been instantiated.. This will ensure that we only ever
@@ -222,6 +230,10 @@ public class MapsActivity extends AppCompatActivity {
         venueMapLoader = new VenueMapLoader(this, googleMap);
         parkingSpotMapLoader = new ParkingSpotMapLoader(this, googleMap);
 
+        // get seek bar radius
+        int radiusInMeter = (int) (MapLayout.SEEK_BAR_DEFAULT_VALUE_IN_FEET * 0.3048);
+        seekBarRadiusInMeter = radiusInMeter;
+
         googleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition cameraPosition) {
@@ -232,9 +244,11 @@ public class MapsActivity extends AppCompatActivity {
                 mapFragment.setRadius(radiusInMeters);
 
                 // Update the location address bar
-                if (mapLayout.getCurrentLayout() == MapLayout.LAYOUT_FIND_PARKING_SPOTS) {
-                    updateLocationAddress(latLng);
-                }
+//                if (mapLayout.getCurrentLayout() == MapLayout.LAYOUT_FIND_PARKING_SPOTS) {
+//                    updateLocationAddress(latLng);
+//                }
+
+                updateLocationAddress(latLng);
 
                 // Display venues and parking spots on the visible map region
                 LatLngBounds latLngBounds = googleMap.getProjection().getVisibleRegion().latLngBounds;
@@ -244,15 +258,16 @@ public class MapsActivity extends AppCompatActivity {
         });
 
         // Zoom the marker when selected
-        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                moveCamera(marker);
-                return true;
-            }
-        });
+//        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+//            @Override
+//            public boolean onMarkerClick(Marker marker) {
+//                moveCamera(marker);
+//                return true;
+//            }
+//        });
 
         setupMapLayout();
+        enableCircle();
     }
 
     private void setupMapLayout() {
@@ -314,7 +329,7 @@ public class MapsActivity extends AppCompatActivity {
             }
         });
 
-        mapLayout.setCancelOffer1OnClick(new View.OnClickListener() {
+        mapLayout.setCancelMyRequestOnClick(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showNotificationLayout();
@@ -324,13 +339,15 @@ public class MapsActivity extends AppCompatActivity {
         mapLayout.setOnLayoutMoved(new MapLayout.OnLayoutMoved() {
             @Override
             public void onLayoutMoved(double ratio) {
-                int topMargin = -(int) (actionBarHeight * ratio);
-
-                LinearLayout.MarginLayoutParams params = (LinearLayout.MarginLayoutParams) toolbar.getLayoutParams();
-                params.setMargins(params.leftMargin, topMargin, params.rightMargin, params.bottomMargin);
-                toolbar.setLayoutParams(params);
+//                int topMargin = -(int) (actionBarHeight * ratio);
+//
+//                LinearLayout.MarginLayoutParams params = (LinearLayout.MarginLayoutParams) toolbar.getLayoutParams();
+//                params.setMargins(params.leftMargin, topMargin, params.rightMargin, params.bottomMargin);
+//                toolbar.setLayoutParams(params);
             }
         });
+
+        mapLayout.setMyLocationBtnMargin(dpToPx(55));
     }
 
     private void updateLocationAddress(LatLng latLng) {
@@ -387,7 +404,7 @@ public class MapsActivity extends AppCompatActivity {
 
         drawer = new DrawerBuilder()
                 .withActivity(this)
-                .withToolbar(toolbar)
+//                .withToolbar(toolbar)
                 .withTranslucentStatusBar(true)
                 .withAccountHeader(headerResult)
 
@@ -510,10 +527,24 @@ public class MapsActivity extends AppCompatActivity {
     }
 
     private void enableCircle() {
+//        Handler handler = new Handler();
+//        handler.postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                if (mapFragment != null) {
+//                    mapFragment.setCircleEnable(true);
+//                    int radiusInMeter = MapUtil.convertMetersToPixels(googleMap, googleMap.getCameraPosition().target,
+//                            300 * 0.3048);
+//                    mapFragment.setRadius(radiusInMeter);
+//                }
+//            }
+//        }, 1000);
+
         if (mapFragment != null) {
             mapFragment.setCircleEnable(true);
-            int radiusInMeter = MapUtil.convertMetersToPixels(googleMap, googleMap.getCameraPosition().target,
-                    300 * 0.3048);
+            int radiusInMeter = MapUtil.convertMetersToPixels(googleMap,
+                    googleMap.getCameraPosition().target,
+                    MapLayout.SEEK_BAR_DEFAULT_VALUE_IN_FEET * 0.3048);
             mapFragment.setRadius(radiusInMeter);
         }
     }
@@ -530,15 +561,15 @@ public class MapsActivity extends AppCompatActivity {
     }
 
     private void hideNotificationLayout() {
-        notificationLayout.setVisibility(View.INVISIBLE);
-        Animation animation = AnimationUtils.loadAnimation(this, R.anim.slide_out_up);
-        notificationLayout.startAnimation(animation);
+//        notificationLayout.setVisibility(View.INVISIBLE);
+//        Animation animation = AnimationUtils.loadAnimation(this, R.anim.slide_out_up);
+//        notificationLayout.startAnimation(animation);
     }
 
     private void showNotificationLayout() {
-        notificationLayout.setVisibility(View.VISIBLE);
-        Animation animation = AnimationUtils.loadAnimation(this, R.anim.slide_in_up);
-        notificationLayout.startAnimation(animation);
+//        notificationLayout.setVisibility(View.VISIBLE);
+//        Animation animation = AnimationUtils.loadAnimation(this, R.anim.slide_in_up);
+//        notificationLayout.startAnimation(animation);
     }
 
     private void setupUser() {
@@ -553,9 +584,9 @@ public class MapsActivity extends AppCompatActivity {
 
     private void getWidgets() {
         mapLayout = (MapLayout) findViewById(R.id.map_layout);
-        notificationLayout = findViewById(R.id.notification_layout);
-        notificationCheckBox = (CheckBox) findViewById(R.id.check_box_notification);
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        notificationLayout = findViewById(R.id.notification_layout);
+//        notificationCheckBox = (CheckBox) findViewById(R.id.check_box_notification);
+//        toolbar = (Toolbar) findViewById(R.id.toolbar);
     }
 
     private class TaskGetAddress extends AsyncTask<LatLng, Void, String> {

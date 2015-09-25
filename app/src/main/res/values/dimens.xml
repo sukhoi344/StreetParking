@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="curtain_view_fixed">56dp</dimen>
+    <dimen name="find_parking_spot_layout_height">110dp</dimen>
+    <dimen name="find_prking_spot_layout_without_shadow">105dp</dimen>
     <dimen name="curtain_view_offer_height">290dp</dimen>
 </resources>

@@ -3,12 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/first_layout"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/curtain_view_fixed"
+    android:layout_height="@dimen/find_parking_spot_layout_height"
     android:layout_gravity="bottom"
     android:background="#ffffff"
     android:orientation="horizontal"
     tools:showIn="@layout/include_map_layout"
-    android:layout_alignParentBottom="true">
+    android:layout_alignParentBottom="true"
+    android:visibility="invisible">
 
     <Button
         android:id="@+id/btn_find_parking_spots"
