@@ -50,13 +50,18 @@ public class MarkerOptionFactory {
         return null;
     }
 
-    public static MarkerOptions create(Context context, ParkingLot parkingLot) {
+    public static MarkerOptions create(Context context, ParkingLot parkingLot, String duration) {
         try {
             if (parkingLot != null) {
                 ParseGeoPoint location = parkingLot.getLocation();
                 LatLng position = new LatLng(location.getLatitude(), location.getLongitude());
 
-                String price = "$" + parkingLot.getPrice();
+                String split[] = duration.split(" ");
+                int durationValue = Integer.parseInt(split[0]);
+                String durationType = split[1];
+
+                int totalPrice = (int) (durationValue * parkingLot.getPrice());
+                String price = "$" + totalPrice;
 
                 IconGenerator iconGenerator = new IconGenerator(context);
                 iconGenerator.setStyle(IconGenerator.STYLE_GREEN);

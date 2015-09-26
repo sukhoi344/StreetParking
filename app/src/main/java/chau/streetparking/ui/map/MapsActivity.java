@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -41,10 +42,13 @@ import com.mikepenz.materialdrawer.model.SectionDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.parse.ParseUser;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import java.util.Date;
 import java.util.List;
 
 import chau.streetparking.R;
+import chau.streetparking.datamodels.parse.ParkingLot;
 import chau.streetparking.datamodels.parse.Request;
 import chau.streetparking.datamodels.parse.User;
 import chau.streetparking.ui.DividerItemDecoration;
@@ -85,9 +89,13 @@ public class MapsActivity extends AppCompatActivity {
     private MapLayout       mapLayout;
     private MyMapFragment   mapFragment;
 
+    // Sliding up panel
+    private SlidingUpPanelLayout slidingPanelUp;
+
     // Global variables
-    private VenueMapLoader       venueMapLoader;
-    private ParkingSpotMapLoader parkingSpotMapLoader;
+    private VenueMapLoader          venueMapLoader;
+    private ParkingSpotMapLoader    parkingSpotMapLoader;
+    private ParkingDetailDisplayer  parkingDetailDisplayer;
 
     private Geocoder geocoder;
     private TaskGetAddress taskGetAddress;
@@ -108,7 +116,7 @@ public class MapsActivity extends AppCompatActivity {
 
         geocoder = new Geocoder(this);
 
-        setupRequestList(mapLayout.getRecyclerViewRequest());
+//        setupRequestList(mapLayout.getRecyclerViewRequest());
         setUpMapIfNeeded();
 
         // Setup toolbar
@@ -253,21 +261,37 @@ public class MapsActivity extends AppCompatActivity {
                 // Display venues and parking spots on the visible map region
                 LatLngBounds latLngBounds = googleMap.getProjection().getVisibleRegion().latLngBounds;
                 venueMapLoader.load(latLngBounds);
-                parkingSpotMapLoader.load(latLngBounds);
+                parkingSpotMapLoader.load(latLngBounds, mapLayout.getDuration());
             }
         });
 
         // Zoom the marker when selected
-//        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-//            @Override
-//            public boolean onMarkerClick(Marker marker) {
-//                moveCamera(marker);
-//                return true;
-//            }
-//        });
+        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                if (parkingDetailDisplayer != null) {
+                    ParkingLot parkingLot = parkingSpotMapLoader.getParkingLot(marker);
+                    parkingDetailDisplayer.display(parkingLot, mapLayout.getRequestStartDate(),
+                            mapLayout.getDuration());
+                }
 
+                return false;
+            }
+        });
+
+
+        googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                parkingDetailDisplayer.close();
+            }
+        });
+
+        setupPanelUpLayout();
         setupMapLayout();
         enableCircle();
+
+        parkingDetailDisplayer = new ParkingDetailDisplayer(this, googleMap, slidingPanelUp);
     }
 
     private void setupMapLayout() {
@@ -347,7 +371,45 @@ public class MapsActivity extends AppCompatActivity {
             }
         });
 
-        mapLayout.setMyLocationBtnMargin(dpToPx(55));
+        mapLayout.setMyLocationBtnMargin(getResources()
+                .getDimensionPixelSize(R.dimen.google_map_top_margin));
+
+        mapLayout.setOnDurationSetListener(new MapLayout.OnDurationSetListener() {
+            @Override
+            public void onDurationSet(String duration) {
+                if (parkingDetailDisplayer != null) {
+                    parkingDetailDisplayer.setDuration(duration);
+                }
+
+                if (parkingSpotMapLoader != null) {
+                    parkingSpotMapLoader.setDuration(
+                            googleMap.getProjection().getVisibleRegion().latLngBounds,
+                            duration);
+                }
+            }
+        });
+
+        mapLayout.setOnStartDateSetListener(new MapLayout.OnStartDateSetListener() {
+            @Override
+            public void onStartDateSet(Date startDate) {
+                if (parkingDetailDisplayer != null) {
+                    parkingDetailDisplayer.setStartDate(startDate);
+                }
+            }
+        });
+    }
+
+    private void setupPanelUpLayout() {
+        View view = findViewById(R.id.view_transparent);
+        view.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                mapLayout.getMapContainer().dispatchTouchEvent(event);
+                return true;
+            }
+        });
+
+        slidingPanelUp.setDragView(R.id.parking_detail_header);
     }
 
     private void updateLocationAddress(LatLng latLng) {
@@ -363,7 +425,8 @@ public class MapsActivity extends AppCompatActivity {
 
     private void updateCurrentAddress() {
         if (googleMap != null) {
-            mapLayout.setMyLocationBtnMargin(dpToPx(55));
+            mapLayout.setMyLocationBtnMargin(getResources()
+                    .getDimensionPixelSize(R.dimen.google_map_top_margin));
             LatLng latLng = googleMap.getCameraPosition().target;
             new TaskGetAddress().execute(latLng);
         }
@@ -587,6 +650,7 @@ public class MapsActivity extends AppCompatActivity {
 //        notificationLayout = findViewById(R.id.notification_layout);
 //        notificationCheckBox = (CheckBox) findViewById(R.id.check_box_notification);
 //        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        slidingPanelUp = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
     }
 
     private class TaskGetAddress extends AsyncTask<LatLng, Void, String> {

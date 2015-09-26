@@ -3,4 +3,13 @@
     <dimen name="find_parking_spot_layout_height">110dp</dimen>
     <dimen name="find_prking_spot_layout_without_shadow">105dp</dimen>
     <dimen name="curtain_view_offer_height">290dp</dimen>
+
+    <!-- Margin for map buttons -->
+    <dimen name="google_map_top_margin">55dp</dimen>
+
+    <!-- Parking detail header -->
+    <dimen name="parking_detail_header">65dp</dimen>
+    <dimen name="parking_detail_item_title">24sp</dimen>
+    <dimen name="parking_detail_item_content">18sp</dimen>
+
 </resources>

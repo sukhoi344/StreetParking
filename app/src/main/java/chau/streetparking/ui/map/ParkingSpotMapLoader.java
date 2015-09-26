@@ -1,6 +1,6 @@
 package chau.streetparking.ui.map;
 
-import android.content.Context;
+import android.app.Activity;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptor;
@@ -20,7 +20,6 @@ import java.util.Set;
 import chau.streetparking.R;
 import chau.streetparking.backend.ParkingSpotFinder;
 import chau.streetparking.datamodels.parse.ParkingLot;
-import chau.streetparking.ui.map.MarkerOptionFactory;
 import chau.streetparking.util.Logger;
 import chau.streetparking.util.MapUtil;
 
@@ -31,7 +30,7 @@ public class ParkingSpotMapLoader {
     private static final int DEFAULT_DISTANCE_TO_HIDE_MARKERS = 1500; // In meter
     private static final int DEFAULT_MAXIMUM_DISTANCE_TO_SHOW = 15000; // In meter
 
-    final private Context context;
+    final private Activity activity;
     final private GoogleMap map;
 
     private ParkingSpotFinder finder;
@@ -42,18 +41,19 @@ public class ParkingSpotMapLoader {
     // Cache variables
     private Set<ParkingLot> cache = new HashSet<>();
     private Set<Marker> markerSet = new HashSet<>();
-    private Map<Marker, BitmapDescriptor> marketToIcon = new HashMap<>();
+    private Map<Marker, BitmapDescriptor> markerToIcon = new HashMap<>();
+    private Map<Marker, ParkingLot> markerToLot = new HashMap<>();
     private float previousDistance = 0;
 
 
-    public ParkingSpotMapLoader(Context context, GoogleMap map) {
-        this.context = context;
+    public ParkingSpotMapLoader(Activity activity, GoogleMap map) {
+        this.activity = activity;
         this.map = map;
-        finder = new ParkingSpotFinder(context);
+        finder = new ParkingSpotFinder(activity);
         smallDot = BitmapDescriptorFactory.fromResource(R.drawable.green_dot);
     }
 
-    public void load(final LatLngBounds latLngBounds) {
+    public void load(final LatLngBounds latLngBounds, final String duration) {
         final float distance = MapUtil.getDistance(latLngBounds.northeast, latLngBounds.southwest);
 
         if (distance > maxDisplayDistance)
@@ -72,11 +72,12 @@ public class ParkingSpotMapLoader {
                                 cache.add(parkingLot);
 
                                 MarkerOptions markerOptions = MarkerOptionFactory
-                                        .create(context, parkingLot);
+                                        .create(activity, parkingLot, duration);
                                 Marker marker = map.addMarker(markerOptions);
 
                                 markerSet.add(marker);
-                                marketToIcon.put(marker, markerOptions.getIcon());
+                                markerToIcon.put(marker, markerOptions.getIcon());
+                                markerToLot.put(marker, parkingLot);
 
                                 if (distance > distanceToHide) {
                                     marker.setIcon(smallDot);
@@ -93,6 +94,52 @@ public class ParkingSpotMapLoader {
         });
     }
 
+    public void setDuration(final LatLngBounds latLngBounds, final String duration) {
+        final float distance = MapUtil.getDistance(latLngBounds.northeast, latLngBounds.southwest);
+
+        final Map<Marker, ParkingLot> newMap = new HashMap<>();
+        cache.clear();
+        markerToIcon.clear();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (Map.Entry<Marker, ParkingLot> entry : markerToLot.entrySet()) {
+                    final Marker marker = entry.getKey();
+                    final ParkingLot parkingLot = entry.getValue();
+
+                    cache.add(parkingLot);
+                     final MarkerOptions markerOptions = MarkerOptionFactory
+                            .create(activity, parkingLot, duration);
+
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Marker newMarker = map.addMarker(markerOptions);
+                            marker.remove();
+
+                            markerSet.add(newMarker);
+                            markerToIcon.put(newMarker, markerOptions.getIcon());
+                            newMap.put(newMarker, parkingLot);
+
+                            if (distance > distanceToHide) {
+                                newMarker.setIcon(smallDot);
+                            }
+                        }
+                    });
+                }
+
+                try {
+                    Thread.sleep(200);
+                } catch (Exception ignore) {}
+
+                markerToLot = newMap;
+            }
+        }).start();
+
+
+    }
+
     /**
      * Set the distance across the Google Map on the visible region to
      * hide markers on the map.
@@ -100,6 +147,13 @@ public class ParkingSpotMapLoader {
      */
     public void setDistanceToHide(int distanceToHide) {
         this.distanceToHide = distanceToHide;
+    }
+
+    public ParkingLot getParkingLot(Marker marker) {
+        if (marker == null)
+            return null;
+
+        return markerToLot.get(marker);
     }
 
     private void checkDistance(LatLngBounds latLngBounds) {
@@ -112,7 +166,7 @@ public class ParkingSpotMapLoader {
 
         else if (distance <= distanceToHide && previousDistance > distanceToHide) {
             for (Marker marker : markerSet) {
-                marker.setIcon(marketToIcon.get(marker));
+                marker.setIcon(markerToIcon.get(marker));
             }
         }
 

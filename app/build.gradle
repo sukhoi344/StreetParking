@@ -67,5 +67,7 @@ dependencies {
     compile 'com.stripe:stripe-android:+'
     compile 'com.facebook.android:facebook-android-sdk:4.5.0'
     compile 'com.foursquare:foursquare-android-oauth:1.0.3'
+    compile 'com.sothree.slidinguppanel:library:3.1.1'
+    compile 'me.grantland:autofittextview:0.2.+'
     compile files('libs/ParseFacebookUtilsV4-1.9.4.jar')
 }

@@ -63,10 +63,10 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     private ViewGroup   firstLayout;
 
     // First layout (only has 2 buttons: "Find Parking Spot" and "My Requests"
-    private Button          btnFindParkingSpots;
-    private Button          btnMyRequests;
-    private OnClickListener btnFindParkingListener;
-    private OnClickListener btnMyRequestListener;
+//    private Button          btnFindParkingSpots;
+//    private Button          btnMyRequests;
+//    private OnClickListener btnFindParkingListener;
+//    private OnClickListener btnMyRequestListener;
 
     // Find parking spot layout
 //    private CurtainView curtainViewFindParking;
@@ -76,17 +76,19 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
 //    private Button      btnFind;
     private TextView    tvLocation;
     private TextView    tvRadius;
+    private OnDurationSetListener onDurationSetListener;
+    private OnStartDateSetListener onStartDateSetListener;
 
     // My requests layout widgets
-    private CurtainView                 curtainViewMyRequests;
-    private OnLayoutChangeListener      onLayoutChangeListener;
-    private OnLayoutMoved               onLayoutMoved;
+//    private CurtainView                 curtainViewMyRequests;
+//    private OnLayoutChangeListener      onLayoutChangeListener;
+//    private OnLayoutMoved               onLayoutMoved;
 
     // Offer layout 1 widgets
-    private RecyclerView    recyclerViewRequest;
-    private ProgressBar     progressBar;
-    private Button          btnCancelMyRequest;
-    private OnClickListener onClickCancelMyRequest;
+//    private RecyclerView    recyclerViewRequest;
+//    private ProgressBar     progressBar;
+//    private Button          btnCancelMyRequest;
+//    private OnClickListener onClickCancelMyRequest;
 
     private String selectedTime;
     private Date   requestStartDate;
@@ -97,6 +99,14 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
          * @param ratio 0 means the layout hasn't been changed, 1 means changed entirely
          */
         void onLayoutMoved(double ratio);
+    }
+
+    public interface OnDurationSetListener {
+        void onDurationSet(String duration);
+    }
+
+    public interface OnStartDateSetListener {
+        void onStartDateSet(Date startDate);
     }
 
     public MapLayout(Context context) {
@@ -160,6 +170,10 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
             requestStartDate = date;
         }
 
+        if (onStartDateSetListener != null) {
+            onStartDateSetListener.onStartDateSet(requestStartDate);
+        }
+
 //        if (!tvDuration.getText().toString().equals("Tap to select")
 //                && !tvFrom.getText().toString().equals("Tap to select")) {
 //            btnFind.setEnabled(true);
@@ -170,10 +184,22 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     public void onDurationSet(int duration, int durationType, String text) {
         tvDuration.setText(text);
 
+        if (onDurationSetListener != null) {
+            onDurationSetListener.onDurationSet(text);
+        }
+
 //        if (!tvDuration.getText().toString().equals("Tap to select")
 //                && !tvFrom.getText().toString().equals("Tap to select")) {
 //            btnFind.setEnabled(true);
 //        }
+    }
+
+    public void setOnDurationSetListener(OnDurationSetListener onDurationSetListener) {
+        this.onDurationSetListener = onDurationSetListener;
+    }
+
+    public void setOnStartDateSetListener(OnStartDateSetListener onStartDateSetListener) {
+        this.onStartDateSetListener = onStartDateSetListener;
     }
 
     /**
@@ -206,20 +232,20 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
 //        }
     }
 
-    /**
-     * Change UI when the user selects "My Requests" button
-     */
-    private void showMyRequests() {
-        reset();
-        curtainViewMyRequests.addOnLayoutChangeListener(onLayoutChangeListener);
-
-        firstLayout.setVisibility(View.INVISIBLE);
-        curtainViewMyRequests.setVisibility(View.VISIBLE);
-
-        if (curtainViewMyRequests.getCurtainStatus() == ICurtainViewBase.CurtainStatus.CLOSED) {
-            curtainViewMyRequests.toggleStatus();
-        }
-    }
+//    /**
+//     * Change UI when the user selects "My Requests" button
+//     */
+//    private void showMyRequests() {
+//        reset();
+//        curtainViewMyRequests.addOnLayoutChangeListener(onLayoutChangeListener);
+//
+//        firstLayout.setVisibility(View.INVISIBLE);
+//        curtainViewMyRequests.setVisibility(View.VISIBLE);
+//
+//        if (curtainViewMyRequests.getCurtainStatus() == ICurtainViewBase.CurtainStatus.CLOSED) {
+//            curtainViewMyRequests.toggleStatus();
+//        }
+//    }
 
     /**
      * Change UI when the user selects "Cancel" in the FindParkingSpot layout
@@ -249,30 +275,30 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
 //        hideLocationLayout();
     }
 
-    /**
-     * Change UI when the user selects "Cancel" button while in MyRequests layout
-     */
-    public void cancelMyRequests() {
-        if (curtainViewMyRequests.getCurtainStatus() == ICurtainViewBase.CurtainStatus.OPENED) {
-            curtainViewMyRequests.toggleStatus();
-            curtainViewMyRequests.setAutoScrollingListener(new ICurtainViewBase.AutoScrollingListener() {
-                @Override
-                public void onScrolling(int currValue, int currVelocity, int startValue, int finalValue) {
-                }
-
-                @Override
-                public void onScrollFinished() {
-                    curtainViewMyRequests.removeOnLayoutChangeListener(onLayoutChangeListener);
-                    curtainViewMyRequests.setVisibility(View.INVISIBLE);
-                    firstLayout.setVisibility(View.VISIBLE);
-                    curtainViewMyRequests.setAutoScrollingListener(null);
-                }
-            });
-        } else {
-            curtainViewMyRequests.setVisibility(View.INVISIBLE);
-            firstLayout.setVisibility(View.VISIBLE);
-        }
-    }
+//    /**
+//     * Change UI when the user selects "Cancel" button while in MyRequests layout
+//     */
+//    public void cancelMyRequests() {
+//        if (curtainViewMyRequests.getCurtainStatus() == ICurtainViewBase.CurtainStatus.OPENED) {
+//            curtainViewMyRequests.toggleStatus();
+//            curtainViewMyRequests.setAutoScrollingListener(new ICurtainViewBase.AutoScrollingListener() {
+//                @Override
+//                public void onScrolling(int currValue, int currVelocity, int startValue, int finalValue) {
+//                }
+//
+//                @Override
+//                public void onScrollFinished() {
+//                    curtainViewMyRequests.removeOnLayoutChangeListener(onLayoutChangeListener);
+//                    curtainViewMyRequests.setVisibility(View.INVISIBLE);
+//                    firstLayout.setVisibility(View.VISIBLE);
+//                    curtainViewMyRequests.setAutoScrollingListener(null);
+//                }
+//            });
+//        } else {
+//            curtainViewMyRequests.setVisibility(View.INVISIBLE);
+//            firstLayout.setVisibility(View.VISIBLE);
+//        }
+//    }
 
     /**
      * Close the curtain find parking layout
@@ -302,11 +328,11 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     }
 
     public void setBtnFindParkingListener(OnClickListener onClickListener) {
-        btnFindParkingListener = onClickListener;
+//        btnFindParkingListener = onClickListener;
     }
 
     public void setBtnMyRequestListener(OnClickListener onClickListener) {
-        btnMyRequestListener = onClickListener;
+//        btnMyRequestListener = onClickListener;
     }
 
 //    public void setBtnFindListener(OnClickListener onClickListener) {
@@ -315,26 +341,27 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
 //    }
 
     public void setCancelMyRequestOnClick(OnClickListener onClick) {
-        onClickCancelMyRequest = onClick;
+//        onClickCancelMyRequest = onClick;
     }
 
     public void setOnLayoutMoved(OnLayoutMoved onLayoutMoved) {
-        this.onLayoutMoved = onLayoutMoved;
+//        this.onLayoutMoved = onLayoutMoved;
     }
 
     public RecyclerView getRecyclerViewRequest() {
-        return recyclerViewRequest;
+//        return recyclerViewRequest;
+        return null;
     }
 
     public void showProgressBarRequest() {
-        progressBar.setVisibility(View.VISIBLE);
-        recyclerViewRequest.setVisibility(View.INVISIBLE);
-        findViewById(R.id.text_view_no_result).setVisibility(View.INVISIBLE);
+//        progressBar.setVisibility(View.VISIBLE);
+//        recyclerViewRequest.setVisibility(View.INVISIBLE);
+//        findViewById(R.id.text_view_no_result).setVisibility(View.INVISIBLE);
     }
 
     public void hideProgressBarRequest() {
-        progressBar.setVisibility(View.INVISIBLE);
-        recyclerViewRequest.setVisibility(View.VISIBLE);
+//        progressBar.setVisibility(View.INVISIBLE);
+//        recyclerViewRequest.setVisibility(View.VISIBLE);
     }
 
     public void setMyLocationBtnMargin(int top) {
@@ -351,6 +378,10 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
 
     public String getDuration() {
         return tvDuration.getText().toString();
+    }
+
+    public View getMapContainer() {
+        return mapContainer;
     }
 
     private void hideLocationLayout() {
@@ -388,23 +419,23 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
 //        params.height = findSpotLayoutHeight;
 //        mapContainer.setLayoutParams(params);
 
-        btnMyRequests.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showMyRequests();
-                if (btnMyRequestListener != null)
-                    btnMyRequestListener.onClick(v);
-            }
-        });
+//        btnMyRequests.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                showMyRequests();
+//                if (btnMyRequestListener != null)
+//                    btnMyRequestListener.onClick(v);
+//            }
+//        });
 
-        btnFindParkingSpots.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showFindParkingSpot();
-                if (btnFindParkingListener != null)
-                    btnFindParkingListener.onClick(v);
-            }
-        });
+//        btnFindParkingSpots.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                showFindParkingSpot();
+//                if (btnFindParkingListener != null)
+//                    btnFindParkingListener.onClick(v);
+//            }
+//        });
 
         seekBar.setSeekPinByValue(SEEK_BAR_DEFAULT_VALUE_IN_FEET);
 
@@ -424,16 +455,16 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
             }
         });
 
-        btnCancelMyRequest.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                cancelMyRequests();
-                if (onClickCancelMyRequest != null)
-                    onClickCancelMyRequest.onClick(v);
-            }
-        });
+//        btnCancelMyRequest.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                cancelMyRequests();
+//                if (onClickCancelMyRequest != null)
+//                    onClickCancelMyRequest.onClick(v);
+//            }
+//        });
 
-        onLayoutChangeListener = getCurtainViewOfferListener();
+//        onLayoutChangeListener = getCurtainViewOfferListener();
 
         // Show the current time and default parking duration on
         // "Stat Time" and "Duration"
@@ -460,18 +491,18 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
                 params.setMargins(params.leftMargin, topMargin, params.rightMargin, params.topMargin);
                 mapContainer.setLayoutParams(params);
 
-                if (onLayoutMoved != null) {
-                    double ratio = (double) diff / withoutFixedHeight;
-                    onLayoutMoved.onLayoutMoved(ratio);
-                }
+//                if (onLayoutMoved != null) {
+//                    double ratio = (double) diff / withoutFixedHeight;
+//                    onLayoutMoved.onLayoutMoved(ratio);
+//                }
             }
         };
     }
 
     private void openCurtainMyRequests() {
-        if (curtainViewMyRequests.getCurtainStatus() != ICurtainViewBase.CurtainStatus.OPENED) {
-            curtainViewMyRequests.toggleStatus();
-        }
+//        if (curtainViewMyRequests.getCurtainStatus() != ICurtainViewBase.CurtainStatus.OPENED) {
+//            curtainViewMyRequests.toggleStatus();
+//        }
     }
 
     private void reset() {
@@ -526,13 +557,13 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
 //        btnFind = (Button) findViewById(R.id.btn_find);
         tvLocation = (TextView) findViewById(R.id.tv_location);
 
-        btnFindParkingSpots = (Button) findViewById(R.id.btn_find_parking_spots);
-        btnMyRequests = (Button) findViewById(R.id.btn_my_requests);
-
-        curtainViewMyRequests = (CurtainView) findViewById(R.id.curtain_view_my_requests);
-        recyclerViewRequest = (RecyclerView) findViewById(R.id.recycler_view_request);
-        progressBar = (ProgressBar) findViewById(R.id.progress_bar_offer_1);
-        btnCancelMyRequest = (Button) findViewById(R.id.btn_cancel_my_requests);
+//        btnFindParkingSpots = (Button) findViewById(R.id.btn_find_parking_spots);
+//        btnMyRequests = (Button) findViewById(R.id.btn_my_requests);
+//
+//        curtainViewMyRequests = (CurtainView) findViewById(R.id.curtain_view_my_requests);
+//        recyclerViewRequest = (RecyclerView) findViewById(R.id.recycler_view_request);
+//        progressBar = (ProgressBar) findViewById(R.id.progress_bar_offer_1);
+//        btnCancelMyRequest = (Button) findViewById(R.id.btn_cancel_my_requests);
 
         SupportMapFragment supportMapFragment = (SupportMapFragment) ((FragmentActivity) getContext())
                 .getSupportFragmentManager().findFragmentById(R.id.map);

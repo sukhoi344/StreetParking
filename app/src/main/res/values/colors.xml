@@ -25,4 +25,9 @@
 
     <!-- Duration picker color -->
     <color name="duration_btn_selected">#11000000</color>
+
+    <!-- Parking detail layout background -->
+    <color name="parking_detail_layout_background">#ffeeeeee</color>
+
+
 </resources>
