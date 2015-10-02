@@ -77,14 +77,7 @@
     </FrameLayout>
 
 
-
-    <!--&lt;!&ndash;  first layout &ndash;&gt;-->
-    <!--<include layout="@layout/curtain_view_first_layout_include" />-->
-
     <!-- Find Parking Spot CurtainView -->
     <include layout="@layout/find_parking_spot_layout_include" />
-
-    <!--&lt;!&ndash; MyRequest CurtainView&ndash;&gt;-->
-    <!--<include layout="@layout/my_requests_layout_include" />-->
 
 </LinearLayout>

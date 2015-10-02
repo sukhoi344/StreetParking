@@ -66,21 +66,12 @@ public class MapsActivity extends AppCompatActivity {
 
     private static final int REQUEST_CODE_SEARCH = 1;
     private static final int REQUEST_CODE_PROFILE = 3;
-    private static final int REQUEST_CODE_FIND_SPOTS = 4;
 
     private static final int ID_MY_RESERVATIONS = 0;
     private static final int ID_PAYMENT = 1;
     private static final int ID_GARAGE_SETTING = 2;
     private static final int ID_PARKING_REQUESTS = 3;
     private static final int ID_BALANCE = 4;
-
-    // Toolbars
-//    private Toolbar toolbar;
-//    private int     actionBarHeight;
-
-    // Notification setting
-//    private View        notificationLayout;
-//    private CheckBox    notificationCheckBox;
 
     // Maps
     private GoogleApiClient mGoogleApiClient;
@@ -99,7 +90,6 @@ public class MapsActivity extends AppCompatActivity {
 
     private Geocoder geocoder;
     private TaskGetAddress taskGetAddress;
-    private TaskGetRequestList taskGetRequestList;
     private int seekBarRadiusInMeter = 0;
 
     // Drawer variables
@@ -116,14 +106,7 @@ public class MapsActivity extends AppCompatActivity {
 
         geocoder = new Geocoder(this);
 
-//        setupRequestList(mapLayout.getRecyclerViewRequest());
         setUpMapIfNeeded();
-
-        // Setup toolbar
-//        actionBarHeight = ImageUtil.getActionBarHeight(this);
-//        setSupportActionBar(toolbar);
-//        getSupportActionBar().setTitle(getString(R.string.app_name));
-
         setupUser();
         setupDrawer(null);
     }
@@ -177,16 +160,6 @@ public class MapsActivity extends AppCompatActivity {
                     break;
             }
         }
-    }
-
-    public void onFindClicked(View v) {
-    }
-
-    public void onCancelFindSpotsClicked(View v) {
-        mapLayout.setMyLocationBtnMargin(dpToPx(10));
-        mapLayout.cancelFindParkingSpot();
-        disableCircle();
-        showNotificationLayout();
     }
 
     public void onNavigationClicked(View v) {
@@ -295,29 +268,6 @@ public class MapsActivity extends AppCompatActivity {
     }
 
     private void setupMapLayout() {
-        mapLayout.setBtnFindParkingListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                updateCurrentAddress();
-                enableCircle();
-                hideNotificationLayout();
-            }
-        });
-
-        mapLayout.setBtnMyRequestListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (taskGetRequestList != null && taskGetRequestList.isRunning) {
-                    taskGetRequestList.cancel(true);
-                }
-
-                taskGetRequestList = new TaskGetRequestList();
-                taskGetRequestList.execute();
-
-                hideNotificationLayout();
-            }
-        });
-
         mapLayout.setSeekBarListener(new RangeBar.OnRangeBarChangeListener() {
             @Override
             public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex, int rightPinIndex,
@@ -338,25 +288,11 @@ public class MapsActivity extends AppCompatActivity {
             }
         });
 
-//        mapLayout.setBtnFindListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                findParkingSpots();
-//            }
-//        });
-
         mapLayout.setLocationLayoutOnClick(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MapsActivity.this, SearchLocationActivity.class);
                 startActivityForResult(intent, REQUEST_CODE_SEARCH);
-            }
-        });
-
-        mapLayout.setCancelMyRequestOnClick(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showNotificationLayout();
             }
         });
 
@@ -590,19 +526,6 @@ public class MapsActivity extends AppCompatActivity {
     }
 
     private void enableCircle() {
-//        Handler handler = new Handler();
-//        handler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                if (mapFragment != null) {
-//                    mapFragment.setCircleEnable(true);
-//                    int radiusInMeter = MapUtil.convertMetersToPixels(googleMap, googleMap.getCameraPosition().target,
-//                            300 * 0.3048);
-//                    mapFragment.setRadius(radiusInMeter);
-//                }
-//            }
-//        }, 1000);
-
         if (mapFragment != null) {
             mapFragment.setCircleEnable(true);
             int radiusInMeter = MapUtil.convertMetersToPixels(googleMap,
@@ -617,24 +540,6 @@ public class MapsActivity extends AppCompatActivity {
             mapFragment.setCircleEnable(false);
     }
 
-    private void setupRequestList(RecyclerView recyclerView) {
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setOverScrollMode(View.OVER_SCROLL_NEVER);
-        recyclerView.addItemDecoration(new DividerItemDecoration(this, null));
-    }
-
-    private void hideNotificationLayout() {
-//        notificationLayout.setVisibility(View.INVISIBLE);
-//        Animation animation = AnimationUtils.loadAnimation(this, R.anim.slide_out_up);
-//        notificationLayout.startAnimation(animation);
-    }
-
-    private void showNotificationLayout() {
-//        notificationLayout.setVisibility(View.VISIBLE);
-//        Animation animation = AnimationUtils.loadAnimation(this, R.anim.slide_in_up);
-//        notificationLayout.startAnimation(animation);
-    }
-
     private void setupUser() {
         user = (User) ParseUser.getCurrentUser();
 
@@ -647,9 +552,6 @@ public class MapsActivity extends AppCompatActivity {
 
     private void getWidgets() {
         mapLayout = (MapLayout) findViewById(R.id.map_layout);
-//        notificationLayout = findViewById(R.id.notification_layout);
-//        notificationCheckBox = (CheckBox) findViewById(R.id.check_box_notification);
-//        toolbar = (Toolbar) findViewById(R.id.toolbar);
         slidingPanelUp = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
     }
 
@@ -688,38 +590,6 @@ public class MapsActivity extends AppCompatActivity {
                 }
             } catch (Exception e) {}
             finally {
-            }
-        }
-    }
-
-    private class TaskGetRequestList extends AsyncTask<Void, Void, List<Request>> {
-        private boolean isRunning = false;
-
-        @Override
-        protected void onPreExecute() {
-            mapLayout.showProgressBarRequest();
-        }
-
-        @Override
-        protected List<Request> doInBackground(Void... params) {
-            isRunning = true;
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(List<Request> requests) {
-            try {
-                if (!isCancelled() && requests != null) {
-                    mapLayout.hideProgressBarRequest();
-                    mapLayout.getRecyclerViewRequest().swapAdapter(
-                            new RequestAdapter(MapsActivity.this,mapLayout, requests), true);
-                } else {
-                    findViewById(R.id.text_view_no_result).setVisibility(View.VISIBLE);
-                    mapLayout.hideProgressBarRequest();
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         }
     }
