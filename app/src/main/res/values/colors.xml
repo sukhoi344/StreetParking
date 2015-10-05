@@ -9,6 +9,10 @@
     <color name="primary_light">#09aa09</color>
     <color name="background_green_light">#22018509</color>
 
+    <!-- flat button colors -->
+    <color name="flat_button_up">@android:color/transparent</color>
+    <color name="flat_button_down">#22000000</color>
+
     <!-- Date and time picker color -->
     <color name="mdtp_accent_color">#018509</color>
     <color name="mdtp_accent_color_dark">#005827</color>

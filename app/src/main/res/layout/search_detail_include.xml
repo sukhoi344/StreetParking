@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/reveal"
     android:layout_width="match_parent"
-    android:layout_height="300dp"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     android:visibility="invisible"
     android:background="@android:color/white">
@@ -48,6 +48,7 @@
             android:text="Starting"/>
 
         <TextView
+            android:id="@+id/text_starting"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -56,6 +57,7 @@
             android:textColor="@color/search_detail_reveal_text_time"/>
 
         <Button
+            android:id="@+id/btn_calendar_starting"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minHeight="0dp"
@@ -71,7 +73,7 @@
         android:layout_height="30dp"
         android:layout_marginLeft="6dp"
         android:layout_marginRight="6dp"
-        custom:tickStart="1"
+        custom:tickStart="0"
         custom:tickInterval="1"
         custom:tickEnd="24"
         custom:tickColor="#00FFFFFF"
@@ -92,6 +94,7 @@
             android:text="Ending"/>
 
         <TextView
+            android:id="@+id/text_ending"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -100,6 +103,7 @@
             android:textColor="@color/search_detail_reveal_text_time"/>
 
         <Button
+            android:id="@+id/btn_calendar_ending"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minHeight="0dp"
@@ -120,4 +124,29 @@
         custom:tickEnd="24"
         custom:tickColor="#00FFFFFF"
         custom:rangeBar="false"/>
+
+    <!-- Cancel and Done button layout-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginEnd="8dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical|end">
+
+        <Button
+            android:id="@+id/search_detail_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:background="@drawable/flat_button_selector"
+            android:textColor="@color/primary"
+            android:text="Cancel"/>
+
+        <Button
+            android:id="@+id/search_detail_done"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:textColor="@color/primary"
+            android:background="@drawable/flat_button_selector"
+            android:text="Done"/>
+    </LinearLayout>
 </LinearLayout>
