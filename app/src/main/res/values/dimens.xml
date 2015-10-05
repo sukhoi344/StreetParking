@@ -12,4 +12,7 @@
     <dimen name="parking_detail_item_title">24sp</dimen>
     <dimen name="parking_detail_item_content">18sp</dimen>
 
+    <!-- Search detail reveal -->
+    <dimen name="search_detail_reveal_text_title">18sp</dimen>
+
 </resources>

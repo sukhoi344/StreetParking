@@ -29,5 +29,7 @@
     <!-- Parking detail layout background -->
     <color name="parking_detail_layout_background">#ffeeeeee</color>
 
+    <!-- Search detail reveal -->
+    <color name="search_detail_reveal_text_time">#ff0099cc</color>
 
 </resources>

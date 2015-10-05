@@ -1,12 +1,14 @@
 package chau.streetparking.ui.map;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,6 +19,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -47,6 +50,7 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import java.util.Date;
 import java.util.List;
 
+import adik.fabtransitions.RevealToolbar;
 import chau.streetparking.R;
 import chau.streetparking.datamodels.parse.ParkingLot;
 import chau.streetparking.datamodels.parse.Request;
@@ -330,6 +334,42 @@ public class MapsActivity extends AppCompatActivity {
             public void onStartDateSet(Date startDate) {
                 if (parkingDetailDisplayer != null) {
                     parkingDetailDisplayer.setStartDate(startDate);
+                }
+            }
+        });
+
+        testFloatBtn();
+    }
+
+    private void testFloatBtn() {
+        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        final View revealView = findViewById(R.id.reveal);
+        final RevealToolbar toolbar = new RevealToolbar(this, revealView, fab);
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toolbar.Reveal(revealView);
+            }
+        });
+
+
+        Button btnTest = (Button) findViewById(R.id.btn_test_1);
+        btnTest.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toolbar.HideReveal(revealView);
+            }
+        });
+
+        Button btnTest2 = (Button) findViewById(R.id.btn_test_2);
+        btnTest2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (toolbar.isFabHidden()) {
+                    toolbar.showFab(fab);
+                } else {
+                    toolbar.hideFab(fab);
                 }
             }
         });

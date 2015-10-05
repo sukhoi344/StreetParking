@@ -1,83 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
     <FrameLayout
+        android:id="@+id/map_container"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_alignParentTop="true">
+        android:layout_height="match_parent">
 
-        <FrameLayout
-            android:id="@+id/map_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <fragment
-                android:id="@+id/map"
-                android:name="chau.streetparking.ui.map.MyMapFragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="top"
-                tools:activity=".MapsActivity" />
-
-            <!-- Cross layout -->
-            <FrameLayout
-                android:id="@+id/cross_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:visibility="visible">
-
-                <View
-                    android:layout_width="20dp"
-                    android:layout_height="2dp"
-                    android:background="@android:color/holo_red_dark"
-                    android:layout_gravity="center"/>
-
-                <View
-                    android:layout_width="2dp"
-                    android:layout_height="20dp"
-                    android:background="@android:color/holo_red_dark"
-                    android:layout_gravity="center"/>
-            </FrameLayout>
-
-            <!-- Location layout  -->
-            <include layout="@layout/location_layout_include" />
-
-            <!-- Shadow view -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="5dp"
-                android:layout_gravity="bottom"
-                android:background="@drawable/gradient_bottom_dark" />
-        </FrameLayout>
-
-        <com.sothree.slidinguppanel.SlidingUpPanelLayout
-            xmlns:sothree="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/sliding_layout"
+        <fragment
+            android:id="@+id/map"
+            android:name="chau.streetparking.ui.map.MyMapFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="bottom"
-            sothree:umanoPanelHeight="@dimen/parking_detail_header"
-            sothree:umanoFadeColor="@android:color/transparent">
+            android:layout_gravity="top"
+            tools:activity=".MapsActivity" />
+
+        <!-- Cross layout -->
+        <FrameLayout
+            android:id="@+id/cross_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="visible">
 
             <View
-                android:id="@+id/view_transparent"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@android:color/transparent"/>
+                android:layout_width="20dp"
+                android:layout_height="2dp"
+                android:layout_gravity="center"
+                android:background="@android:color/holo_red_dark" />
 
-            <include layout="@layout/parking_detail_layout_include" />
-        </com.sothree.slidinguppanel.SlidingUpPanelLayout>
+            <View
+                android:layout_width="2dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:background="@android:color/holo_red_dark" />
+        </FrameLayout>
 
+        <!-- Location layout  -->
+        <include layout="@layout/location_layout_include" />
+
+        <!-- Shadow view -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="5dp"
+            android:layout_gravity="bottom"
+            android:background="@drawable/gradient_bottom_dark" />
     </FrameLayout>
 
+    <com.sothree.slidinguppanel.SlidingUpPanelLayout
+        xmlns:sothree="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/sliding_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="bottom"
+        sothree:umanoFadeColor="@android:color/transparent"
+        sothree:umanoPanelHeight="@dimen/parking_detail_header">
 
-    <!-- Find Parking Spot CurtainView -->
+        <View
+            android:id="@+id/view_transparent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent" />
+
+        <include layout="@layout/parking_detail_layout_include" />
+    </com.sothree.slidinguppanel.SlidingUpPanelLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_action_search_white"
+        app:backgroundTint="@color/primary_light"
+        app:borderWidth="1dp"
+        app:fabSize="normal"
+        app:rippleColor="@color/primary" />
+
+    <Button
+        android:id="@+id/btn_test_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="test"
+        android:layout_gravity="left"/>
+
+    <Button
+        android:id="@+id/btn_test_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="test"
+        android:layout_gravity="right"/>
+
+    <!-- Search detail layout-->
+    <adik.fabtransitions.MorphFrameLayout
+        android:id="@+id/hide"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="bottom">
+
+        <include layout="@layout/search_detail_include" />
+    </adik.fabtransitions.MorphFrameLayout>
+
+    <!-- Find Parking Spot Layout -->
     <include layout="@layout/find_parking_spot_layout_include" />
-
-</LinearLayout>
+</FrameLayout>

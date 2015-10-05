@@ -4,16 +4,11 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.support.v4.app.FragmentActivity;
-import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -30,8 +25,6 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import chau.streetparking.R;
-import chau.streetparking.ui.curtain.CurtainView;
-import chau.streetparking.ui.curtain.ICurtainViewBase;
 import chau.streetparking.ui.picker.DurationPickerDialog;
 import chau.streetparking.util.DateUtil;
 import chau.streetparking.util.Logger;
