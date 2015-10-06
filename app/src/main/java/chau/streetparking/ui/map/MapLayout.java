@@ -12,8 +12,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
-import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.appyvet.rangebar.RangeBar;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -22,6 +22,7 @@ import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -37,8 +38,7 @@ import chau.streetparking.util.Logger;
  * Created by Chau Thai on 6/9/2015.
  */
 public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSetListener,
-                                                    DatePickerDialog.OnDateSetListener,
-                                                    DurationPickerDialog.OnDurationSetListener {
+                                                    DatePickerDialog.OnDateSetListener {
     private static final String TAG_FROM = "from";
     private static final String TAG_TO = "to";
     public static final int SEEK_BAR_DEFAULT_VALUE_IN_FEET = 300;
@@ -66,17 +66,15 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     private Button                  btnSearchDetailCancel;
     private Button                  btnSearchDetailDone;
 
-
     // Find parking spot layout
 //    private RangeBar    seekBar;
 //    private TextView    tvFrom, tvDuration;
     private TextView    tvLocation;
 //    private TextView    tvRadius;
-//    private OnDurationSetListener onDurationSetListener;
 //    private OnStartDateSetListener onStartDateSetListener;
 
-    private String selectedTime;
-    private Date   requestStartDate;
+    private Date   startDate, endDate;
+    private TimeWrapper timeWrapper;
     private String currentTag = TAG_FROM;
 
     public interface OnLayoutMoved {
@@ -84,14 +82,6 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
          * @param ratio 0 means the layout hasn't been changed, 1 means changed entirely
          */
         void onLayoutMoved(double ratio);
-    }
-
-    public interface OnDurationSetListener {
-        void onDurationSet(String duration);
-    }
-
-    public interface OnStartDateSetListener {
-        void onStartDateSet(Date startDate);
     }
 
     public MapLayout(Context context) {
@@ -132,53 +122,29 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
             timePickerDialog.show(activity.getFragmentManager(), picker.getTag());
         } catch (Exception ignore) {}
 
-        monthOfYear++;
-        selectedTime = "" + ((monthOfYear < 10)? ("0" + monthOfYear): monthOfYear) + "/"
-                + ((dayOfMonth < 10)? "0" + dayOfMonth : dayOfMonth) + "/" + year;
+        timeWrapper = new TimeWrapper(year, monthOfYear, dayOfMonth);
     }
 
     @Override
     public void onTimeSet(RadialPickerLayout picker, int hourOfDay, int minute) {
-//        selectedTime += " " + (hourOfDay < 10? "0" + hourOfDay : hourOfDay) + ":"
-//                + (minute < 10? "0" + minute : minute);
-//
-//        DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm");
-//        dateFormat.setTimeZone(TimeZone.getDefault());
-//        Date date = null;
-//
-//        try {
-//            date = dateFormat.parse(selectedTime);
-//        } catch (Exception e) {
-//            Logger.printStackTrace(e);
-//        }
-//
-//        if (currentTag == TAG_FROM) {
-//            tvFrom.setText(selectedTime);
-//            requestStartDate = date;
-//        }
-//
-//        if (onStartDateSetListener != null) {
-//            onStartDateSetListener.onStartDateSet(requestStartDate);
-//        }
+        Calendar cal = Calendar.getInstance();
+        cal.set(timeWrapper.year, timeWrapper.month, timeWrapper.day, hourOfDay, minute);
 
-//        if (!tvDuration.getText().toString().equals("Tap to select")
-//                && !tvFrom.getText().toString().equals("Tap to select")) {
-//            btnFind.setEnabled(true);
-//        }
-    }
+        long minDiff = (cal.getTimeInMillis() - Calendar.getInstance().getTimeInMillis()) /
+                (1000 * 60);
+        if (minDiff < 0) {
+            Toast.makeText(getContext(), "Invalid time", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-    @Override
-    public void onDurationSet(int duration, int durationType, String text) {
-//        tvDuration.setText(text);
-//
-//        if (onDurationSetListener != null) {
-//            onDurationSetListener.onDurationSet(text);
-//        }
-
-//        if (!tvDuration.getText().toString().equals("Tap to select")
-//                && !tvFrom.getText().toString().equals("Tap to select")) {
-//            btnFind.setEnabled(true);
-//        }
+        if (currentTag == TAG_FROM) {
+            startDate = cal.getTime();
+            tvStarting.setText(getDateStringScheduled((int) minDiff));
+        } else {
+            String timeString = getDateStringScheduled((int) minDiff);
+            timeString += " (" + getHoursStringAhead((int) minDiff) + ")";
+            tvEnding.setText(timeString);
+        }
     }
 
 //    public void setOnDurationSetListener(OnDurationSetListener onDurationSetListener) {
@@ -228,13 +194,21 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         }
     }
 
-    public Date getRequestStartDate() {
-        return requestStartDate;
-    }
+//    public Date getRequestStartDate() {
+//        return requestStartDate;
+//    }
 
 //    public String getDuration() {
 //        return tvDuration.getText().toString();
 //    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
 
     public View getMapContainer() {
         return mapContainer;
@@ -275,6 +249,16 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         btnCalendarEnding.setOnClickListener(new TimeTextViewListener(TAG_TO));
 
         setTimeSearchDetail();
+    }
+
+    private void setStartEndDates() {
+        Calendar startCal = Calendar.getInstance();
+        Calendar endCal = Calendar.getInstance();
+
+        endCal.add(Calendar.HOUR, 3);
+
+        startDate = startCal.getTime();
+        endDate = endCal.getTime();
     }
 
     private void setTimeSearchDetail() {
@@ -326,7 +310,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         } else if (dayOfYearScheduled - dayOfYearCurrent == 1) {
             timeString += "Tomorrow at ";
         } else {
-            timeString += DateUtil.getStringFromDate(scheduledCalendar.getTime(), "MM/dd at ");
+            timeString += DateUtil.getStringFromDate(scheduledCalendar.getTime(), "MM/dd") + " at ";
         }
 
         timeString += DateUtil.getStringFromDate(scheduledCalendar.getTime(), "hh:mm aa");
@@ -341,8 +325,9 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         long minDiff = (scheduledCalendar.getTimeInMillis() - currentCalendar.getTimeInMillis()) /
                 (1000 * 60);
         double hourDiff = minDiff / 60.0;
+        String hourText = String.format("%.1f", hourDiff);
 
-        return hourDiff + " " + (hourDiff <= 1? "hour" : "hours");
+        return hourText + " " + (hourDiff <= 1? "hour" : "hours");
     }
 
     private void init(Context context) {
@@ -351,6 +336,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         getWidgets();
 
         setupSearchDetail();
+        setStartEndDates();
 
 //        seekBar.setSeekPinByValue(SEEK_BAR_DEFAULT_VALUE_IN_FEET);
 
@@ -431,5 +417,17 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
 
         // This is a hack!!! Beware new Google Play Service update
         myLocationBtn = map.findViewById(2);
+    }
+
+    private static class TimeWrapper {
+        int year;
+        int month;
+        int day;
+
+        public TimeWrapper(int year, int month, int day) {
+            this.year = year;
+            this.month = month;
+            this.day = day;
+        }
     }
 }

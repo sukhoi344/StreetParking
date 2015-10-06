@@ -249,8 +249,8 @@ public class MapsActivity extends AppCompatActivity {
             public boolean onMarkerClick(Marker marker) {
                 if (parkingDetailDisplayer != null) {
                     ParkingLot parkingLot = parkingSpotMapLoader.getParkingLot(marker);
-                    parkingDetailDisplayer.display(parkingLot, mapLayout.getRequestStartDate(),
-                            "2 hours");
+                    parkingDetailDisplayer.display(parkingLot, mapLayout.getStartDate(),
+                            "3 hours");
                 }
 
                 return false;
