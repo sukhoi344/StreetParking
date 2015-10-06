@@ -43,8 +43,6 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     private static final String TAG_TO = "to";
     public static final int SEEK_BAR_DEFAULT_VALUE_IN_FEET = 300;
 
-    private static final int DEFAULT_DURATION_IN_HOUR = 1;
-
     // The map
     private View map;
     private View mapContainer;
@@ -66,12 +64,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     private Button                  btnSearchDetailCancel;
     private Button                  btnSearchDetailDone;
 
-    // Find parking spot layout
-//    private RangeBar    seekBar;
-//    private TextView    tvFrom, tvDuration;
     private TextView    tvLocation;
-//    private TextView    tvRadius;
-//    private OnStartDateSetListener onStartDateSetListener;
 
     private Date   startDate, endDate;
     private TimeWrapper timeWrapper;
@@ -147,26 +140,6 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         }
     }
 
-//    public void setOnDurationSetListener(OnDurationSetListener onDurationSetListener) {
-//        this.onDurationSetListener = onDurationSetListener;
-//    }
-//
-//    public void setOnStartDateSetListener(OnStartDateSetListener onStartDateSetListener) {
-//        this.onStartDateSetListener = onStartDateSetListener;
-//    }
-
-//    /**
-//     * Set seek bar listener
-//     */
-//    public void setSeekBarListener(RangeBar.OnRangeBarChangeListener listener) {
-//        if (seekBar != null && listener != null) {
-//            seekBar.setOnRangeBarChangeListener(listener);
-//        }
-//    }
-
-//    public void setTextRadius(String text) {
-//        tvRadius.setText(text);
-//    }
 
     /**
      * Set the text for the Parking Location layout
@@ -194,13 +167,6 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         }
     }
 
-//    public Date getRequestStartDate() {
-//        return requestStartDate;
-//    }
-
-//    public String getDuration() {
-//        return tvDuration.getText().toString();
-//    }
 
     public Date getStartDate() {
         return startDate;
@@ -213,14 +179,6 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     public View getMapContainer() {
         return mapContainer;
     }
-
-
-//    private void setCurrentTimeForPickers() {
-//        tvDuration.setText(DEFAULT_DURATION_IN_HOUR + " HOUR");
-//
-//        Date date = new Date();
-//        tvFrom.setText(DateUtil.getStringFromDate(date, DateUtil.DATE_STRING_FORMAT_1));
-//    }
 
     private void setupSearchDetail() {
         fab.setOnClickListener(new OnClickListener() {
@@ -268,23 +226,24 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         rangeBarStarting.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
             @Override
             public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex, int rightPinIndex, String leftPinValue, String rightPinValue) {
-                int value = Integer.parseInt(rightPinValue);
+                int value = rightPinIndex;
                 int minutes = (int) (value / 2.0f * 60);
 
                 tvStarting.setText(getDateStringScheduled(minutes));
+
+                Calendar cal = Calendar.getInstance();
+                cal.add(Calendar.MINUTE, minutes);
+                startDate = cal.getTime();
+
+                // Correct the ending date
+                setEndingDate(rangeBarEnding.getRightIndex());
             }
         });
 
         rangeBarEnding.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
             @Override
             public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex, int rightPinIndex, String leftPinValue, String rightPinValue) {
-                int value = Integer.parseInt(rightPinValue);
-                int minutes = (int) (value / 2.0f * 60);
-
-                String timeString = getDateStringScheduled(minutes);
-                timeString += " (" + getHoursStringAhead(minutes) + ")";
-
-                tvEnding.setText(timeString);
+                setEndingDate(rightPinIndex);
             }
         });
 
@@ -292,6 +251,24 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
 
         tvStarting.setText(getDateStringScheduled(0));
         tvEnding.setText(endingString);
+    }
+
+    private void setEndingDate(int rightPinIndex) {
+        int value = rightPinIndex + 1;
+        int minAfterAdded = (int) (value / 2.0f * 60);
+
+        Calendar currentCal = Calendar.getInstance();
+        int minStartAdded =  (int) (startDate.getTime() - currentCal.getTimeInMillis()) / (1000 * 60);
+        int totalMin = minAfterAdded + minStartAdded;
+
+        String timeString = getDateStringScheduled(totalMin);
+        timeString += " (" + getHoursStringAhead(totalMin) + ")";
+
+        tvEnding.setText(timeString);
+
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.MINUTE, totalMin);
+        endDate = cal.getTime();
     }
 
     private String getDateStringScheduled(int minutes) {
@@ -318,12 +295,10 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     }
 
     private String getHoursStringAhead(int minutes) {
-        Calendar currentCalendar = Calendar.getInstance();
         Calendar scheduledCalendar = Calendar.getInstance();
         scheduledCalendar.add(Calendar.MINUTE, minutes);
 
-        long minDiff = (scheduledCalendar.getTimeInMillis() - currentCalendar.getTimeInMillis()) /
-                (1000 * 60);
+        long minDiff = (scheduledCalendar.getTimeInMillis() - startDate.getTime()) / (1000 * 60);
         double hourDiff = minDiff / 60.0;
         String hourText = String.format("%.1f", hourDiff);
 
@@ -335,28 +310,8 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         inflater.inflate(R.layout.include_map_layout, this, true);
         getWidgets();
 
-        setupSearchDetail();
         setStartEndDates();
-
-//        seekBar.setSeekPinByValue(SEEK_BAR_DEFAULT_VALUE_IN_FEET);
-
-//        tvFrom.setOnClickListener(new TimeTextViewListener(TAG_FROM));
-//        tvDuration.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                try {
-//                    DurationPickerDialog dialog = DurationPickerDialog.newInstance(2,
-//                            DurationPickerDialog.DurationType.HOUR);
-//                    dialog.setDurationSetListener(MapLayout.this);
-//                    Activity activity = (Activity) getContext();
-//                    dialog.show(activity.getFragmentManager(), "duration");
-//                } catch (Exception e) {
-//                    Logger.printStackTrace(e);
-//                }
-//            }
-//        });
-//
-//        setCurrentTimeForPickers();
+        setupSearchDetail();
     }
 
     private class TimeTextViewListener implements OnClickListener {
@@ -392,11 +347,6 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     private void getWidgets() {
         mapContainer = findViewById(R.id.map_container);
         locationLayout = (ViewGroup) findViewById(R.id.location_layout);
-
-//        seekBar = (RangeBar) findViewById(R.id.seek_bar);
-//        tvRadius = (TextView) findViewById(R.id.tv_radius);
-//        tvFrom = (TextView) findViewById(R.id.from);
-//        tvDuration = (TextView) findViewById(R.id.duration);
         tvLocation = (TextView) findViewById(R.id.tv_location);
 
         SupportMapFragment supportMapFragment = (SupportMapFragment) ((FragmentActivity) getContext())
