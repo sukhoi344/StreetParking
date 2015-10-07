@@ -133,6 +133,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         if (currentTag == TAG_FROM) {
             startDate = cal.getTime();
             tvStarting.setText(getDateStringScheduled((int) minDiff));
+            setEndingDate(rangeBarEnding.getRightIndex());
         } else {
             String timeString = getDateStringScheduled((int) minDiff);
             timeString += " (" + getHoursStringAhead((int) minDiff) + ")";
