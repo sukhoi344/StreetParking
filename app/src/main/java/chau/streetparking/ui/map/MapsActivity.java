@@ -351,6 +351,7 @@ public class MapsActivity extends AppCompatActivity {
         });
 
         slidingPanelUp.setDragView(R.id.parking_detail_header);
+
     }
 
     private void updateLocationAddress(LatLng latLng) {

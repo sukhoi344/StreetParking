@@ -5,12 +5,17 @@ import android.app.Activity;
 import android.content.Context;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,6 +37,7 @@ import adik.fabtransitions.RevealToolbar;
 import chau.streetparking.R;
 import chau.streetparking.ui.picker.DurationPickerDialog;
 import chau.streetparking.util.DateUtil;
+import chau.streetparking.util.ImageUtil;
 import chau.streetparking.util.Logger;
 
 /**
@@ -55,6 +61,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     private FloatingActionButton    fab;
     private View                    revealView;
     private RevealToolbar           revealToolbar;
+    private EditText                etLocation;
     private Button                  btnCalendarStarting;
     private Button                  btnCalendarEnding;
     private RangeBar                rangeBarStarting;
@@ -313,7 +320,43 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
 
         setStartEndDates();
         setupSearchDetail();
+
+        test();
     }
+
+    private void test() {
+        final View view = LayoutInflater.from(getContext()).inflate(R.layout.location_suggest_view, MapLayout.this, false);
+        addView(view);
+        view.setClickable(true);
+
+        etLocation.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                int[] location = new int[2];
+                etLocation.getLocationInWindow(location);
+
+                int bottomMargin = getHeight() - location[1] - 200;
+                Logger.d("yolo", "bottom: " + bottomMargin);
+
+                ViewGroup.MarginLayoutParams params = (MarginLayoutParams) view.getLayoutParams();
+                params.setMargins(location[0], 0, 0, bottomMargin);
+
+                view.setLayoutParams(params);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+    }
+
+
 
     private class TimeTextViewListener implements OnClickListener {
         private final String TAG;
@@ -357,6 +400,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         fab = (FloatingActionButton) findViewById(R.id.fab);
         revealView = findViewById(R.id.reveal);
         revealToolbar = new RevealToolbar((Activity) getContext(), revealView, fab);
+        etLocation = (EditText) findViewById(R.id.location_address);
         btnCalendarStarting = (Button) findViewById(R.id.btn_calendar_starting);
         btnCalendarEnding = (Button) findViewById(R.id.btn_calendar_ending);
         rangeBarStarting = (RangeBar) findViewById(R.id.seek_bar_starting);

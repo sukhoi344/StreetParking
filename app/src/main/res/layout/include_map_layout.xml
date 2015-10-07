@@ -49,6 +49,28 @@
             android:layout_height="5dp"
             android:layout_gravity="bottom"
             android:background="@drawable/gradient_bottom_dark" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab"
+            style="@style/floating_action_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:src="@drawable/ic_action_search_white"
+            app:backgroundTint="@color/primary_light"
+            app:borderWidth="1dp"
+            app:fabSize="normal"
+            app:rippleColor="@color/primary"/>
+
+        <!-- Search detail layout-->
+        <adik.fabtransitions.MorphFrameLayout
+            android:id="@+id/hide"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom">
+
+            <include layout="@layout/search_detail_include" />
+        </adik.fabtransitions.MorphFrameLayout>
     </FrameLayout>
 
     <com.sothree.slidinguppanel.SlidingUpPanelLayout
@@ -68,29 +90,4 @@
 
         <include layout="@layout/parking_detail_layout_include" />
     </com.sothree.slidinguppanel.SlidingUpPanelLayout>
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        style="@style/floating_action_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:src="@drawable/ic_action_search_white"
-        app:backgroundTint="@color/primary_light"
-        app:borderWidth="1dp"
-        app:fabSize="normal"
-        app:rippleColor="@color/primary"/>
-
-    <!-- Search detail layout-->
-    <adik.fabtransitions.MorphFrameLayout
-        android:id="@+id/hide"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="bottom">
-
-        <include layout="@layout/search_detail_include" />
-    </adik.fabtransitions.MorphFrameLayout>
-
-    <!-- Find Parking Spot Layout -->
-    <include layout="@layout/find_parking_spot_layout_include" />
 </FrameLayout>
