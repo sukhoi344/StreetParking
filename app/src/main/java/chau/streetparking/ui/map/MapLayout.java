@@ -9,13 +9,11 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,18 +24,12 @@ import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.TimeZone;
 
 import adik.fabtransitions.RevealToolbar;
 import chau.streetparking.R;
-import chau.streetparking.ui.picker.DurationPickerDialog;
 import chau.streetparking.util.DateUtil;
-import chau.streetparking.util.ImageUtil;
 import chau.streetparking.util.Logger;
 
 /**
@@ -70,6 +62,9 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     private TextView                tvEnding;
     private Button                  btnSearchDetailCancel;
     private Button                  btnSearchDetailDone;
+
+    // Suggest locations View
+    private LocationSuggestView viewSuggest;
 
     private TextView    tvLocation;
 
@@ -201,6 +196,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
             @Override
             public void onClick(View v) {
                 revealToolbar.HideReveal(revealView);
+                viewSuggest.hide();
             }
         });
 
@@ -321,13 +317,16 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         setStartEndDates();
         setupSearchDetail();
 
-        test();
+        setupSuggestView();
     }
 
-    private void test() {
-        final View view = LayoutInflater.from(getContext()).inflate(R.layout.location_suggest_view, MapLayout.this, false);
-        addView(view);
-        view.setClickable(true);
+    private void setupSuggestView() {
+//        final View view = LayoutInflater.from(getContext()).inflate(R.layout.location_suggest_view, MapLayout.this, false);
+        viewSuggest = new LocationSuggestView(getContext());
+
+        addView(viewSuggest);
+        viewSuggest.setClickable(true);
+        viewSuggest.setVisibility(View.INVISIBLE);
 
         etLocation.addTextChangedListener(new TextWatcher() {
             @Override
@@ -343,10 +342,8 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
                 int bottomMargin = getHeight() - location[1] - 200;
                 Logger.d("yolo", "bottom: " + bottomMargin);
 
-                ViewGroup.MarginLayoutParams params = (MarginLayoutParams) view.getLayoutParams();
-                params.setMargins(location[0], 0, 0, bottomMargin);
-
-                view.setLayoutParams(params);
+                viewSuggest.setMargin(bottomMargin, location[0], location[0]);
+                viewSuggest.show();
             }
 
             @Override
@@ -355,8 +352,6 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
             }
         });
     }
-
-
 
     private class TimeTextViewListener implements OnClickListener {
         private final String TAG;

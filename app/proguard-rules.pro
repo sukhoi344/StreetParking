@@ -21,6 +21,15 @@
 -keep class chau.streetparking.datamodels.** {*;}
 -keep class com.stripe.** { *; }
 
+-keepclassmembers class ** {
+    public void onEvent*(**);
+}
+
+# Only required if you use AsyncExecutor
+-keepclassmembers class * extends de.greenrobot.event.util.ThrowableFailureEvent {
+    <init>(java.lang.Throwable);
+}
+
 -dontwarn com.backendless.**
 -dontwarn weborb.**
 -dontwarn com.makeramen.roundedimageview.**
