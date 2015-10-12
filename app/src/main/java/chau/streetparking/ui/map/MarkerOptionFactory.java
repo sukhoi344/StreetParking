@@ -11,11 +11,14 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.ui.IconGenerator;
 import com.parse.ParseGeoPoint;
 
+import java.util.Date;
+
 import chau.streetparking.R;
 import chau.streetparking.datamodels.foursquare.Location;
 import chau.streetparking.datamodels.foursquare.Venue;
 import chau.streetparking.datamodels.parse.ParkingLot;
 import chau.streetparking.util.Logger;
+import chau.streetparking.util.ParkingUtil;
 
 /**
  * Created by Chau Thai on 9/19/2015.
@@ -50,17 +53,13 @@ public class MarkerOptionFactory {
         return null;
     }
 
-    public static MarkerOptions create(Context context, ParkingLot parkingLot, String duration) {
+    public static MarkerOptions create(Context context, ParkingLot parkingLot, Date startDate, Date endDate) {
         try {
             if (parkingLot != null) {
                 ParseGeoPoint location = parkingLot.getLocation();
                 LatLng position = new LatLng(location.getLatitude(), location.getLongitude());
 
-                String split[] = duration.split(" ");
-                int durationValue = Integer.parseInt(split[0]);
-                String durationType = split[1];
-
-                int totalPrice = (int) (durationValue * parkingLot.getPrice());
+                int totalPrice = ParkingUtil.getPrice(parkingLot, startDate, endDate);
                 String price = "$" + totalPrice;
 
                 IconGenerator iconGenerator = new IconGenerator(context);
@@ -80,6 +79,4 @@ public class MarkerOptionFactory {
 
         return null;
     }
-
-
 }

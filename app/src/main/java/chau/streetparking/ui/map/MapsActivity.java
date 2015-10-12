@@ -218,7 +218,6 @@ public class MapsActivity extends AppCompatActivity {
         int radiusInMeter = (int) (MapLayout.SEEK_BAR_DEFAULT_VALUE_IN_FEET * 0.3048);
         seekBarRadiusInMeter = radiusInMeter;
 
-        // TODO: change the "2 hours" duration
         googleMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
             @Override
             public void onCameraChange(CameraPosition cameraPosition) {
@@ -238,7 +237,7 @@ public class MapsActivity extends AppCompatActivity {
                 // Display venues and parking spots on the visible map region
                 LatLngBounds latLngBounds = googleMap.getProjection().getVisibleRegion().latLngBounds;
                 venueMapLoader.load(latLngBounds);
-                parkingSpotMapLoader.load(latLngBounds, "2 hours");
+                parkingSpotMapLoader.load(latLngBounds, mapLayout.getStartDate(), mapLayout.getEndDate());
             }
         });
 
@@ -249,7 +248,7 @@ public class MapsActivity extends AppCompatActivity {
                 if (parkingDetailDisplayer != null) {
                     ParkingLot parkingLot = parkingSpotMapLoader.getParkingLot(marker);
                     parkingDetailDisplayer.display(parkingLot, mapLayout.getStartDate(),
-                            "3 hours");
+                            mapLayout.getEndDate());
                 }
 
                 return false;
@@ -272,26 +271,6 @@ public class MapsActivity extends AppCompatActivity {
     }
 
     private void setupMapLayout() {
-//        mapLayout.setSeekBarListener(new RangeBar.OnRangeBarChangeListener() {
-//            @Override
-//            public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex, int rightPinIndex,
-//                                              String leftPinValue, String rightPinValue) {
-//                double radiusInFt = Double.parseDouble(rightPinValue);
-//
-//                int radiusInMeter = (int) (radiusInFt * 0.3048);
-//                seekBarRadiusInMeter = radiusInMeter;
-//                mapFragment.setRadius(MapUtil.convertMetersToPixels(googleMap,
-//                        googleMap.getCameraPosition().target, radiusInMeter));
-//
-//                mapLayout.setTextRadius(rightPinValue + " ft");
-//
-//                if (radiusInFt == rangeBar.getTickEnd()) {
-//                    rangeBar.setTickEnd(rangeBar.getTickEnd() * 2.0f);
-//                }
-//
-//            }
-//        });
-
         mapLayout.setLocationLayoutOnClick(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -300,51 +279,16 @@ public class MapsActivity extends AppCompatActivity {
             }
         });
 
-        mapLayout.setOnLayoutMoved(new MapLayout.OnLayoutMoved() {
-            @Override
-            public void onLayoutMoved(double ratio) {
-//                int topMargin = -(int) (actionBarHeight * ratio);
-//
-//                LinearLayout.MarginLayoutParams params = (LinearLayout.MarginLayoutParams) toolbar.getLayoutParams();
-//                params.setMargins(params.leftMargin, topMargin, params.rightMargin, params.bottomMargin);
-//                toolbar.setLayoutParams(params);
-            }
-        });
-
         mapLayout.setMyLocationBtnMargin(getResources()
                 .getDimensionPixelSize(R.dimen.google_map_top_margin));
-
-//        mapLayout.setOnDurationSetListener(new MapLayout.OnDurationSetListener() {
-//            @Override
-//            public void onDurationSet(String duration) {
-//                if (parkingDetailDisplayer != null) {
-//                    parkingDetailDisplayer.setDuration(duration);
-//                }
-//
-//                if (parkingSpotMapLoader != null) {
-//                    parkingSpotMapLoader.setDuration(
-//                            googleMap.getProjection().getVisibleRegion().latLngBounds,
-//                            duration);
-//                }
-//            }
-//        });
-
-//        mapLayout.setOnStartDateSetListener(new MapLayout.OnStartDateSetListener() {
-//            @Override
-//            public void onStartDateSet(Date startDate) {
-//                if (parkingDetailDisplayer != null) {
-//                    parkingDetailDisplayer.setStartDate(startDate);
-//                }
-//            }
-//        });
 
         mapLayout.setBtnDoneOnClick(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Date startDate = mapLayout.getStartDate();
-                Date endDate = mapLayout.getEndDate();
-                String textLocation = mapLayout.getSearchText();
-                LatLng latLng = mapLayout.getSearchLatLng();
+                MapLayout.SearchDetail searchDetail = mapLayout.getSearchDetail();
+                LatLngBounds latLngBounds = googleMap.getProjection().getVisibleRegion().latLngBounds;
+                parkingDetailDisplayer.setDates(searchDetail.startDate, searchDetail.endDate);
+                parkingSpotMapLoader.setDates(latLngBounds, searchDetail.startDate, searchDetail.endDate);
 
             }
         });

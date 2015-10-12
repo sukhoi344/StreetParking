@@ -11,6 +11,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -53,7 +54,7 @@ public class ParkingSpotMapLoader {
         smallDot = BitmapDescriptorFactory.fromResource(R.drawable.green_dot);
     }
 
-    public void load(final LatLngBounds latLngBounds, final String duration) {
+    public void load(final LatLngBounds latLngBounds, final Date startDate, final Date endDate) {
         final float distance = MapUtil.getDistance(latLngBounds.northeast, latLngBounds.southwest);
 
         if (distance > maxDisplayDistance)
@@ -72,7 +73,7 @@ public class ParkingSpotMapLoader {
                                 cache.add(parkingLot);
 
                                 MarkerOptions markerOptions = MarkerOptionFactory
-                                        .create(activity, parkingLot, duration);
+                                        .create(activity, parkingLot, startDate, endDate);
                                 Marker marker = map.addMarker(markerOptions);
 
                                 markerSet.add(marker);
@@ -94,7 +95,7 @@ public class ParkingSpotMapLoader {
         });
     }
 
-    public void setDuration(final LatLngBounds latLngBounds, final String duration) {
+    public void setDates(final LatLngBounds latLngBounds, final Date startDate, final Date endDate) {
         final float distance = MapUtil.getDistance(latLngBounds.northeast, latLngBounds.southwest);
 
         final Map<Marker, ParkingLot> newMap = new HashMap<>();
@@ -110,7 +111,7 @@ public class ParkingSpotMapLoader {
 
                     cache.add(parkingLot);
                      final MarkerOptions markerOptions = MarkerOptionFactory
-                            .create(activity, parkingLot, duration);
+                            .create(activity, parkingLot, startDate, endDate);
 
                     activity.runOnUiThread(new Runnable() {
                         @Override

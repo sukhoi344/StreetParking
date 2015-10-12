@@ -59,7 +59,7 @@ public class RequestAdapter extends RecyclerView.Adapter {
 
             viewHolder.address.setText(request.getLocation().toString());
             viewHolder.start.setText(request.getStartTime().toString());
-            viewHolder.end.setText(request.getDuration());
+            viewHolder.end.setText(request.getEndTime().toString());
             viewHolder.view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

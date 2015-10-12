@@ -13,6 +13,7 @@ import java.util.Date;
 import chau.streetparking.R;
 import chau.streetparking.datamodels.parse.ParkingLot;
 import chau.streetparking.util.Logger;
+import chau.streetparking.util.ParkingUtil;
 
 /**
  * Created by Chau Thai on 9/26/2015.
@@ -41,14 +42,14 @@ public class ParkingDetailDisplayer {
         close();
     }
 
-    public void display(ParkingLot parkingLot, Date startDate, String duration) {
+    public void display(ParkingLot parkingLot, Date startDate, Date endDate) {
         if (parkingLot == null)
             return;
 
         try {
             currentParkingLot = parkingLot;
-            setupHeader(parkingLot, duration);
-            setupItems(parkingLot, duration);
+            setupHeader(parkingLot, startDate, endDate);
+            setupItems(parkingLot);
 
             // Show the panel
             panel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
@@ -61,26 +62,41 @@ public class ParkingDetailDisplayer {
         panel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
     }
 
-    public void setStartDate(Date startDate) {
-
-    }
-
-    public void setDuration(String duration) {
+    public void setDates(Date startDate, Date endDate) {
         if (currentParkingLot != null) {
-            showPrice(currentParkingLot, duration);
+            showPrice(currentParkingLot, startDate, endDate);
         }
     }
 
-    private void setupHeader(ParkingLot parkingLot, String duration) {
+    private void setupHeader(ParkingLot parkingLot, Date startDate, Date endDate) {
         // Set price
-        showPrice(parkingLot, duration);
+        showPrice(parkingLot, startDate, endDate);
 
         // Set address
         tvAddress.setText(parkingLot.getAddress());
     }
 
-    private void setupItems(ParkingLot parkingLot, String duration) {
-        tvItemPrice.setText("$" + parkingLot.getPrice() + " per Hour");
+    private void setupItems(ParkingLot parkingLot) {
+        String textPrice = "$" + parkingLot.getPrice();
+        String priceType = parkingLot.getPriceType();
+
+        switch (priceType) {
+            case ParkingLot.PriceType.HOURLY:
+                textPrice += " per Hour";
+                break;
+            case ParkingLot.PriceType.MONTHLY:
+                textPrice += " per Month";
+                break;
+            case ParkingLot.PriceType.DAILY:
+                textPrice += " per Day";
+                break;
+            default:
+                textPrice += " per Hour";
+                break;
+        }
+
+
+        tvItemPrice.setText(textPrice);
 
         if (parkingLot.getInfo() != null && !parkingLot.getInfo().isEmpty()) {
             tvItemInfo.setText(parkingLot.getInfo());
@@ -92,13 +108,10 @@ public class ParkingDetailDisplayer {
         tvItemAbout.setText(Html.fromHtml(textAbout));
     }
 
-    private void showPrice(ParkingLot parkingLot, String duration) {
-        String split[] = duration.split(" ");
-        int durationValue = Integer.parseInt(split[0]);
-        String durationType = split[1];
-
-        int totalPrice = (int) (durationValue * parkingLot.getPrice());
-        tvPrice.setText("$" + totalPrice);
+    private void showPrice(ParkingLot parkingLot, Date startDate, Date endDate) {
+        int totalPrice = ParkingUtil.getPrice(parkingLot, startDate, endDate);
+        String text = "$" + totalPrice;
+        tvPrice.setText(text);
     }
 
     private void getWidgets() {

@@ -16,7 +16,7 @@ public class Request extends ParseObject {
     private static final String KEY_USER = "user";
     private static final String KEY_TO = "to";
     private static final String KEY_START_TIME = "startTime";
-    private static final String KEY_DURATION = "duration";
+    private static final String KEY_END_TIME = "endTime";
     private static final String KEY_LOCATION = "location";
     private static final String KEY_RADIUS = "radius";
     private static final String KEY_STATUS = "status";
@@ -45,14 +45,13 @@ public class Request extends ParseObject {
         put(KEY_START_TIME, date);
     }
 
-    public void setDuration(String duration) {
-        put(KEY_DURATION, duration);
+    public void setEndTime(Date date) {
+        put(KEY_END_TIME, date);
     }
 
-    public String getDuration() {
-        return getString(KEY_DURATION);
+    public Date getEndTime() {
+        return getDate(KEY_END_TIME);
     }
-
 
     public ParseGeoPoint getLocation() {
         return getParseGeoPoint(KEY_LOCATION);

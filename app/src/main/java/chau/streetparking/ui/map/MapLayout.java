@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -228,26 +229,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
             @Override
             public void onClick(View v) {
                 setTimeSearchDetail();
-                revealView.setVisibility(View.VISIBLE);
-
-                Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.slide_bottom_up);
-                animation.setAnimationListener(new Animation.AnimationListener() {
-                    @Override
-                    public void onAnimationStart(Animation animation) {
-                        fab.hide();
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animation animation) {
-                        revealView.setVisibility(View.VISIBLE);
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animation animation) {
-
-                    }
-                });
-                revealView.startAnimation(animation);
+                showSearchPanel();
             }
         });
 
@@ -259,25 +241,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
                 if (btnCancelOnClick != null)
                     btnCancelOnClick.onClick(v);
 
-                Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.slide_bottom_out);
-                animation.setAnimationListener(new Animation.AnimationListener() {
-                    @Override
-                    public void onAnimationStart(Animation animation) {
-
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animation animation) {
-                        revealView.setVisibility(View.INVISIBLE);
-                        fab.show();
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animation animation) {
-
-                    }
-                });
-                revealView.startAnimation(animation);
+                hideSearchPanel();
             }
         });
 
@@ -286,6 +250,8 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
             public void onClick(View v) {
                 if (btnDoneOnClick != null)
                     btnDoneOnClick.onClick(v);
+
+                hideSearchPanel();
             }
         });
 
@@ -424,6 +390,9 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
                 etLocation.setText(location);
                 etLocation.setSelection(location.length());
                 viewSuggest.hide();
+
+                InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(etLocation.getWindowToken(), 0);
             }
         });
 
@@ -444,6 +413,51 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
             @Override
             public void afterTextChanged(Editable s) {}
         });
+    }
+
+    private void showSearchPanel() {
+        revealView.setVisibility(View.VISIBLE);
+
+        Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.slide_bottom_up);
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                fab.hide();
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                revealView.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        revealView.startAnimation(animation);
+    }
+
+    private void hideSearchPanel() {
+        Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.slide_bottom_out);
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                revealView.setVisibility(View.INVISIBLE);
+                fab.show();
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        revealView.startAnimation(animation);
     }
 
     private class TimeTextViewListener implements OnClickListener {
