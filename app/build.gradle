@@ -11,6 +11,7 @@ android {
         versionCode 8
         versionName "1.0 Build 1509.01"
     }
+
     buildTypes {
         release {
             minifyEnabled true
@@ -76,5 +77,7 @@ dependencies {
     compile 'com.sothree.slidinguppanel:library:3.1.1'
     compile 'me.grantland:autofittextview:0.2.+'
     compile files('libs/ParseFacebookUtilsV4-1.9.4.jar')
-    compile(name:'fabtransition', ext:'aar')
+    compile ('com.github.ozodrukh:CircularReveal:1.1.1@aar') {
+        transitive = true;
+    }
 }

@@ -5,149 +5,163 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:visibility="invisible"
-    android:background="@android:color/white"
+    android:background="@android:color/transparent"
+    android:layout_gravity="bottom"
     android:clickable="true">
 
-    <TextView
+    <View
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/primary"
-        android:paddingLeft="10dp"
-        android:text="Search Detail"
-        android:textColor="@android:color/white"/>
+        android:layout_height="5dp"
+        android:background="@drawable/gradient_bottom_dark" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="-10dp"
-        android:textSize="@dimen/search_detail_reveal_text_title"
-        android:text="Location"/>
-
-    <EditText
-        android:id="@+id/location_address"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:inputType="textPostalAddress" />
-
-    <!-- Starting layout -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:orientation="horizontal">
+        android:orientation="vertical"
+        android:background="@android:color/white">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/primary"
+            android:paddingLeft="10dp"
+            android:text="Search Detail"
+            android:textColor="@android:color/white"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
-            android:textSize="@dimen/search_detail_reveal_text_title"
-            android:text="Starting"/>
-
-        <TextView
-            android:id="@+id/text_starting"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Today at 5pm"
-            android:singleLine="true"
-            android:textColor="@color/search_detail_reveal_text_time"/>
-
-        <Button
-            android:id="@+id/btn_calendar_starting"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="0dp"
-            android:minWidth="0dp"
             android:layout_marginLeft="10dp"
-            android:background="@drawable/ic_action_calendar"/>
-    </LinearLayout>
-
-    <com.appyvet.rangebar.RangeBar
-        xmlns:custom="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/seek_bar_starting"
-        android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:layout_marginLeft="6dp"
-        android:layout_marginRight="6dp"
-        custom:tickStart="0"
-        custom:tickInterval="1"
-        custom:tickEnd="24"
-        custom:tickColor="#00FFFFFF"
-        custom:rangeBar="false"/>
-
-    <!-- Ending layout -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="-10dp"
             android:textSize="@dimen/search_detail_reveal_text_title"
-            android:text="Ending"/>
+            android:text="Location"/>
 
-        <TextView
-            android:id="@+id/text_ending"
-            android:layout_width="0dp"
+        <EditText
+            android:id="@+id/location_address"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Tomorrow at 5pm"
-            android:singleLine="true"
-            android:textColor="@color/search_detail_reveal_text_time"/>
-
-        <Button
-            android:id="@+id/btn_calendar_ending"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="0dp"
-            android:minWidth="0dp"
             android:layout_marginLeft="10dp"
-            android:background="@drawable/ic_action_calendar"/>
+            android:layout_marginRight="10dp"
+            android:inputType="textPostalAddress" />
+
+        <!-- Starting layout -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:textSize="@dimen/search_detail_reveal_text_title"
+                android:text="Starting"/>
+
+            <TextView
+                android:id="@+id/text_starting"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Today at 5pm"
+                android:singleLine="true"
+                android:textColor="@color/search_detail_reveal_text_time"/>
+
+            <Button
+                android:id="@+id/btn_calendar_starting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/ic_action_calendar"/>
+        </LinearLayout>
+
+        <com.appyvet.rangebar.RangeBar
+            xmlns:custom="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/seek_bar_starting"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_marginLeft="6dp"
+            android:layout_marginRight="6dp"
+            custom:tickStart="0"
+            custom:tickInterval="1"
+            custom:tickEnd="24"
+            custom:tickColor="#00FFFFFF"
+            custom:rangeBar="false"/>
+
+        <!-- Ending layout -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:textSize="@dimen/search_detail_reveal_text_title"
+                android:text="Ending"/>
+
+            <TextView
+                android:id="@+id/text_ending"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Tomorrow at 5pm"
+                android:singleLine="true"
+                android:textColor="@color/search_detail_reveal_text_time"/>
+
+            <Button
+                android:id="@+id/btn_calendar_ending"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="0dp"
+                android:minWidth="0dp"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/ic_action_calendar"/>
+        </LinearLayout>
+
+        <com.appyvet.rangebar.RangeBar
+            xmlns:custom="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/seek_bar_ending"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_marginLeft="6dp"
+            android:layout_marginRight="6dp"
+            custom:tickStart="1"
+            custom:tickInterval="1"
+            custom:tickEnd="24"
+            custom:tickColor="#00FFFFFF"
+            custom:rangeBar="false"/>
+
+        <!-- Cancel and Done button layout-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical|end">
+
+            <Button
+                android:id="@+id/search_detail_cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:background="@drawable/flat_button_selector"
+                android:textColor="@color/primary"
+                android:text="Cancel"/>
+
+            <Button
+                android:id="@+id/search_detail_done"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:textColor="@color/primary"
+                android:background="@drawable/flat_button_selector"
+                android:text="Done"/>
+        </LinearLayout>
     </LinearLayout>
 
-    <com.appyvet.rangebar.RangeBar
-        xmlns:custom="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/seek_bar_ending"
-        android:layout_width="match_parent"
-        android:layout_height="30dp"
-        android:layout_marginLeft="6dp"
-        android:layout_marginRight="6dp"
-        custom:tickStart="1"
-        custom:tickInterval="1"
-        custom:tickEnd="24"
-        custom:tickColor="#00FFFFFF"
-        custom:rangeBar="false"/>
-
-    <!-- Cancel and Done button layout-->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_marginEnd="8dp"
-        android:orientation="horizontal"
-        android:gravity="center_vertical|end">
-
-        <Button
-            android:id="@+id/search_detail_cancel"
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:background="@drawable/flat_button_selector"
-            android:textColor="@color/primary"
-            android:text="Cancel"/>
-
-        <Button
-            android:id="@+id/search_detail_done"
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:textColor="@color/primary"
-            android:background="@drawable/flat_button_selector"
-            android:text="Done"/>
-    </LinearLayout>
 </LinearLayout>

@@ -50,7 +50,6 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import java.util.Date;
 import java.util.List;
 
-import adik.fabtransitions.RevealToolbar;
 import chau.streetparking.R;
 import chau.streetparking.datamodels.parse.ParkingLot;
 import chau.streetparking.datamodels.parse.Request;
@@ -267,7 +266,7 @@ public class MapsActivity extends AppCompatActivity {
 
         setupPanelUpLayout();
         setupMapLayout();
-        enableCircle();
+//        enableCircle();
 
         parkingDetailDisplayer = new ParkingDetailDisplayer(this, googleMap, slidingPanelUp);
     }
@@ -338,6 +337,17 @@ public class MapsActivity extends AppCompatActivity {
 //                }
 //            }
 //        });
+
+        mapLayout.setBtnDoneOnClick(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Date startDate = mapLayout.getStartDate();
+                Date endDate = mapLayout.getEndDate();
+                String textLocation = mapLayout.getSearchText();
+                LatLng latLng = mapLayout.getSearchLatLng();
+
+            }
+        });
     }
 
     private void setupPanelUpLayout() {

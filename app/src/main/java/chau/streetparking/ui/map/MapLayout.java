@@ -3,6 +3,7 @@ package chau.streetparking.ui.map;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.location.Address;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentActivity;
 import android.text.Editable;
@@ -11,6 +12,8 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -20,6 +23,7 @@ import android.widget.Toast;
 
 import com.appyvet.rangebar.RangeBar;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
@@ -27,10 +31,9 @@ import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 import java.util.Calendar;
 import java.util.Date;
 
-import adik.fabtransitions.RevealToolbar;
 import chau.streetparking.R;
 import chau.streetparking.util.DateUtil;
-import chau.streetparking.util.Logger;
+import chau.streetparking.util.ImageUtil;
 
 /**
  * Created by Chau Thai on 6/9/2015.
@@ -52,7 +55,6 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     // Search Detail panel
     private FloatingActionButton    fab;
     private View                    revealView;
-    private RevealToolbar           revealToolbar;
     private EditText                etLocation;
     private Button                  btnCalendarStarting;
     private Button                  btnCalendarEnding;
@@ -63,8 +65,13 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     private Button                  btnSearchDetailCancel;
     private Button                  btnSearchDetailDone;
 
+    // Listener
+    private OnClickListener btnDoneOnClick;
+    private OnClickListener btnCancelOnClick;
+
     // Suggest locations View
     private LocationSuggestView viewSuggest;
+    private AddressWrapper addressWrapper;
 
     private TextView    tvLocation;
 
@@ -170,13 +177,46 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         }
     }
 
-
     public Date getStartDate() {
         return startDate;
     }
 
     public Date getEndDate() {
         return endDate;
+    }
+
+    public String getSearchText() {
+        return etLocation.getText().toString();
+    }
+
+    public LatLng getSearchLatLng() {
+        if (addressWrapper == null)
+            return null;
+
+        String searchText = etLocation.getText().toString();
+        if (searchText.equals(addressWrapper.text)) {
+            return new LatLng(addressWrapper.address.getLatitude(),
+                    addressWrapper.address.getLongitude());
+        }
+
+        return null;
+    }
+
+    public SearchDetail getSearchDetail() {
+        return new SearchDetail(
+                startDate,
+                endDate,
+                getSearchText(),
+                getSearchLatLng()
+        );
+    }
+
+    public void setBtnDoneOnClick(OnClickListener onClick) {
+        this.btnDoneOnClick = onClick;
+    }
+
+    public void setBtnCancelOnClick(OnClickListener onClick) {
+        this.btnCancelOnClick = onClick;
     }
 
     public View getMapContainer() {
@@ -187,23 +227,65 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         fab.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                revealToolbar.Reveal(revealView);
                 setTimeSearchDetail();
+                revealView.setVisibility(View.VISIBLE);
+
+                Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.slide_bottom_up);
+                animation.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+                        fab.hide();
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        revealView.setVisibility(View.VISIBLE);
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+
+                    }
+                });
+                revealView.startAnimation(animation);
             }
         });
 
         btnSearchDetailCancel.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                revealToolbar.HideReveal(revealView);
                 viewSuggest.hide();
+
+                if (btnCancelOnClick != null)
+                    btnCancelOnClick.onClick(v);
+
+                Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.slide_bottom_out);
+                animation.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        revealView.setVisibility(View.INVISIBLE);
+                        fab.show();
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+
+                    }
+                });
+                revealView.startAnimation(animation);
             }
         });
 
         btnSearchDetailDone.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                revealToolbar.HideReveal(revealView);
+                if (btnDoneOnClick != null)
+                    btnDoneOnClick.onClick(v);
             }
         });
 
@@ -211,6 +293,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         btnCalendarEnding.setOnClickListener(new TimeTextViewListener(TAG_TO));
 
         setTimeSearchDetail();
+//        revealView.setVisibility(View.VISIBLE);
     }
 
     private void setStartEndDates() {
@@ -316,40 +399,50 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
 
         setStartEndDates();
         setupSearchDetail();
-
         setupSuggestView();
     }
 
     private void setupSuggestView() {
-//        final View view = LayoutInflater.from(getContext()).inflate(R.layout.location_suggest_view, MapLayout.this, false);
         viewSuggest = new LocationSuggestView(getContext());
 
         addView(viewSuggest);
         viewSuggest.setClickable(true);
         viewSuggest.setVisibility(View.INVISIBLE);
 
+        viewSuggest.setOnSuggestSelectedListener(new LocationSuggestView.OnSuggestSelectedListener() {
+            @Override
+            public void onSelected(Address address) {
+                String location = address.getAddressLine(0);
+                if (address.getMaxAddressLineIndex() >= 1)
+                    location += ", " + address.getAddressLine(1);
+
+                // Save it
+                addressWrapper = new AddressWrapper();
+                addressWrapper.text = location;
+                addressWrapper.address = address;
+
+                etLocation.setText(location);
+                etLocation.setSelection(location.length());
+                viewSuggest.hide();
+            }
+        });
+
         etLocation.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 int[] location = new int[2];
                 etLocation.getLocationInWindow(location);
-
-                int bottomMargin = getHeight() - location[1] - 200;
-                Logger.d("yolo", "bottom: " + bottomMargin);
+                int bottomMargin = getHeight() - location[1] - ImageUtil.getPixelFromDP(65);
 
                 viewSuggest.setMargin(bottomMargin, location[0], location[0]);
-                viewSuggest.show();
+                viewSuggest.search(s.toString());
             }
 
             @Override
-            public void afterTextChanged(Editable s) {
-
-            }
+            public void afterTextChanged(Editable s) {}
         });
     }
 
@@ -394,7 +487,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
         revealView = findViewById(R.id.reveal);
-        revealToolbar = new RevealToolbar((Activity) getContext(), revealView, fab);
+//        revealToolbar = new RevealToolbar((Activity) getContext(), revealView, fab);
         etLocation = (EditText) findViewById(R.id.location_address);
         btnCalendarStarting = (Button) findViewById(R.id.btn_calendar_starting);
         btnCalendarEnding = (Button) findViewById(R.id.btn_calendar_ending);
@@ -409,6 +502,20 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         myLocationBtn = map.findViewById(2);
     }
 
+    public static class SearchDetail {
+        Date startDate;
+        Date endDate;
+        String locationText;
+        LatLng latLng;
+
+        public SearchDetail(Date startDate, Date endDate, String locationText, LatLng latLng) {
+            this.startDate = startDate;
+            this.endDate = endDate;
+            this.locationText = locationText;
+            this.latLng = latLng;
+        }
+    }
+
     private static class TimeWrapper {
         int year;
         int month;
@@ -419,5 +526,10 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
             this.month = month;
             this.day = day;
         }
+    }
+
+    private static class AddressWrapper {
+        Address address;
+        String text;
     }
 }

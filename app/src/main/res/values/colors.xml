@@ -36,4 +36,8 @@
     <!-- Search detail reveal -->
     <color name="search_detail_reveal_text_time">#ff0099cc</color>
 
+    <!-- row selector light-->
+    <color name="row_light_up">#00ffffff</color>
+    <color name="row_light_down">#11000000</color>
+
 </resources>

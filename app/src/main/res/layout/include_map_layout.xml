@@ -25,7 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:visibility="visible">
+            android:visibility="invisible">
 
             <View
                 android:layout_width="20dp"
@@ -43,13 +43,6 @@
         <!-- Location layout  -->
         <include layout="@layout/location_layout_include" />
 
-        <!-- Shadow view -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="5dp"
-            android:layout_gravity="bottom"
-            android:background="@drawable/gradient_bottom_dark" />
-
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"
             style="@style/floating_action_button"
@@ -62,15 +55,13 @@
             app:fabSize="normal"
             app:rippleColor="@color/primary"/>
 
-        <!-- Search detail layout-->
-        <adik.fabtransitions.MorphFrameLayout
-            android:id="@+id/hide"
+        <io.codetail.widget.RevealFrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_gravity="bottom">
 
             <include layout="@layout/search_detail_include" />
-        </adik.fabtransitions.MorphFrameLayout>
+        </io.codetail.widget.RevealFrameLayout>
     </FrameLayout>
 
     <com.sothree.slidinguppanel.SlidingUpPanelLayout
