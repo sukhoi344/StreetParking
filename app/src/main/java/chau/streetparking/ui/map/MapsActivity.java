@@ -216,7 +216,7 @@ public class MapsActivity extends AppCompatActivity {
 //                    updateLocationAddress(latLng);
 //                }
 
-                updateLocationAddress(latLng);
+//                updateLocationAddress(latLng);
 
                 // Display venues and parking spots on the visible map region
                 LatLngBounds latLngBounds = googleMap.getProjection().getVisibleRegion().latLngBounds;
