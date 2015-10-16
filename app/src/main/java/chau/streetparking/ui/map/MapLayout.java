@@ -79,6 +79,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     private Date   startDate, endDate;
     private TimeWrapper timeWrapper;
     private String currentTag = TAG_FROM;
+    private volatile boolean settingSearchDetailText = false;
 
     public interface OnLayoutMoved {
         /**
@@ -178,6 +179,27 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         }
     }
 
+    public void setSearchAddress(Address address) {
+        settingSearchDetailText = true;
+
+        if (address != null) {
+            String searchText = "";
+            if (address.getMaxAddressLineIndex() >= 0)
+                searchText += address.getAddressLine(0);
+            if (address.getMaxAddressLineIndex() >= 1)
+                searchText += " " + address.getAddressLine(1);
+
+            addressWrapper = new AddressWrapper();
+            addressWrapper.address = address;
+            addressWrapper.text = searchText;
+
+            etLocation.setText(searchText);
+            etLocation.setSelection(searchText.length());
+        }
+
+        settingSearchDetailText = false;
+    }
+
     public Date getStartDate() {
         return startDate;
     }
@@ -262,7 +284,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
 //        revealView.setVisibility(View.VISIBLE);
     }
 
-    private void setStartEndDates() {
+    private void initStartEndDates() {
         Calendar startCal = Calendar.getInstance();
         Calendar endCal = Calendar.getInstance();
 
@@ -363,7 +385,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         inflater.inflate(R.layout.include_map_layout, this, true);
         getWidgets();
 
-        setStartEndDates();
+        initStartEndDates();
         setupSearchDetail();
         setupSuggestView();
     }
@@ -402,12 +424,14 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                int[] location = new int[2];
-                etLocation.getLocationInWindow(location);
-                int bottomMargin = getHeight() - location[1] - ImageUtil.getPixelFromDP(65);
+                if (!settingSearchDetailText) {
+                    int[] location = new int[2];
+                    etLocation.getLocationInWindow(location);
+                    int bottomMargin = getHeight() - location[1] - ImageUtil.getPixelFromDP(65);
 
-                viewSuggest.setMargin(bottomMargin, location[0], location[0]);
-                viewSuggest.search(s.toString());
+                    viewSuggest.setMargin(bottomMargin, location[0], location[0]);
+                    viewSuggest.search(s.toString());
+                }
             }
 
             @Override
@@ -493,7 +517,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     private void getWidgets() {
         mapContainer = findViewById(R.id.map_container);
         locationLayout = (ViewGroup) findViewById(R.id.location_layout);
-        tvLocation = (TextView) findViewById(R.id.tv_location);
+        tvLocation = (TextView) locationLayout.findViewById(R.id.title2);
 
         SupportMapFragment supportMapFragment = (SupportMapFragment) ((FragmentActivity) getContext())
                 .getSupportFragmentManager().findFragmentById(R.id.map);

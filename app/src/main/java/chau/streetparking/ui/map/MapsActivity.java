@@ -1,30 +1,18 @@
 package chau.streetparking.ui.map;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.os.Handler;
-import android.support.design.widget.FloatingActionButton;
+import android.os.*;
+import android.os.Process;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.LinearLayout;
-import android.widget.Toast;
 
-import com.appyvet.rangebar.RangeBar;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -47,20 +35,16 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.parse.ParseUser;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
-import java.util.Date;
 import java.util.List;
 
 import chau.streetparking.R;
 import chau.streetparking.datamodels.parse.ParkingLot;
-import chau.streetparking.datamodels.parse.Request;
 import chau.streetparking.datamodels.parse.User;
-import chau.streetparking.ui.DividerItemDecoration;
 import chau.streetparking.ui.garage.MyGarageActivity;
 import chau.streetparking.ui.ProfileActivity;
 import chau.streetparking.ui.SearchLocationActivity;
 import chau.streetparking.ui.login.StartActivity;
 import chau.streetparking.ui.payment.PaymentActivity;
-import chau.streetparking.util.ImageUtil;
 import chau.streetparking.util.Logger;
 import chau.streetparking.util.MapUtil;
 
@@ -429,6 +413,7 @@ public class MapsActivity extends AppCompatActivity {
                         if (lastLocation != null) {
                             LatLng latLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
                             showMyLocation(latLng);
+                            initSearchDetail(latLng);
                         }
                     }
 
@@ -445,6 +430,31 @@ public class MapsActivity extends AppCompatActivity {
                 .build();
 
         mGoogleApiClient.connect();
+    }
+
+    private void initSearchDetail(final LatLng latLng) {
+        if (latLng != null) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+                    try {
+                        List<Address> matches = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+                        final Address bestMatch = (matches.isEmpty() ? null : matches.get(0));
+                        if (bestMatch != null) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mapLayout.setSearchAddress(bestMatch);
+                                }
+                            });
+                        }
+                    } catch (Exception e) {
+                        Logger.printStackTrace(e);
+                    }
+                }
+            }).start();
+        }
     }
 
     private void showMyLocation(LatLng latLng) {
