@@ -74,7 +74,9 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     private LocationSuggestView viewSuggest;
     private AddressWrapper addressWrapper;
 
-    private TextView    tvLocation;
+    // Search Detail bar
+    private TextView tvSearchBarLocation;
+    private TextView tvSearchBarTime;
 
     private Date   startDate, endDate;
     private TimeWrapper timeWrapper;
@@ -158,7 +160,7 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
      * @param location
      */
     public void setLocationText(String location) {
-        tvLocation.setText(location);
+        tvSearchBarTime.setText(location);
     }
 
     public void setLocationLayoutOnClick(OnClickListener onClickListener) {
@@ -517,7 +519,8 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
     private void getWidgets() {
         mapContainer = findViewById(R.id.map_container);
         locationLayout = (ViewGroup) findViewById(R.id.location_layout);
-        tvLocation = (TextView) locationLayout.findViewById(R.id.title2);
+        tvSearchBarTime = (TextView) locationLayout.findViewById(R.id.title2);
+        tvSearchBarLocation = (TextView) locationLayout.findViewById(R.id.title1);
 
         SupportMapFragment supportMapFragment = (SupportMapFragment) ((FragmentActivity) getContext())
                 .getSupportFragmentManager().findFragmentById(R.id.map);
