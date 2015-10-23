@@ -76,7 +76,7 @@ public class MapsActivity extends AppCompatActivity {
     private ParkingDetailDisplayer  parkingDetailDisplayer;
 
     private Geocoder geocoder;
-    private TaskGetAddress taskGetAddress;
+//    private TaskGetAddress taskGetAddress;
     private int seekBarRadiusInMeter = 0;
 
     // Drawer variables
@@ -114,14 +114,14 @@ public class MapsActivity extends AppCompatActivity {
         if (resultCode != RESULT_OK)
             return;
 
-        if (requestCode == REQUEST_CODE_SEARCH) {
-            Address address = data.getParcelableExtra(SearchLocationActivity.EXTRA_ADDRESS);
-            if (address != null && address.hasLatitude() && address.hasLatitude()) {
-                LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                moveCamera(latLng, false);
-                updateLocationAddress(latLng);
-            }
-        }
+//        if (requestCode == REQUEST_CODE_SEARCH) {
+//            Address address = data.getParcelableExtra(SearchLocationActivity.EXTRA_ADDRESS);
+//            if (address != null && address.hasLatitude() && address.hasLatitude()) {
+//                LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+//                moveCamera(latLng, false);
+//                updateLocationAddress(latLng);
+//            }
+//        }
 
         if (requestCode == REQUEST_CODE_PROFILE && data != null) {
             int code = data.getIntExtra(ProfileActivity.EXTRA_PROFILE, ProfileActivity.PROFILE_NO_CHANGE);
@@ -292,25 +292,25 @@ public class MapsActivity extends AppCompatActivity {
 
     }
 
-    private void updateLocationAddress(LatLng latLng) {
-        try {
-            if (latLng != null && taskGetAddress != null && taskGetAddress.isLoading) {
-                taskGetAddress.cancel(true);
-            }
-
-            taskGetAddress = new TaskGetAddress();
-            taskGetAddress.execute(latLng);
-        } catch (Exception e) {}
-    }
-
-    private void updateCurrentAddress() {
-        if (googleMap != null) {
-            mapLayout.setMyLocationBtnMargin(getResources()
-                    .getDimensionPixelSize(R.dimen.google_map_top_margin));
-            LatLng latLng = googleMap.getCameraPosition().target;
-            new TaskGetAddress().execute(latLng);
-        }
-    }
+//    private void updateLocationAddress(LatLng latLng) {
+//        try {
+//            if (latLng != null && taskGetAddress != null && taskGetAddress.isLoading) {
+//                taskGetAddress.cancel(true);
+//            }
+//
+//            taskGetAddress = new TaskGetAddress();
+//            taskGetAddress.execute(latLng);
+//        } catch (Exception e) {}
+//    }
+//
+//    private void updateCurrentAddress() {
+//        if (googleMap != null) {
+//            mapLayout.setMyLocationBtnMargin(getResources()
+//                    .getDimensionPixelSize(R.dimen.google_map_top_margin));
+//            LatLng latLng = googleMap.getCameraPosition().target;
+//            new TaskGetAddress().execute(latLng);
+//        }
+//    }
 
     private void setupDrawer(Toolbar toolbar) {
         String name = user.getFirstName() + " " + user.getLastName();
@@ -525,42 +525,42 @@ public class MapsActivity extends AppCompatActivity {
         slidingPanelUp = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
     }
 
-    private class TaskGetAddress extends AsyncTask<LatLng, Void, String> {
-        private boolean isLoading = false;
-
-        @Override
-        protected void onPreExecute() {
-            isLoading = true;
-        }
-
-        @Override
-        protected String doInBackground(LatLng... params) {
-            try {
-                List<Address> matches = geocoder.getFromLocation(params[0].latitude, params[0].longitude, 1);
-                Address bestMatch = (matches.isEmpty() ? null : matches.get(0));
-
-                if (bestMatch != null) {
-                    return bestMatch.getAddressLine(0);
-                }
-
-            } catch (Exception e) {
-                Logger.printStackTrace(e);
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            try {
-                isLoading = false;
-
-                if (!isCancelled() && s != null && !s.isEmpty()) {
-                    mapLayout.setLocationText(s);
-                }
-            } catch (Exception e) {}
-            finally {
-            }
-        }
-    }
+//    private class TaskGetAddress extends AsyncTask<LatLng, Void, String> {
+//        private boolean isLoading = false;
+//
+//        @Override
+//        protected void onPreExecute() {
+//            isLoading = true;
+//        }
+//
+//        @Override
+//        protected String doInBackground(LatLng... params) {
+//            try {
+//                List<Address> matches = geocoder.getFromLocation(params[0].latitude, params[0].longitude, 1);
+//                Address bestMatch = (matches.isEmpty() ? null : matches.get(0));
+//
+//                if (bestMatch != null) {
+//                    return bestMatch.getAddressLine(0);
+//                }
+//
+//            } catch (Exception e) {
+//                Logger.printStackTrace(e);
+//            }
+//
+//            return null;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(String s) {
+//            try {
+//                isLoading = false;
+//
+//                if (!isCancelled() && s != null && !s.isEmpty()) {
+//                    mapLayout.setLocationText(s);
+//                }
+//            } catch (Exception e) {}
+//            finally {
+//            }
+//        }
+//    }
 }

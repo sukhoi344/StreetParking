@@ -145,13 +145,16 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
 
         if (currentTag == TAG_FROM) {
             startDate = cal.getTime();
-            tvStarting.setText(getDateStringScheduled((int) minDiff));
-            setEndingDate(rangeBarEnding.getRightIndex());
+            endDate = getEndDateFromRightPin(startDate, rangeBarEnding.getRightIndex());
+
+            tvStarting.setText(getDateStringScheduled(startDate));
         } else {
-            String timeString = getDateStringScheduled((int) minDiff);
-            timeString += " (" + getHoursStringAhead((int) minDiff) + ")";
-            tvEnding.setText(timeString);
+            endDate = cal.getTime();
         }
+
+        String endString = getDateStringScheduled(endDate) +
+                " (" + getTimeStringAhead(startDate, endDate) + ")";
+        tvEnding.setText(endString);
     }
 
 
@@ -303,34 +306,41 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         rangeBarStarting.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
             @Override
             public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex, int rightPinIndex, String leftPinValue, String rightPinValue) {
-                int value = rightPinIndex;
-                int minutes = (int) (value / 2.0f * 60);
-
-                tvStarting.setText(getDateStringScheduled(minutes));
+                int minutes = (int) (rightPinIndex / 2.0f * 60);
 
                 Calendar cal = Calendar.getInstance();
                 cal.add(Calendar.MINUTE, minutes);
                 startDate = cal.getTime();
 
+                tvStarting.setText(getDateStringScheduled(startDate));
+
                 // Correct the ending date
-                setEndingDate(rangeBarEnding.getRightIndex());
+                endDate = getEndDateFromRightPin(startDate, rangeBarEnding.getRightIndex());
+
+                String endString = getDateStringScheduled(endDate) +
+                        " (" + getTimeStringAhead(startDate, endDate) + ")";
+                tvEnding.setText(endString);
             }
         });
 
         rangeBarEnding.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
             @Override
             public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex, int rightPinIndex, String leftPinValue, String rightPinValue) {
-                setEndingDate(rightPinIndex);
+                endDate = getEndDateFromRightPin(startDate, rightPinIndex);
+                String endString = getDateStringScheduled(endDate) +
+                        " (" + getTimeStringAhead(startDate, endDate) + ")";
+                tvEnding.setText(endString);
             }
         });
 
-        String endingString = getDateStringScheduled(60 * 3) + " (" + getHoursStringAhead(60 * 3) + ")";
+        String endString = getDateStringScheduled(endDate) +
+                " (" + getTimeStringAhead(startDate, endDate) + ")";
 
-        tvStarting.setText(getDateStringScheduled(0));
-        tvEnding.setText(endingString);
+        tvStarting.setText(getDateStringScheduled(startDate));
+        tvEnding.setText(endString);
     }
 
-    private void setEndingDate(int rightPinIndex) {
+    private Date getEndDateFromRightPin(Date startDate, int rightPinIndex) {
         int value = rightPinIndex + 1;
         int minAfterAdded = (int) (value / 2.0f * 60);
 
@@ -338,20 +348,33 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         int minStartAdded =  (int) (startDate.getTime() - currentCal.getTimeInMillis()) / (1000 * 60);
         int totalMin = minAfterAdded + minStartAdded;
 
-        String timeString = getDateStringScheduled(totalMin);
-        timeString += " (" + getHoursStringAhead(totalMin) + ")";
-
-        tvEnding.setText(timeString);
-
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.MINUTE, totalMin);
-        endDate = cal.getTime();
+        return cal.getTime();
     }
 
-    private String getDateStringScheduled(int minutes) {
+//    private void setEndingDate(int rightPinIndex) {
+//        int value = rightPinIndex + 1;
+//        int minAfterAdded = (int) (value / 2.0f * 60);
+//
+//        Calendar currentCal = Calendar.getInstance();
+//        int minStartAdded =  (int) (startDate.getTime() - currentCal.getTimeInMillis()) / (1000 * 60);
+//        int totalMin = minAfterAdded + minStartAdded;
+//
+//        Calendar cal = Calendar.getInstance();
+//        cal.add(Calendar.MINUTE, totalMin);
+//        endDate = cal.getTime();
+//
+//        String timeString = getDateStringScheduled(endDate);
+//        timeString += " (" + getTimeStringAhead(totalMin) + ")";
+//
+//        tvEnding.setText(timeString);
+//    }
+
+    private String getDateStringScheduled(Date scheduledDate) {
         Calendar currentCalendar = Calendar.getInstance();
         Calendar scheduledCalendar = Calendar.getInstance();
-        scheduledCalendar.add(Calendar.MINUTE, minutes);
+        scheduledCalendar.setTime(scheduledDate);
 
         int dayOfYearScheduled = scheduledCalendar.get(Calendar.DAY_OF_YEAR);
         int dayOfYearCurrent = currentCalendar.get(Calendar.DAY_OF_YEAR);
@@ -371,11 +394,8 @@ public class MapLayout extends FrameLayout implements TimePickerDialog.OnTimeSet
         return timeString;
     }
 
-    private String getHoursStringAhead(int minutes) {
-        Calendar scheduledCalendar = Calendar.getInstance();
-        scheduledCalendar.add(Calendar.MINUTE, minutes);
-
-        long minDiff = (scheduledCalendar.getTimeInMillis() - startDate.getTime()) / (1000 * 60);
+    private String getTimeStringAhead(Date startDate, Date endDate) {
+        long minDiff = (endDate.getTime() - startDate.getTime()) / (1000 * 60);
         double hourDiff = minDiff / 60.0;
         String hourText = String.format("%.1f", hourDiff);
 
